@@ -1,0 +1,76 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Section from "../components/Section.astro";
+import PageHero from "../components/PageHero.astro";
+import CTA from "../components/CTA.astro";
+---
+
+<BaseLayout
+  title="License | AGPL-3.0 brain + Apache-2.0 agents | z4j"
+  description="z4j uses split licensing: the brain dashboard is AGPL-3.0, and every agent pip package you install in your app is Apache-2.0 so your code stays unencumbered."
+  keywords={["z4j license", "AGPL-3.0", "Apache-2.0", "split licensing", "open source license"]}
+>
+  <PageHero
+    breadcrumb={[{ label: "License" }]}
+    title="Open source. Split licensed."
+    subtitle="Every component has a license chosen for the right reason. Agents are Apache 2.0 so your app code is never AGPL-tainted. The brain is AGPL v3 to keep the playing field level."
+  />
+
+  <Section>
+    <div class="space-y-8 max-w-3xl">
+
+      <article class="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]/40 p-6">
+        <h2 class="text-lg font-semibold mb-2">Agent packages: Apache 2.0</h2>
+        <p class="text-sm text-[var(--color-muted)] mb-4">
+          <code>z4j-django</code>, <code>z4j-flask</code>, <code>z4j-fastapi</code>, <code>z4j-bare</code>,
+          <code>z4j-celery</code>, <code>z4j-rq</code>, <code>z4j-dramatiq</code>, <code>z4j-huey</code>,
+          <code>z4j-arq</code>, <code>z4j-taskiq</code>, and all scheduler packages.
+        </p>
+        <ul class="space-y-1 text-sm text-[var(--color-muted)]">
+          <li class="flex items-start gap-2"><span class="text-[var(--color-accent)]">✓</span> Use in proprietary applications</li>
+          <li class="flex items-start gap-2"><span class="text-[var(--color-accent)]">✓</span> Modify, fork, redistribute</li>
+          <li class="flex items-start gap-2"><span class="text-[var(--color-accent)]">✓</span> No copyleft obligations on your code</li>
+        </ul>
+      </article>
+
+      <article class="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]/40 p-6">
+        <h2 class="text-lg font-semibold mb-2">Brain: AGPL v3</h2>
+        <p class="text-sm text-[var(--color-muted)] mb-4">
+          <code>z4j-brain</code>: the dashboard, REST API, WebSocket server, Postgres models, reconciliation worker.
+        </p>
+        <ul class="space-y-1 text-sm text-[var(--color-muted)]">
+          <li class="flex items-start gap-2"><span class="text-[var(--color-accent)]">✓</span> Self-host freely for internal use</li>
+          <li class="flex items-start gap-2"><span class="text-[var(--color-accent)]">✓</span> Modify and deploy internally</li>
+          <li class="flex items-start gap-2"><span class="text-[var(--color-warning)]">⚠</span> If you serve modifications to third parties over a network, you must open-source them</li>
+        </ul>
+      </article>
+
+      <article class="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]/40 p-6">
+        <h2 class="text-lg font-semibold mb-2">Commercial license</h2>
+        <p class="text-sm text-[var(--color-muted)] mb-4">
+          For organizations with AGPL-incompatible policies. Contact
+          <a href="mailto:licensing@z4j.com" class="text-[var(--color-primary)] hover:underline">licensing@z4j.com</a>.
+        </p>
+      </article>
+
+      <div class="mt-8 space-y-4 text-sm text-[var(--color-muted)]">
+        <h3 class="text-base font-semibold text-[var(--color-text)]">Our commitments</h3>
+        <ul class="space-y-2">
+          <li class="flex items-start gap-2"><span>•</span> Every released version keeps its license permanently. No retroactive re-licensing.</li>
+          <li class="flex items-start gap-2"><span>•</span> Security fixes ship in the open-source release on the same day as any commercial release.</li>
+          <li class="flex items-start gap-2"><span>•</span> The roadmap is public. Commercial direction is announced openly.</li>
+          <li class="flex items-start gap-2"><span>•</span> We make no "free forever" pledge. We commit to license stability, open roadmap, and honest communication.</li>
+        </ul>
+      </div>
+    </div>
+  </Section>
+
+  <CTA
+    title="Questions about licensing?"
+    subtitle="We're happy to clarify any licensing concerns."
+    primaryHref="mailto:licensing@z4j.com"
+    primaryLabel="Contact licensing"
+    secondaryHref="https://z4j.dev/reference/license/"
+    secondaryLabel="Read full details"
+  />
+</BaseLayout>

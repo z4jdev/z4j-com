@@ -1,0 +1,75 @@
+---
+import "../styles/global.css";
+import SiteNav from "../components/SiteNav.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import SEO from "../components/SEO.astro";
+
+interface Props {
+  title: string;
+  description?: string;
+  canonical?: string;
+  ogImage?: string;
+  ogType?: "website" | "article" | "product";
+  article?: {
+    publishedTime?: string;
+    modifiedTime?: string;
+    author?: string;
+    section?: string;
+    tags?: string[];
+  };
+  noindex?: boolean;
+  keywords?: string[];
+  jsonLd?: object | object[];
+  breadcrumbs?: Array<{ name: string; href: string }>;
+}
+
+const {
+  title,
+  description = "The control plane for Python task queues. One dashboard for Celery, RQ, Dramatiq, Huey, arq, and taskiq. Self-hosted, open source, production-ready.",
+  canonical,
+  ogImage,
+  ogType,
+  article,
+  noindex,
+  keywords,
+  jsonLd,
+  breadcrumbs,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="generator" content={Astro.generator} />
+    <SEO
+      title={title}
+      description={description}
+      canonical={canonical}
+      ogImage={ogImage}
+      ogType={ogType}
+      article={article}
+      noindex={noindex}
+      keywords={keywords}
+      jsonLd={jsonLd}
+      breadcrumbs={breadcrumbs}
+    />
+    <script is:inline>
+      (function(){var t=localStorage.getItem('z4j-theme')||
+        (matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+        document.documentElement.setAttribute('data-theme',t);
+      })();
+    </script>
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:bg-[var(--color-primary)] focus:px-3 focus:py-2 focus:text-white focus:text-sm">
+      Skip to main content
+    </a>
+    <SiteNav />
+    <main id="main" class="flex-1">
+      <slot />
+    </main>
+    <SiteFooter />
+  </body>
+</html>

@@ -1,0 +1,307 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Section from "../../components/Section.astro";
+import Card from "../../components/Card.astro";
+import CodeCopy from "../../components/CodeCopy.astro";
+import Icon from "../../components/Icon.astro";
+import Breadcrumb from "../../components/Breadcrumb.astro";
+import CTA from "../../components/CTA.astro";
+import { DEPLOYMENTS } from "../../data/deployments";
+import { ENGINES } from "../../data/engines";
+import { PLATFORMS } from "../../data/platforms";
+
+export function getStaticPaths() {
+  return DEPLOYMENTS.map((d) => ({
+    params: { slug: d.slug },
+    props: { deployment: d },
+  }));
+}
+
+const { deployment } = Astro.props;
+const other = DEPLOYMENTS.filter((d) => d.slug !== deployment.slug);
+
+const badgeClass: Record<string, string> = {
+  accent: "bg-[var(--color-accent)]/15 text-[var(--color-accent)]",
+  primary: "bg-[var(--color-primary)]/15 text-[var(--color-primary)]",
+  warning: "bg-[var(--color-warning)]/20 text-[var(--color-warning)]",
+};
+
+const productSchema = {
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  name: `Deploy z4j with ${deployment.name}`,
+  description: deployment.tagline,
+  totalTime: "PT5M",
+  step: [
+    {
+      "@type": "HowToStep",
+      position: 1,
+      name: `Install z4j via ${deployment.name}`,
+      text: deployment.install,
+    },
+  ],
+};
+
+const metaTitle = `Deploy z4j with ${deployment.name} | z4j`;
+const metaDescription = `${deployment.tagline} Best for: ${deployment.audience}.`.slice(0, 160);
+---
+
+<BaseLayout
+  title={metaTitle}
+  description={metaDescription}
+  keywords={[deployment.name, "z4j deploy", ...deployment.targetTiers]}
+  jsonLd={productSchema}
+  breadcrumbs={[
+    { name: "Install", href: "/install" },
+    { name: deployment.name, href: `/install/${deployment.slug}` },
+  ]}
+>
+  <Section compact>
+    <Breadcrumb items={[
+      { label: "Install", href: "/install" },
+      { label: deployment.name },
+    ]} />
+
+    <div class="flex flex-wrap items-center gap-4">
+      <div class="inline-flex size-16 items-center justify-center rounded-xl bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
+        <Icon name={deployment.icon} size={32} />
+      </div>
+      <div>
+        <div class="flex items-center gap-3">
+          <h1 class="text-4xl font-bold tracking-tight md:text-5xl">{deployment.name}</h1>
+          <span class={`rounded-full px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider ${badgeClass[deployment.badgeColor]}`}>
+            {deployment.badge}
+          </span>
+        </div>
+        <p class="mt-1 text-sm text-[var(--color-muted)]">For {deployment.audience}</p>
+      </div>
+    </div>
+
+    <p class="mt-6 max-w-3xl text-xl font-medium text-[var(--color-primary)]">{deployment.tagline}</p>
+
+    <div class="mt-4 flex flex-wrap gap-1.5">
+      {deployment.targetTiers.map((t) => (
+        <span class="rounded-full bg-[var(--color-surface-raised)] px-3 py-1 text-xs font-medium text-[var(--color-muted)]">
+          {t}
+        </span>
+      ))}
+    </div>
+  </Section>
+
+  <Section
+    eyebrow="Architecture"
+    title={`What runs: ${deployment.containers.length} ${deployment.containers.length === 1 ? "process" : "services"}`}
+    subtitle="z4j ships one image for the brain. Backend and dashboard are bundled. There is no separate frontend container."
+  >
+    <div class="grid gap-4 md:grid-cols-2">
+      {deployment.containers.map((c, i) => (
+        <div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
+          <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <span class="inline-flex size-8 items-center justify-center rounded-lg bg-[var(--color-primary)]/10 text-[var(--color-primary)] text-sm font-bold">
+                {i + 1}
+              </span>
+              <h3 class="text-base font-semibold">{c.name}</h3>
+            </div>
+            {c.image && (
+              <code class="truncate rounded bg-[var(--color-surface-raised)] px-2 py-0.5 font-mono text-[11px] text-[var(--color-muted)]">
+                {c.image}
+              </code>
+            )}
+          </div>
+          <p class="mt-3 text-sm leading-relaxed text-[var(--color-muted)]">{c.purpose}</p>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  <Section compact eyebrow="Install" title="Get running in minutes">
+    <CodeCopy code={deployment.install} lang={deployment.installLang} />
+    <p class="mt-3 text-xs text-[var(--color-muted)]">
+      After the brain is running, open <code class="rounded bg-[var(--color-surface-raised)] px-1.5 py-0.5 font-mono text-xs">http://localhost:7700</code> and sign in.
+    </p>
+  </Section>
+
+  <Section>
+    <div class="grid gap-8 md:grid-cols-2">
+      <div>
+        <h2 class="mb-4 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+          Requirements
+        </h2>
+        <ul class="space-y-2.5">
+          {deployment.requirements.map((r) => (
+            <li class="flex items-start gap-2.5 text-sm">
+              <Icon name="check" size={15} class="mt-0.5 text-[var(--color-accent)] shrink-0" />
+              <span>{r}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="space-y-4">
+        <div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
+          <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+            <Icon name="database" size={14} />
+            Database
+          </div>
+          <p class="mt-2">{deployment.database}</p>
+        </div>
+
+        <div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
+          <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+            <Icon name="trends" size={14} />
+            Scale envelope
+          </div>
+          <p class="mt-2 text-sm">{deployment.scaleLimit}</p>
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <Section eyebrow="Decision helper" title="Is this the right tier for you?">
+    <div class="grid gap-6 md:grid-cols-2">
+      <div class="rounded-xl border border-[var(--color-accent)]/30 bg-[var(--color-accent)]/5 p-6">
+        <h3 class="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-[var(--color-accent)]">
+          <Icon name="check" size={16} />
+          Use this when
+        </h3>
+        <ul class="space-y-2.5">
+          {deployment.whenToUse.map((u) => (
+            <li class="flex items-start gap-2.5 text-sm">
+              <Icon name="check" size={15} class="mt-0.5 text-[var(--color-accent)] shrink-0" />
+              <span>{u}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="rounded-xl border border-[var(--color-danger)]/30 bg-[var(--color-danger)]/5 p-6">
+        <h3 class="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-[var(--color-danger)]">
+          <Icon name="x" size={16} />
+          Not ideal when
+        </h3>
+        <ul class="space-y-2.5">
+          {deployment.whenNotToUse.map((u) => (
+            <li class="flex items-start gap-2.5 text-sm">
+              <Icon name="x" size={15} class="mt-0.5 text-[var(--color-danger)] shrink-0" />
+              <span class="text-[var(--color-muted)]">{u}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </Section>
+
+  <Section eyebrow="What ships" title="Capabilities in this tier">
+    <ul class="grid gap-3 md:grid-cols-2">
+      {
+        deployment.features.map((f) => (
+          <li class="flex items-center gap-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-3 text-sm">
+            {f.enabled ? (
+              <Icon name="check" size={16} class="text-[var(--color-accent)] shrink-0" />
+            ) : (
+              <Icon name="x" size={16} class="text-[var(--color-muted)]/60 shrink-0" />
+            )}
+            <span class={f.enabled ? "" : "text-[var(--color-muted)]/60 line-through"}>
+              {f.label}
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  {deployment.slug !== "pip" && (
+    <Section eyebrow="HTTPS" title="Put a TLS terminator in front">
+      <div class="grid gap-6 md:grid-cols-[1fr_auto] md:items-center">
+        <div class="max-w-2xl space-y-3 text-[var(--color-muted)] leading-relaxed">
+          <p>
+            The brain image binds HTTP on port 7700. In production, route traffic through a reverse proxy that terminates TLS. z4j does not bundle one because your infrastructure likely already has one.
+          </p>
+          <p>
+            For a homelab with a public DNS name, the optional Caddy compose overlay shipped in the repo gives you auto-HTTPS via Let's Encrypt in about two minutes. Teams with existing Traefik, Cloudflare, or nginx plug z4j in with a few lines of config.
+          </p>
+        </div>
+        <a
+          href="/install/tls"
+          class="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-primary)] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 transition-opacity shrink-0"
+        >
+          TLS setup guide
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 5h8m0 0L5 1m4 4L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </Section>
+  )}
+
+  <Section
+    eyebrow="Upgrade path"
+    title="How to move up a tier"
+    subtitle={deployment.upgradePath}
+  />
+
+  <Section eyebrow="Install adapters" title="Works with every engine and framework">
+    <h3 class="mb-3 text-sm font-semibold text-[var(--color-muted)]">Framework adapters</h3>
+    <div class="grid gap-4 md:grid-cols-3">
+      {
+        PLATFORMS.map((p) => (
+          <Card
+            href={`/platforms/${p.slug}`}
+            title={p.shortName}
+            icon={p.icon}
+            logo={p.logo}
+            description={p.tagline}
+          />
+        ))
+      }
+    </div>
+    <h3 class="mt-10 mb-3 text-sm font-semibold text-[var(--color-muted)]">Engine adapters</h3>
+    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {
+        ENGINES.map((e) => (
+          <Card
+            href={`/engines/${e.slug}`}
+            title={e.shortName}
+            icon={e.icon}
+            logo={e.logo}
+            description={e.tagline}
+          />
+        ))
+      }
+    </div>
+  </Section>
+
+  <Section eyebrow="Other deployments" title="Compare with">
+    <div class="grid gap-4 md:grid-cols-2">
+      {
+        other.map((d) => (
+          <a
+            href={`/install/${d.slug}`}
+            class="group flex items-start gap-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5 transition-all hover:-translate-y-0.5 hover:border-[var(--color-primary)]/40"
+          >
+            <div class="inline-flex size-10 items-center justify-center rounded-lg bg-[var(--color-primary)]/10 text-[var(--color-primary)] shrink-0">
+              <Icon name={d.icon} size={20} />
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <h3 class="text-base font-semibold truncate">{d.name}</h3>
+                <span class={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase ${badgeClass[d.badgeColor]}`}>
+                  {d.badge}
+                </span>
+              </div>
+              <p class="mt-1 text-sm text-[var(--color-muted)]">{d.tagline}</p>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </Section>
+
+  <CTA
+    title={`Ready to run z4j with ${deployment.name}?`}
+    subtitle="Copy the install command above, run it, and open the dashboard on port 7700."
+    primaryHref={deployment.docsHref}
+    primaryLabel="Full install guide"
+    secondaryHref="/install"
+    secondaryLabel="Compare tiers"
+  />
+</BaseLayout>

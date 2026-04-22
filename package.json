@@ -1,0 +1,31 @@
+{
+  "name": "z4j-com",
+  "version": "1.0.0",
+  "description": "z4j.com - public marketing site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev --host 0.0.0.0 --port 4321",
+    "build": "astro build",
+    "preview": "astro preview --host 0.0.0.0 --port 4322",
+    "check": "astro check",
+    "fmt": "prettier --write \"src/**/*.{astro,ts,tsx,md,css}\""
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.8",
+    "@astrojs/sitemap": "^3.7.2",
+    "@tailwindcss/vite": "^4.2.4",
+    "astro": "^6.1.8",
+    "tailwindcss": "^4.2.4",
+    "typescript": "^6.0.3"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "yaml@<2.8.3": ">=2.8.3"
+    }
+  }
+}

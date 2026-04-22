@@ -1,0 +1,2 @@
+/docs/* https://z4j.dev/:splat 301
+/api/* https://z4j.dev/api/:splat 301

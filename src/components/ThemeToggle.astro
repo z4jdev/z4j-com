@@ -1,0 +1,45 @@
+---
+---
+
+<button
+  id="theme-toggle"
+  type="button"
+  class="inline-flex size-9 items-center justify-center rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-muted)] hover:text-[var(--color-fg)] transition-colors"
+  aria-label="Toggle theme"
+>
+  <svg class="theme-icon-sun size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+  </svg>
+  <svg class="theme-icon-moon size-4 hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+  </svg>
+</button>
+
+<script is:inline>
+(function() {
+  const stored = localStorage.getItem('z4j-theme');
+  const pref = stored || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', pref);
+
+  function update(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('z4j-theme', theme);
+    const sun = document.querySelector('.theme-icon-sun');
+    const moon = document.querySelector('.theme-icon-moon');
+    if (sun && moon) {
+      sun.classList.toggle('hidden', theme === 'light');
+      moon.classList.toggle('hidden', theme === 'dark');
+    }
+  }
+
+  update(pref);
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.getElementById('theme-toggle');
+    if (btn) btn.addEventListener('click', function() {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      update(next);
+    });
+  });
+})();
+</script>

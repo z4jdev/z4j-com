@@ -1,0 +1,23 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+
+# Sitemaps
+Sitemap: https://z4j.com/sitemap-index.xml
+
+# Crawl-delay suggestions (optional, ignored by Google but respected by others)
+User-agent: *
+Crawl-delay: 1
+
+# Explicit allow for major AI crawlers (we want to be referenced in AI answers)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /

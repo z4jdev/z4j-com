@@ -1,0 +1,94 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Section from "../components/Section.astro";
+import Card from "../components/Card.astro";
+import PageHero from "../components/PageHero.astro";
+import CTA from "../components/CTA.astro";
+---
+
+<BaseLayout
+  title="Security posture | z4j"
+  description="z4j security posture: HMAC-chained audit log, Argon2id password hashing, defense-in-depth rate limits, redaction pipeline, SSRF hardening, two pre-release audits."
+  keywords={["z4j security", "HMAC audit log", "Argon2id hashing", "task queue security", "tamper-evident logs"]}
+>
+  <PageHero
+    breadcrumb={[{ label: "Security" }]}
+    title="Built for production from day one."
+    subtitle="Two rounds of pre-release security audits. Zero open HIGH or CRITICAL findings. Every control below is enforced end-to-end."
+  />
+
+  <Section>
+    <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+      <Card title="HMAC-chained audit log" icon="audit-log" description="Per-row HMAC-SHA256 signed by the server secret + prev_row_hmac chain. Tamper-evident against both row modification AND deletion, even by a DBA with raw table access." />
+      <Card title="Argon2id password hashing" icon="fingerprint" description="64 MiB memory, 3 iterations, parallelism 4. Password policy: min 12 chars, 3-of-4 character classes, ~1,500 denylist entries." />
+      <Card title="Wire-protocol HMAC v2" icon="key" description="Every WebSocket frame signed. Replay guard (±60s + nonce + monotonic seq). Session-bound frames. SignatureError closes the socket with code 4403." />
+      <Card title="CSRF double-submit" icon="shield" description="__Host-prefixed CSRF cookie + X-CSRF-Token header required on every mutating endpoint. Constant-time comparison." />
+      <Card title="Secure cookies" icon="lock" description="HttpOnly session cookie, Secure + SameSite=Lax in prod, __Host- prefix. No JS access to session tokens." />
+      <Card title="IP rate limits" icon="rate-limiting" description="/auth/login (20/min), /invitations (30/min), /auth/password-reset (10/min). Bounded memory via inline prune + 120-char key cap." />
+      <Card title="Account lockout" icon="lock" description="5 failed login attempts → 15-minute account lockout. Combines with IP rate limits for layered defense." />
+      <Card title="Redaction pipeline" icon="redaction" description="Recursive scrubber at the agent (~40 patterns: API keys, tokens, AWS creds, private keys). Defense-in-depth re-scrub on the brain." />
+      <Card title="SSRF hardening" icon="shield" description="Every outbound URL (webhooks, SMTP, Slack) passes through: private-IP block, DNS-rebinding resolve-before-dial, scheme allow-list." />
+      <Card title="HSTS + CSP" icon="lock" description="Strict-Transport-Security (1yr), strict Content-Security-Policy (no unsafe-inline, no unsafe-eval), X-Frame-Options: DENY, Referrer-Policy: strict-origin." />
+      <Card title="RBAC everywhere" icon="rbac" description="Every mutating endpoint checks membership + role. UI mirrors the server policy (useCan hook). Cross-project access = 403." />
+      <Card title="Secret storage" icon="key" description="Tokens stored as HMAC-SHA256 hashes only, never plaintext. Server secret in env, not on disk. No 'recovery' codes." />
+    </div>
+  </Section>
+
+  <Section
+    eyebrow="audit trail"
+    title="Pre-release security audits"
+    subtitle="Findings are public. Fixes are in-tree. Methodology is documented."
+  >
+    <div class="grid gap-4 md:grid-cols-2">
+      <Card
+        href="https://github.com/z4jdev/z4j/blob/main/docs/SECURITY_AUDIT_PRERELEASE.md"
+        title="Pre-release audit"
+        description="Dec 2025 deep pass: OpenAPI-driven auth bypass, IDOR, CSRF, SSRF, XSS, rate limits, HMAC tampering. Zero HIGH/CRITICAL open."
+      />
+      <Card
+        href="https://github.com/z4jdev/z4j/blob/main/docs/SECURITY_AUDIT_FINDINGS.md"
+        title="Prior audit rounds (6 batches)"
+        description="Sept 2025 to Feb 2026, six adversarial audit rounds. All findings closed pre-v1.0."
+      />
+      <Card
+        href="https://github.com/z4jdev/z4j/blob/main/docs/SECURITY_HARDENING_RQ.md"
+        title="z4j-rq hardening"
+        description="Adapter-specific adversarial pass on z4j-rq. 70 unit tests + security scenarios all green."
+      />
+      <Card
+        href="https://github.com/z4jdev/z4j/blob/main/docs/SECURITY_HARDENING_DRAMATIQ.md"
+        title="z4j-dramatiq hardening"
+        description="Adapter-specific adversarial pass on z4j-dramatiq (including dual-broker Redis + RabbitMQ)."
+      />
+    </div>
+  </Section>
+
+  <Section eyebrow="disclosure" title="Reporting a vulnerability">
+    <div class="prose-like max-w-3xl space-y-4 text-[var(--color-muted)] leading-relaxed">
+      <p>
+        Please report security issues privately to
+        <a href="mailto:security@z4j.com" class="text-[var(--color-primary)] hover:underline">security@z4j.com</a>.
+        Include a clear reproduction, expected vs. actual behavior, and a
+        severity estimate.
+      </p>
+      <p>
+        <strong class="text-[var(--color-fg)]">Response targets:</strong>
+        initial acknowledgment within 48 hours; triage within 7 days;
+        fix + advisory within 30 days for HIGH or CRITICAL findings.
+      </p>
+      <p>
+        We credit reporters in the advisory (opt-in). We do not offer a
+        paid bounty at this time.
+      </p>
+    </div>
+  </Section>
+
+  <CTA
+    title="Read the full security docs"
+    subtitle="Threat model, controls, CVE disclosure policy, compliance posture: all on z4j.dev."
+    primaryHref="https://z4j.dev/security/"
+    primaryLabel="Security docs"
+    secondaryHref="mailto:security@z4j.com"
+    secondaryLabel="Report a vulnerability"
+  />
+</BaseLayout>

@@ -1,0 +1,96 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Section from "../../components/Section.astro";
+import Card from "../../components/Card.astro";
+import PageHero from "../../components/PageHero.astro";
+import CTA from "../../components/CTA.astro";
+import { ENGINES } from "../../data/engines";
+---
+
+<BaseLayout
+  title="Supported task queue engines | z4j"
+  description="z4j supports six Python task queue engines: Celery, RQ, Dramatiq, Huey, arq, and taskiq. One dashboard, one set of actions, one audit log across every engine."
+  keywords={["Celery dashboard", "RQ dashboard", "Dramatiq dashboard", "Huey dashboard", "arq dashboard", "taskiq dashboard"]}
+>
+  <PageHero
+    breadcrumb={[{ label: "Engines" }]}
+    title="Every Python task queue that matters."
+    subtitle="Each engine adapter is a separate Apache-2.0 pip package. Install only the ones you need. Mix them freely within a project."
+  />
+
+  <Section>
+    <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+      {
+        ENGINES.map((e) => (
+          <Card
+            href={`/engines/${e.slug}`}
+            title={e.shortName}
+            icon={e.icon}
+            logo={e.logo}
+            description={e.tagline}
+          >
+            <div class="mt-2 flex flex-wrap gap-1">
+              {e.broker.slice(0, 3).map((b) => (
+                <span class="rounded bg-[var(--color-border)]/50 px-1.5 py-0.5 text-[10px] text-[var(--color-muted)]">
+                  {b}
+                </span>
+              ))}
+            </div>
+          </Card>
+        ))
+      }
+    </div>
+  </Section>
+
+  <Section
+    eyebrow="comparison"
+    title="Action surface at a glance"
+    subtitle="What each engine supports natively vs. what's polyfilled by the brain. Grey cells = physics-level limitations (engine has no remote-control channel or no bulk-enumeration primitive)."
+  >
+    <div class="overflow-x-auto rounded-xl border border-[var(--color-border)]">
+      <table class="w-full text-sm">
+        <thead class="bg-[var(--color-surface)]">
+          <tr class="text-left">
+            <th class="px-4 py-3 font-medium sticky left-0 bg-[var(--color-surface)]">Action</th>
+            {ENGINES.map((e) => (
+              <th class="px-4 py-3 font-medium text-center">{e.shortName}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {
+            ["submit_task", "retry_task", "cancel_task", "bulk_retry", "purge_queue", "requeue_dead_letter", "restart_worker", "rate_limit"].map((action) => (
+              <tr class="border-t border-[var(--color-border)]">
+                <td class="px-4 py-3 font-mono text-xs sticky left-0 bg-[var(--color-bg)]">{action}</td>
+                {ENGINES.map((e) => {
+                  const native = e.nativeActions.some((a) => a.startsWith(action));
+                  const polyfill = e.brainPolyfilledActions.some((a) => a.startsWith(action));
+                  const cls = native
+                    ? "text-[var(--color-accent)]"
+                    : polyfill
+                      ? "text-[var(--color-primary)]"
+                      : "text-[var(--color-muted)]/40";
+                  const label = native ? "native" : polyfill ? "polyfill" : "-";
+                  return <td class={`px-4 py-3 text-center ${cls}`}>{label}</td>;
+                })}
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="mt-4 text-xs text-[var(--color-muted)]">
+      <span class="text-[var(--color-accent)]">native</span> = engine implements it directly.
+      <span class="text-[var(--color-primary)]">polyfill</span> = brain lowers to submit_task transparently.
+    </p>
+  </Section>
+
+  <CTA
+    title="Don't see your engine?"
+    subtitle="z4j's Protocol is stable and public. Each adapter is ~300 LOC. We'd love a contribution."
+    primaryHref="https://github.com/z4jdev/z4j"
+    primaryLabel="Open an issue"
+    secondaryHref="https://z4j.dev/contributing/adding-an-engine/"
+    secondaryLabel="Adapter guide"
+  />
+</BaseLayout>

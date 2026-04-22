@@ -1,0 +1,489 @@
+---
+interface Props {
+  slug: string;
+  title: string;
+}
+const { slug, title } = Astro.props;
+
+// Color tokens for mockups (work in both light and dark theme since SVG
+// uses fixed colors that read well on both code-bg backgrounds).
+const C = {
+  bg: "#0b0d1a",
+  panel: "#111827",
+  border: "#1e293b",
+  muted: "#64748b",
+  text: "#e2e8f0",
+  subtext: "#94a3b8",
+  accent: "#22c55e",
+  primary: "#7c3aed",
+  warning: "#f59e0b",
+  danger: "#ef4444",
+  info: "#3b82f6",
+};
+---
+
+<figure class="overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-code-bg)]">
+  <div class="flex items-center gap-2 border-b border-white/10 px-4 py-2.5">
+    <span class="size-2.5 rounded-full bg-[#ef4444]/70"></span>
+    <span class="size-2.5 rounded-full bg-[#f59e0b]/70"></span>
+    <span class="size-2.5 rounded-full bg-[#22c55e]/70"></span>
+    <span class="ml-3 font-mono text-xs text-slate-400">z4j dashboard &mdash; {title}</span>
+  </div>
+
+  <svg viewBox="0 0 960 540" class="w-full h-auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label={`${title} screenshot mockup`}>
+    <rect width="960" height="540" fill={C.bg}/>
+
+    {slug === "unified-actions" && (
+      <>
+        <text x="32" y="48" font-family="Inter" font-size="18" font-weight="700" fill={C.text}>Tasks</text>
+        <text x="32" y="68" font-family="Inter" font-size="12" fill={C.subtext}>3 selected</text>
+        <g transform="translate(280, 30)">
+          <rect width="116" height="36" rx="8" fill={C.primary} opacity="0.15" stroke={C.primary}/>
+          <text x="58" y="23" text-anchor="middle" font-family="Inter" font-size="12" font-weight="600" fill={C.primary}>Retry (3)</text>
+        </g>
+        <g transform="translate(404, 30)">
+          <rect width="108" height="36" rx="8" fill={C.panel} stroke={C.border}/>
+          <text x="54" y="23" text-anchor="middle" font-family="Inter" font-size="12" fill={C.text}>Cancel</text>
+        </g>
+        <g transform="translate(520, 30)">
+          <rect width="108" height="36" rx="8" fill={C.panel} stroke={C.border}/>
+          <text x="54" y="23" text-anchor="middle" font-family="Inter" font-size="12" fill={C.text}>Bulk retry</text>
+        </g>
+        <g transform="translate(636, 30)">
+          <rect width="108" height="36" rx="8" fill={C.panel} stroke={C.border}/>
+          <text x="54" y="23" text-anchor="middle" font-family="Inter" font-size="12" fill={C.text}>Purge</text>
+        </g>
+
+        {[0,1,2,3,4,5,6].map((i) => (
+          <g transform={`translate(32, ${100 + i * 55})`}>
+            <rect width="896" height="45" rx="8" fill={C.panel} stroke={C.border}/>
+            {i < 3 && <rect width="3" height="45" fill={C.primary}/>}
+            <circle cx="24" cy="22" r="6" fill={i < 3 ? C.primary : i === 3 ? C.accent : i === 4 ? C.danger : C.info}/>
+            <text x="46" y="20" font-family="JetBrains Mono" font-size="11" fill={C.text}>email.send_welcome(user_id={i + 1001})</text>
+            <text x="46" y="34" font-family="Inter" font-size="10" fill={C.subtext}>{i < 3 ? "failed  ·  celery" : i === 3 ? "succeeded  ·  rq" : i === 4 ? "failed  ·  dramatiq" : "running  ·  huey"}</text>
+            <text x="780" y="28" font-family="JetBrains Mono" font-size="10" fill={C.subtext}>{i < 3 ? "2s ago" : `${i * 5}s ago`}</text>
+          </g>
+        ))}
+      </>
+    )}
+
+    {slug === "reconciliation" && (
+      <>
+        <text x="32" y="48" font-family="Inter" font-size="18" font-weight="700" fill={C.text}>Reconciliation worker</text>
+        <text x="32" y="68" font-family="Inter" font-size="12" fill={C.subtext}>Sweeping stuck tasks every 60s</text>
+
+        <g transform="translate(32, 100)">
+          <rect width="440" height="180" rx="10" fill={C.panel} stroke={C.border}/>
+          <text x="20" y="30" font-family="Inter" font-size="12" font-weight="600" fill={C.subtext}>LAST SWEEP</text>
+          <text x="20" y="68" font-family="Inter" font-size="40" font-weight="700" fill={C.accent}>247</text>
+          <text x="20" y="92" font-family="Inter" font-size="13" fill={C.text}>tasks probed</text>
+          <text x="160" y="68" font-family="Inter" font-size="40" font-weight="700" fill={C.primary}>12</text>
+          <text x="160" y="92" font-family="Inter" font-size="13" fill={C.text}>state corrected</text>
+          <text x="280" y="68" font-family="Inter" font-size="40" font-weight="700" fill={C.warning}>3</text>
+          <text x="280" y="92" font-family="Inter" font-size="13" fill={C.text}>marked lost</text>
+          <rect x="20" y="120" width="400" height="40" rx="6" fill={C.bg}/>
+          <text x="32" y="146" font-family="JetBrains Mono" font-size="11" fill={C.subtext}>Next sweep in 00:47</text>
+        </g>
+
+        <g transform="translate(488, 100)">
+          <rect width="440" height="180" rx="10" fill={C.panel} stroke={C.border}/>
+          <text x="20" y="30" font-family="Inter" font-size="12" font-weight="600" fill={C.subtext}>PER-ENGINE PROBE</text>
+          {[{e:"celery", n:162, c:C.info},{e:"rq", n:44, c:C.accent},{e:"dramatiq", n:21, c:C.warning},{e:"huey", n:20, c:C.primary}].map((row, i) => (
+            <g transform={`translate(20, ${55 + i * 28})`}>
+              <text x="0" y="12" font-family="JetBrains Mono" font-size="11" fill={C.text}>{row.e}</text>
+              <rect x="80" y="3" width={row.n * 2} height="12" rx="2" fill={row.c}/>
+              <text x={85 + row.n * 2} y="12" font-family="Inter" font-size="10" fill={C.subtext}>{row.n}</text>
+            </g>
+          ))}
+        </g>
+
+        <g transform="translate(32, 300)">
+          <text x="0" y="20" font-family="Inter" font-size="13" font-weight="600" fill={C.text}>Recent reconciliations</text>
+          {[0,1,2,3].map((i) => (
+            <g transform={`translate(0, ${40 + i * 42})`}>
+              <rect width="896" height="34" rx="6" fill={C.panel} stroke={C.border}/>
+              <circle cx="18" cy="17" r="4" fill={i === 2 ? C.danger : C.accent}/>
+              <text x="36" y="20" font-family="JetBrains Mono" font-size="11" fill={C.text}>task_id=01H6M...{i}42  ·  reports.generate_weekly</text>
+              <text x="600" y="20" font-family="Inter" font-size="11" fill={C.subtext}>{i === 2 ? "lost (engine unknown)" : `corrected: pending → succeeded`}</text>
+              <text x="840" y="20" font-family="JetBrains Mono" font-size="10" fill={C.subtext}>{i*3 + 1}m ago</text>
+            </g>
+          ))}
+        </g>
+      </>
+    )}
+
+    {slug === "trends" && (
+      <>
+        <text x="32" y="48" font-family="Inter" font-size="18" font-weight="700" fill={C.text}>Trends</text>
+        <text x="32" y="68" font-family="Inter" font-size="12" fill={C.subtext}>Last 24 hours</text>
+
+        <g transform="translate(680, 30)">
+          {["1h","6h","24h","7d"].map((w, i) => (
+            <g transform={`translate(${i * 58}, 0)`}>
+              <rect width="52" height="32" rx="6" fill={i === 2 ? C.primary : C.panel} stroke={C.border}/>
+              <text x="26" y="21" text-anchor="middle" font-family="Inter" font-size="11" fill={i === 2 ? "white" : C.text}>{w}</text>
+            </g>
+          ))}
+        </g>
+
+        <g transform="translate(32, 100)">
+          {[{l:"Success rate", v:"98.2%", c:C.accent},{l:"Failures", v:"127", c:C.danger},{l:"Throughput", v:"4.2k/h", c:C.info},{l:"Retries", v:"43", c:C.warning}].map((stat, i) => (
+            <g transform={`translate(${i * 228}, 0)`}>
+              <rect width="212" height="90" rx="10" fill={C.panel} stroke={C.border}/>
+              <text x="20" y="30" font-family="Inter" font-size="11" font-weight="600" fill={C.subtext}>{stat.l.toUpperCase()}</text>
+              <text x="20" y="72" font-family="Inter" font-size="32" font-weight="700" fill={stat.c}>{stat.v}</text>
+            </g>
+          ))}
+        </g>
+
+        <g transform="translate(32, 220)">
+          <rect width="896" height="280" rx="10" fill={C.panel} stroke={C.border}/>
+          <text x="20" y="30" font-family="Inter" font-size="13" font-weight="600" fill={C.text}>Task outcomes over time</text>
+
+          <g transform="translate(40, 50)">
+            {[0,1,2,3,4].map((i) => (
+              <line x1="0" y1={i*50} x2="820" y2={i*50} stroke={C.border} stroke-dasharray="2 4"/>
+            ))}
+            <polyline fill="none" stroke={C.accent} stroke-width="2.5" points="0,180 60,160 120,140 180,150 240,120 300,100 360,110 420,85 480,70 540,90 600,60 660,55 720,65 780,50 820,45"/>
+            <polyline fill="none" stroke={C.danger} stroke-width="2" stroke-dasharray="4 3" points="0,210 60,205 120,198 180,200 240,194 300,188 360,190 420,185 480,182 540,188 600,180 660,178 720,182 780,176 820,174"/>
+            <polyline fill="none" stroke={C.warning} stroke-width="2" stroke-dasharray="2 4" points="0,220 60,222 120,218 180,221 240,216 300,212 360,214 420,210 480,208 540,213 600,207 660,205 720,209 780,203 820,202"/>
+          </g>
+
+          <g transform="translate(40, 245)">
+            <circle cx="6" cy="6" r="4" fill={C.accent}/><text x="18" y="10" font-family="Inter" font-size="11" fill={C.subtext}>Success</text>
+            <circle cx="90" cy="6" r="4" fill={C.danger}/><text x="102" y="10" font-family="Inter" font-size="11" fill={C.subtext}>Failure</text>
+            <circle cx="172" cy="6" r="4" fill={C.warning}/><text x="184" y="10" font-family="Inter" font-size="11" fill={C.subtext}>Retry</text>
+          </g>
+        </g>
+      </>
+    )}
+
+    {slug === "visual-dag" && (
+      <>
+        <text x="32" y="48" font-family="Inter" font-size="18" font-weight="700" fill={C.text}>Task DAG</text>
+        <text x="32" y="68" font-family="Inter" font-size="12" fill={C.subtext}>chord: generate_report</text>
+
+        <g stroke={C.border} stroke-width="2" fill="none">
+          <path d="M480 120 L280 200"/>
+          <path d="M480 120 L480 200"/>
+          <path d="M480 120 L680 200"/>
+          <path d="M280 250 L280 330"/>
+          <path d="M480 250 L480 330"/>
+          <path d="M680 250 L680 330"/>
+          <path d="M280 380 L480 460"/>
+          <path d="M480 380 L480 460"/>
+          <path d="M680 380 L480 460"/>
+        </g>
+
+        {/* Root */}
+        <g transform="translate(420, 90)">
+          <rect width="120" height="56" rx="10" fill={C.primary} opacity="0.2" stroke={C.primary}/>
+          <text x="60" y="25" text-anchor="middle" font-family="Inter" font-size="12" font-weight="600" fill={C.primary}>generate_report</text>
+          <text x="60" y="42" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill={C.subtext}>running  ·  1.2s</text>
+        </g>
+
+        {/* Middle tier (parallel group) */}
+        {[{x:220,l:"fetch_orders",ok:true,t:"420ms"},{x:420,l:"fetch_users",ok:true,t:"380ms"},{x:620,l:"fetch_inventory",ok:false,t:"timeout"}].map((node) => (
+          <g transform={`translate(${node.x}, 200)`}>
+            <rect width="120" height="56" rx="10" fill={C.panel} stroke={node.ok ? C.border : C.danger} stroke-width={node.ok ? "1" : "2"}/>
+            <text x="60" y="25" text-anchor="middle" font-family="Inter" font-size="12" font-weight="600" fill={C.text}>{node.l}</text>
+            <text x="60" y="42" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill={node.ok ? C.accent : C.danger}>{node.ok ? `ok · ${node.t}` : `failed · ${node.t}`}</text>
+          </g>
+        ))}
+
+        {/* Third tier */}
+        {[{x:220,l:"transform_orders"},{x:420,l:"aggregate"},{x:620,l:"reconcile_stock"}].map((node) => (
+          <g transform={`translate(${node.x}, 330)`}>
+            <rect width="120" height="56" rx="10" fill={C.panel} stroke={C.border}/>
+            <text x="60" y="25" text-anchor="middle" font-family="Inter" font-size="12" font-weight="600" fill={C.text}>{node.l}</text>
+            <text x="60" y="42" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill={C.muted}>pending</text>
+          </g>
+        ))}
+
+        {/* Join */}
+        <g transform="translate(420, 460)">
+          <rect width="120" height="56" rx="10" fill={C.panel} stroke={C.border}/>
+          <text x="60" y="25" text-anchor="middle" font-family="Inter" font-size="12" font-weight="600" fill={C.text}>send_email</text>
+          <text x="60" y="42" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill={C.muted}>pending</text>
+        </g>
+      </>
+    )}
+
+    {slug === "rbac" && (
+      <>
+        <text x="32" y="48" font-family="Inter" font-size="18" font-weight="700" fill={C.text}>Memberships</text>
+        <text x="32" y="68" font-family="Inter" font-size="12" fill={C.subtext}>Project: billing-prod</text>
+
+        {[
+          {n:"Alice Chen", e:"alice@example.com", r:"Owner", rc:C.primary, init:"AC"},
+          {n:"Bob Martinez", e:"bob@example.com", r:"Admin", rc:C.info, init:"BM"},
+          {n:"Carlos Silva", e:"carlos@example.com", r:"Operator", rc:C.warning, init:"CS"},
+          {n:"Diana Park", e:"diana@example.com", r:"Operator", rc:C.warning, init:"DP"},
+          {n:"Evan Nakamura", e:"evan@example.com", r:"Viewer", rc:C.muted, init:"EN"},
+        ].map((u, i) => (
+          <g transform={`translate(32, ${100 + i * 68})`}>
+            <rect width="896" height="56" rx="10" fill={C.panel} stroke={C.border}/>
+            <circle cx="38" cy="28" r="18" fill={u.rc} opacity="0.25"/>
+            <text x="38" y="33" text-anchor="middle" font-family="Inter" font-size="12" font-weight="700" fill={u.rc}>{u.init}</text>
+            <text x="76" y="24" font-family="Inter" font-size="13" font-weight="600" fill={C.text}>{u.n}</text>
+            <text x="76" y="42" font-family="JetBrains Mono" font-size="11" fill={C.subtext}>{u.e}</text>
+            <g transform="translate(720, 16)">
+              <rect width="100" height="26" rx="13" fill={u.rc} opacity="0.15"/>
+              <text x="50" y="18" text-anchor="middle" font-family="Inter" font-size="11" font-weight="600" fill={u.rc}>{u.r}</text>
+            </g>
+            <text x="840" y="32" font-family="Inter" font-size="20" fill={C.muted}>⋯</text>
+          </g>
+        ))}
+      </>
+    )}
+
+    {slug === "invitations" && (
+      <>
+        <text x="32" y="48" font-family="Inter" font-size="18" font-weight="700" fill={C.text}>Invite a team member</text>
+        <g transform="translate(32, 100)">
+          <rect width="896" height="380" rx="12" fill={C.panel} stroke={C.border}/>
+          <text x="32" y="44" font-family="Inter" font-size="12" font-weight="600" fill={C.subtext}>EMAIL</text>
+          <rect x="32" y="54" width="600" height="44" rx="8" fill={C.bg} stroke={C.border}/>
+          <text x="48" y="81" font-family="JetBrains Mono" font-size="13" fill={C.text}>new-hire@example.com</text>
+
+          <text x="32" y="134" font-family="Inter" font-size="12" font-weight="600" fill={C.subtext}>ROLE</text>
+          <g transform="translate(32, 144)">
+            {["Viewer","Operator","Admin"].map((r, i) => (
+              <g transform={`translate(${i * 108}, 0)`}>
+                <rect width="100" height="44" rx="8" fill={i === 1 ? C.primary : C.bg} opacity={i === 1 ? "0.2" : "1"} stroke={i === 1 ? C.primary : C.border}/>
+                <text x="50" y="28" text-anchor="middle" font-family="Inter" font-size="12" font-weight="600" fill={i === 1 ? C.primary : C.text}>{r}</text>
+              </g>
+            ))}
+          </g>
+
+          <g transform="translate(32, 224)">
+            <rect width="832" height="56" rx="8" fill={C.accent} opacity="0.1" stroke={C.accent} stroke-opacity="0.3"/>
+            <text x="20" y="24" font-family="Inter" font-size="12" font-weight="600" fill={C.accent}>SMTP CONFIGURED</text>
+            <text x="20" y="42" font-family="Inter" font-size="11" fill={C.subtext}>Invite link will be emailed automatically on create.</text>
+          </g>
+
+          <g transform="translate(32, 312)">
+            <rect width="160" height="40" rx="8" fill={C.primary}/>
+            <text x="80" y="26" text-anchor="middle" font-family="Inter" font-size="13" font-weight="700" fill="white">Send invite</text>
+          </g>
+          <g transform="translate(204, 312)">
+            <rect width="120" height="40" rx="8" fill={C.bg} stroke={C.border}/>
+            <text x="60" y="26" text-anchor="middle" font-family="Inter" font-size="13" fill={C.text}>Cancel</text>
+          </g>
+        </g>
+      </>
+    )}
+
+    {slug === "password-reset" && (
+      <>
+        <g transform="translate(280, 80)">
+          <rect width="400" height="380" rx="12" fill={C.panel} stroke={C.border}/>
+          <text x="200" y="50" text-anchor="middle" font-family="Inter" font-size="20" font-weight="700" fill={C.text}>Reset your password</text>
+          <text x="200" y="76" text-anchor="middle" font-family="Inter" font-size="12" fill={C.subtext}>Enter the email linked to your account</text>
+
+          <text x="32" y="128" font-family="Inter" font-size="11" font-weight="600" fill={C.subtext}>EMAIL</text>
+          <rect x="32" y="138" width="336" height="44" rx="8" fill={C.bg} stroke={C.border}/>
+          <text x="48" y="165" font-family="JetBrains Mono" font-size="13" fill={C.text}>you@example.com</text>
+
+          <g transform="translate(32, 208)">
+            <rect width="336" height="44" rx="8" fill={C.primary}/>
+            <text x="168" y="28" text-anchor="middle" font-family="Inter" font-size="13" font-weight="700" fill="white">Send reset link</text>
+          </g>
+
+          <text x="200" y="290" text-anchor="middle" font-family="Inter" font-size="11" fill={C.muted}>Response time constant regardless of whether</text>
+          <text x="200" y="307" text-anchor="middle" font-family="Inter" font-size="11" fill={C.muted}>the email exists. No enumeration possible.</text>
+
+          <g transform="translate(140, 340)">
+            <rect width="120" height="26" rx="13" fill={C.accent} opacity="0.15"/>
+            <text x="60" y="18" text-anchor="middle" font-family="Inter" font-size="10" font-weight="600" fill={C.accent}>Timing-safe</text>
+          </g>
+        </g>
+      </>
+    )}
+
+    {slug === "redaction" && (
+      <>
+        <text x="32" y="48" font-family="Inter" font-size="18" font-weight="700" fill={C.text}>Redaction at capture</text>
+
+        <g transform="translate(32, 90)">
+          <rect width="430" height="420" rx="10" fill={C.panel} stroke={C.danger} stroke-opacity="0.3"/>
+          <text x="20" y="36" font-family="Inter" font-size="12" font-weight="700" fill={C.danger}>RAW (never leaves agent)</text>
+          <rect x="20" y="54" width="390" height="346" rx="6" fill={C.bg}/>
+          <g font-family="JetBrains Mono" font-size="11" fill={C.subtext}>
+            <text x="36" y="80">task = charge_customer(</text>
+            <text x="54" y="100" fill={C.text}>customer_id=<tspan fill={C.accent}>&quot;cus_abc123&quot;</tspan>,</text>
+            <text x="54" y="120" fill={C.text}>amount=<tspan fill={C.accent}>2495</tspan>,</text>
+            <text x="54" y="140" fill={C.text}>api_key=<tspan fill={C.danger}>&quot;sk_live_51H...&quot;</tspan>,</text>
+            <text x="54" y="160" fill={C.text}>authorization=<tspan fill={C.danger}>&quot;Bearer eyJhbG...&quot;</tspan>,</text>
+            <text x="54" y="180" fill={C.text}>card=<tspan fill={C.danger}>&quot;4242 4242 4242 4242&quot;</tspan>,</text>
+            <text x="54" y="200" fill={C.text}>user_email=<tspan fill={C.danger}>&quot;jane@acme.com&quot;</tspan>,</text>
+            <text x="54" y="220" fill={C.text}>ssn=<tspan fill={C.danger}>&quot;123-45-6789&quot;</tspan></text>
+            <text x="36" y="240">)</text>
+          </g>
+        </g>
+
+        <g transform="translate(488, 90)">
+          <rect width="440" height="420" rx="10" fill={C.panel} stroke={C.accent} stroke-opacity="0.4"/>
+          <text x="20" y="36" font-family="Inter" font-size="12" font-weight="700" fill={C.accent}>REDACTED (what brain sees)</text>
+          <rect x="20" y="54" width="400" height="346" rx="6" fill={C.bg}/>
+          <g font-family="JetBrains Mono" font-size="11" fill={C.subtext}>
+            <text x="36" y="80">task = charge_customer(</text>
+            <text x="54" y="100" fill={C.text}>customer_id=<tspan fill={C.accent}>&quot;cus_abc123&quot;</tspan>,</text>
+            <text x="54" y="120" fill={C.text}>amount=<tspan fill={C.accent}>2495</tspan>,</text>
+            <text x="54" y="140" fill={C.text}>api_key=<tspan fill={C.muted}>&quot;&lt;redacted:api_key&gt;&quot;</tspan>,</text>
+            <text x="54" y="160" fill={C.text}>authorization=<tspan fill={C.muted}>&quot;&lt;redacted:header&gt;&quot;</tspan>,</text>
+            <text x="54" y="180" fill={C.text}>card=<tspan fill={C.muted}>&quot;&lt;redacted:card&gt;&quot;</tspan>,</text>
+            <text x="54" y="200" fill={C.text}>user_email=<tspan fill={C.muted}>&quot;&lt;redacted:email&gt;&quot;</tspan>,</text>
+            <text x="54" y="220" fill={C.text}>ssn=<tspan fill={C.muted}>&quot;&lt;redacted:ssn&gt;&quot;</tspan></text>
+            <text x="36" y="240">)</text>
+
+            <text x="36" y="300" fill={C.subtext}># Pattern matches applied:</text>
+            <text x="36" y="320" fill={C.accent}># ✓ Stripe key format</text>
+            <text x="36" y="340" fill={C.accent}># ✓ Bearer token header</text>
+            <text x="36" y="360" fill={C.accent}># ✓ Credit card (Luhn)</text>
+            <text x="36" y="380" fill={C.accent}># ✓ Email / SSN / custom</text>
+          </g>
+        </g>
+      </>
+    )}
+
+    {slug === "audit-log" && (
+      <>
+        <text x="32" y="48" font-family="Inter" font-size="18" font-weight="700" fill={C.text}>Audit log</text>
+        <text x="32" y="68" font-family="Inter" font-size="12" fill={C.subtext}>HMAC-chained · tamper-evident</text>
+
+        <g transform="translate(720, 40)">
+          <rect width="208" height="32" rx="16" fill={C.accent} opacity="0.15" stroke={C.accent} stroke-opacity="0.3"/>
+          <text x="104" y="21" text-anchor="middle" font-family="Inter" font-size="12" font-weight="600" fill={C.accent}>Chain verified · 12,483 rows</text>
+        </g>
+
+        {[
+          {ts:"14:32:18", a:"alice@...", act:"task.retry", t:"email.send_welcome", r:"ok"},
+          {ts:"14:30:05", a:"bob@...", act:"queue.purge", t:"dead-letter.failed", r:"ok"},
+          {ts:"14:28:41", a:"alice@...", act:"schedule.create", t:"daily-digest", r:"ok"},
+          {ts:"14:25:12", a:"system", act:"auth.login_failed", t:"10.0.12.5", r:"denied"},
+          {ts:"14:22:38", a:"bob@...", act:"membership.role_changed", t:"carlos@... → admin", r:"ok"},
+          {ts:"14:19:14", a:"alice@...", act:"agent.token_minted", t:"web-prod-01", r:"ok"},
+        ].map((row, i) => (
+          <g transform={`translate(32, ${100 + i * 50})`}>
+            <rect width="896" height="40" rx="6" fill={C.panel} stroke={C.border}/>
+            <text x="18" y="25" font-family="JetBrains Mono" font-size="11" fill={C.subtext}>{row.ts}</text>
+            <text x="110" y="25" font-family="Inter" font-size="12" font-weight="600" fill={C.text}>{row.a}</text>
+            <g transform="translate(240, 10)">
+              <rect width="170" height="22" rx="4" fill={row.r === "ok" ? C.info : C.danger} opacity="0.2"/>
+              <text x="10" y="16" font-family="JetBrains Mono" font-size="10" font-weight="600" fill={row.r === "ok" ? C.info : C.danger}>{row.act}</text>
+            </g>
+            <text x="432" y="25" font-family="Inter" font-size="11" fill={C.subtext}>{row.t}</text>
+            <text x="830" y="25" font-family="JetBrains Mono" font-size="10" fill={C.muted}>hmac ✓</text>
+          </g>
+        ))}
+      </>
+    )}
+
+    {slug === "rate-limiting" && (
+      <>
+        <text x="32" y="48" font-family="Inter" font-size="18" font-weight="700" fill={C.text}>Rate limits</text>
+        <text x="32" y="68" font-family="Inter" font-size="12" fill={C.subtext}>Per-IP sliding window buckets</text>
+
+        <g transform="translate(32, 100)">
+          {[{e:"/auth/login",l:"20 / min",u:18,c:C.warning},{e:"/invitations",l:"30 / min",u:4,c:C.accent},{e:"/auth/password-reset",l:"10 / min",u:2,c:C.accent}].map((ep, i) => (
+            <g transform={`translate(0, ${i * 110})`}>
+              <rect width="896" height="96" rx="10" fill={C.panel} stroke={C.border}/>
+              <text x="20" y="28" font-family="JetBrains Mono" font-size="12" font-weight="600" fill={C.text}>{ep.e}</text>
+              <text x="20" y="46" font-family="Inter" font-size="11" fill={C.subtext}>Limit: {ep.l}</text>
+              <rect x="20" y="60" width="856" height="16" rx="8" fill={C.bg}/>
+              <rect x="20" y="60" width={856 * (ep.u / 30)} height="16" rx="8" fill={ep.c}/>
+              <text x="840" y="46" text-anchor="end" font-family="JetBrains Mono" font-size="11" font-weight="600" fill={ep.c}>{ep.u} hits</text>
+            </g>
+          ))}
+        </g>
+
+        <g transform="translate(32, 440)">
+          <rect width="896" height="60" rx="10" fill={C.danger} opacity="0.1" stroke={C.danger} stroke-opacity="0.3"/>
+          <text x="20" y="28" font-family="Inter" font-size="12" font-weight="700" fill={C.danger}>BLOCKED</text>
+          <text x="20" y="46" font-family="JetBrains Mono" font-size="11" fill={C.subtext}>103.241.5.82 · /auth/login · 23 attempts in 60s · inline-pruned bucket</text>
+        </g>
+      </>
+    )}
+
+    {slug === "worker-restart" && (
+      <>
+        <text x="32" y="48" font-family="Inter" font-size="18" font-weight="700" fill={C.text}>Restart worker</text>
+        <g transform="translate(32, 100)">
+          <rect width="896" height="400" rx="12" fill={C.panel} stroke={C.border}/>
+
+          <text x="32" y="44" font-family="Inter" font-size="13" font-weight="700" fill={C.text}>web-prod-01 · celery worker</text>
+          <text x="32" y="66" font-family="JetBrains Mono" font-size="11" fill={C.subtext}>engine=celery · pool=prefork · concurrency=8</text>
+
+          <g transform="translate(32, 96)">
+            <rect width="250" height="90" rx="8" fill={C.bg} stroke={C.border}/>
+            <text x="16" y="22" font-family="Inter" font-size="10" font-weight="600" fill={C.subtext}>PREFLIGHT</text>
+            <text x="16" y="46" font-family="Inter" font-size="12" fill={C.accent}>✓ Z4J_RESTART_ALLOWED=1</text>
+            <text x="16" y="64" font-family="Inter" font-size="12" fill={C.accent}>✓ /tmp/z4j.allow-restart</text>
+            <text x="16" y="82" font-family="Inter" font-size="12" fill={C.accent}>✓ No flap in last 60s</text>
+          </g>
+
+          <g transform="translate(302, 96)">
+            <rect width="280" height="90" rx="8" fill={C.bg} stroke={C.border}/>
+            <text x="16" y="22" font-family="Inter" font-size="10" font-weight="600" fill={C.subtext}>STRATEGY</text>
+            <text x="16" y="48" font-family="Inter" font-size="13" font-weight="600" fill={C.primary}>Native pool_restart</text>
+            <text x="16" y="68" font-family="Inter" font-size="11" fill={C.subtext}>celery-only: graceful drain</text>
+          </g>
+
+          <g transform="translate(602, 96)">
+            <rect width="262" height="90" rx="8" fill={C.accent} opacity="0.1" stroke={C.accent} stroke-opacity="0.3"/>
+            <text x="16" y="22" font-family="Inter" font-size="10" font-weight="600" fill={C.accent}>STATUS</text>
+            <text x="16" y="48" font-family="Inter" font-size="15" font-weight="700" fill={C.accent}>✓ Drained</text>
+            <text x="16" y="68" font-family="JetBrains Mono" font-size="11" fill={C.subtext}>Respawned in 1.8s · 0 task loss</text>
+          </g>
+
+          <rect x="32" y="216" width="832" height="160" rx="8" fill={C.bg}/>
+          <g font-family="JetBrains Mono" font-size="10" fill={C.subtext}>
+            <text x="48" y="236" fill={C.accent}>[14:32:18] restart requested by alice@example.com</text>
+            <text x="48" y="254">[14:32:18] preflight OK</text>
+            <text x="48" y="272">[14:32:18] strategy: pool_restart (celery native)</text>
+            <text x="48" y="290">[14:32:18] broadcasting TERM to 8 workers...</text>
+            <text x="48" y="308">[14:32:19] 8 in-flight tasks drained</text>
+            <text x="48" y="326">[14:32:20] pool restarted, accepting new tasks</text>
+            <text x="48" y="344" fill={C.accent}>[14:32:20] audit row written (id=01H6M...c42)</text>
+          </g>
+        </g>
+      </>
+    )}
+
+    {slug === "redis-streams" && (
+      <>
+        <text x="32" y="48" font-family="Inter" font-size="18" font-weight="700" fill={C.text}>Live events</text>
+        <g transform="translate(720, 30)">
+          <circle cx="12" cy="16" r="6" fill={C.accent}>
+            <animate attributeName="opacity" values="0.3;1;0.3" dur="1.4s" repeatCount="indefinite"/>
+          </circle>
+          <text x="28" y="20" font-family="Inter" font-size="12" font-weight="600" fill={C.accent}>Connected</text>
+          <text x="120" y="20" font-family="JetBrains Mono" font-size="11" fill={C.subtext}>247 events / sec</text>
+        </g>
+
+        {[
+          {t:"14:32:18.432", e:"task_sent", d:"email.send_welcome(user=1024)", c:C.info},
+          {t:"14:32:18.401", e:"task_started", d:"reports.weekly_digest", c:C.warning},
+          {t:"14:32:18.389", e:"task_succeeded", d:"analytics.aggregate → 12.4MB", c:C.accent},
+          {t:"14:32:18.367", e:"task_sent", d:"billing.charge(invoice=54321)", c:C.info},
+          {t:"14:32:18.342", e:"task_failed", d:"webhook.deliver → ConnectionError", c:C.danger},
+          {t:"14:32:18.318", e:"task_retry", d:"webhook.deliver (attempt 2/5)", c:C.warning},
+          {t:"14:32:18.289", e:"worker_heartbeat", d:"web-prod-03 · queue_depth=12", c:C.muted},
+          {t:"14:32:18.254", e:"task_succeeded", d:"email.send_welcome → 204 OK", c:C.accent},
+          {t:"14:32:18.221", e:"task_sent", d:"search.reindex(entity=Order)", c:C.info},
+        ].map((ev, i) => (
+          <g transform={`translate(32, ${100 + i * 44})`}>
+            <rect width="896" height="36" rx="6" fill={C.panel} stroke={C.border}/>
+            <text x="16" y="22" font-family="JetBrains Mono" font-size="10" fill={C.subtext}>{ev.t}</text>
+            <g transform="translate(140, 8)">
+              <rect width="120" height="22" rx="4" fill={ev.c} opacity="0.2"/>
+              <text x="8" y="15" font-family="JetBrains Mono" font-size="10" font-weight="600" fill={ev.c}>{ev.e}</text>
+            </g>
+            <text x="280" y="22" font-family="JetBrains Mono" font-size="10" fill={C.text}>{ev.d}</text>
+          </g>
+        ))}
+      </>
+    )}
+  </svg>
+</figure>

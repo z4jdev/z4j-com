@@ -1,0 +1,290 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Section from "../components/Section.astro";
+import PageHero from "../components/PageHero.astro";
+import CTA from "../components/CTA.astro";
+import { ENGINES } from "../data/engines";
+import { PLATFORMS } from "../data/platforms";
+import { SCHEDULERS } from "../data/schedulers";
+import { FEATURES } from "../data/features";
+import { DEPLOYMENTS } from "../data/deployments";
+import { COMPETITORS } from "../data/competitors";
+
+interface Node {
+  label: string;
+  href?: string;
+  desc?: string;
+  badge?: string;
+  external?: boolean;
+  children?: Node[];
+}
+
+interface FlatLine {
+  prefix: string;
+  node: Node;
+  depth: number;
+}
+
+function flatten(nodes: Node[], prefix = "", depth = 0): FlatLine[] {
+  const out: FlatLine[] = [];
+  nodes.forEach((node, i) => {
+    const last = i === nodes.length - 1;
+    const connector = depth === 0 ? "" : last ? "└── " : "├── ";
+    out.push({ prefix: prefix + connector, node, depth });
+    if (node.children?.length) {
+      const nextPrefix = prefix + (depth === 0 ? "" : last ? "    " : "│   ");
+      out.push(...flatten(node.children, nextPrefix, depth + 1));
+    }
+  });
+  return out;
+}
+
+const product: Node[] = [
+  { label: "Home", href: "/", desc: "Landing page" },
+  {
+    label: "Features",
+    href: "/features",
+    desc: "All capabilities, architecture, packages",
+    badge: `${FEATURES.length}`,
+    children: FEATURES.map((f) => ({
+      label: f.title,
+      href: `/features/${f.slug}`,
+      desc: f.tagline,
+    })),
+  },
+  {
+    label: "Engines",
+    href: "/engines",
+    desc: "Python task-queue engines and action matrix",
+    badge: `${ENGINES.length}`,
+    children: ENGINES.map((e) => ({
+      label: e.shortName,
+      href: `/engines/${e.slug}`,
+      desc: e.tagline,
+    })),
+  },
+  {
+    label: "Platforms",
+    href: "/platforms",
+    desc: "Framework adapters",
+    badge: `${PLATFORMS.length}`,
+    children: PLATFORMS.map((p) => ({
+      label: p.shortName,
+      href: `/platforms/${p.slug}`,
+      desc: p.tagline,
+    })),
+  },
+  {
+    label: "Schedulers",
+    href: "/schedulers",
+    desc: "Scheduler adapters for every engine",
+    badge: `${SCHEDULERS.length}`,
+    children: SCHEDULERS.map((s) => ({
+      label: s.shortName,
+      href: `/schedulers/${s.slug}`,
+      desc: s.tagline,
+    })),
+  },
+  {
+    label: "Install",
+    href: "/install",
+    desc: "Deployment paths and TLS guide",
+    badge: `${DEPLOYMENTS.length + 1}`,
+    children: [
+      ...DEPLOYMENTS.map((d) => ({
+        label: d.name,
+        href: `/install/${d.slug}`,
+        desc: d.tagline,
+      })),
+      {
+        label: "TLS setup",
+        href: "/install/tls",
+        desc: "Reverse-proxy and certificate configuration",
+      },
+    ],
+  },
+  {
+    label: "Compare",
+    href: "/compare",
+    desc: "z4j vs. other dashboards",
+    badge: `${COMPETITORS.length}`,
+    children: COMPETITORS.map((c) => ({
+      label: c.name,
+      href: `/compare/${c.slug}`,
+      desc: c.tagline,
+    })),
+  },
+  { label: "Pricing", href: "/pricing", desc: "Free and open source" },
+];
+
+const company: Node[] = [
+  { label: "About", href: "/about", desc: "Who builds z4j" },
+  { label: "Security", href: "/security", desc: "Audit posture and disclosure" },
+  { label: "Community", href: "/community", desc: "Discord, GitHub, contributing" },
+  { label: "Roadmap", href: "/roadmap", desc: "What is shipping next" },
+  { label: "Changelog", href: "/changelog", desc: "Release history" },
+  { label: "Contact", href: "/contact", desc: "Get in touch" },
+];
+
+const legal: Node[] = [
+  { label: "License", href: "/license", desc: "Apache 2.0 agents, AGPL-3 brain" },
+  { label: "Privacy", href: "/privacy" },
+  { label: "Terms", href: "/terms" },
+];
+
+const external: Node[] = [
+  { label: "Documentation", href: "https://z4j.dev", external: true, desc: "Full technical docs" },
+  { label: "GitHub", href: "https://github.com/z4jdev/z4j", external: true, desc: "Source, issues, PRs" },
+  { label: "XML sitemap", href: "/sitemap.xml", external: true, desc: "Machine-readable sitemap" },
+];
+
+const productLines = flatten(product);
+const companyLines = flatten(company);
+const legalLines = flatten(legal);
+const externalLines = flatten(external);
+
+const totalPages =
+  1 +
+  1 + FEATURES.length +
+  1 + ENGINES.length +
+  1 + PLATFORMS.length +
+  1 + SCHEDULERS.length +
+  2 + DEPLOYMENTS.length +
+  1 + COMPETITORS.length +
+  1 +
+  company.length +
+  legal.length;
+
+const stats = [
+  { label: "Total pages", count: totalPages },
+  { label: "Features", count: FEATURES.length },
+  { label: "Engines", count: ENGINES.length },
+  { label: "Schedulers", count: SCHEDULERS.length },
+];
+---
+
+<BaseLayout
+  title="Sitemap | z4j"
+  description="Every page on z4j.com, organized as a tree. Product, company, and legal sections plus external resources."
+>
+  <PageHero
+    breadcrumb={[{ label: "Sitemap" }]}
+    title="Sitemap"
+    subtitle="Every page on z4j.com, grouped by section. Search engines consume the XML sitemap; this page is the human-readable index."
+  >
+    <dl class="mt-8 grid grid-cols-2 gap-x-8 gap-y-4 border-t border-[var(--color-border)] pt-6 sm:grid-cols-4">
+      {stats.map((s) => (
+        <div>
+          <dt class="font-mono text-[10px] font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+            {s.label}
+          </dt>
+          <dd class="mt-1 text-2xl font-semibold tracking-tight">{s.count}</dd>
+        </div>
+      ))}
+    </dl>
+  </PageHero>
+
+  <Section compact>
+    <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)]">
+      <header class="flex items-center justify-between gap-3 border-b border-[var(--color-border)] px-5 py-3">
+        <h2 class="text-sm font-semibold tracking-tight">Product</h2>
+        <span class="font-mono text-[11px] uppercase tracking-wider text-[var(--color-muted)]">
+          {productLines.length} pages
+        </span>
+      </header>
+
+      <div class="overflow-x-auto">
+        <ul class="min-w-[420px] divide-y divide-[var(--color-border)]/50 text-sm">
+          {productLines.map((line) => (
+            <li class="flex items-baseline gap-2 px-5 py-2 transition-colors hover:bg-[var(--color-surface-raised)]/60">
+              <span
+                class="shrink-0 whitespace-pre font-mono text-xs text-[var(--color-muted)]/60"
+                aria-hidden="true"
+              >{line.prefix}</span>
+              <div class="min-w-0 flex-1">
+                {line.node.href ? (
+                  <a
+                    href={line.node.href}
+                    class:list={[
+                      "transition-colors hover:text-[var(--color-primary)]",
+                      line.depth === 0
+                        ? "font-semibold text-[var(--color-fg)]"
+                        : "text-[var(--color-fg)]/90",
+                    ]}
+                  >
+                    {line.node.label}
+                  </a>
+                ) : (
+                  <span class="font-medium">{line.node.label}</span>
+                )}
+                {line.node.desc && (
+                  <span class="ml-2 text-[var(--color-muted)]"> - {line.node.desc}</span>
+                )}
+              </div>
+              {line.node.badge && (
+                <span class="shrink-0 font-mono text-[11px] font-medium text-[var(--color-muted)]">
+                  {line.node.badge}
+                </span>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </Section>
+
+  <Section compact>
+    <div class="grid gap-5 lg:grid-cols-3">
+      {[
+        { title: "Company", tree: companyLines, count: company.length },
+        { title: "Legal", tree: legalLines, count: legal.length },
+        { title: "External", tree: externalLines, count: external.length },
+      ].map((panel) => (
+        <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)]">
+          <header class="flex items-center justify-between gap-2 border-b border-[var(--color-border)] px-4 py-2.5">
+            <h2 class="text-sm font-semibold tracking-tight">{panel.title}</h2>
+            <span class="font-mono text-[11px] uppercase tracking-wider text-[var(--color-muted)]">
+              {panel.count}
+            </span>
+          </header>
+          <ul class="divide-y divide-[var(--color-border)]/50 text-sm">
+            {panel.tree.map((line) => (
+              <li class="flex items-baseline gap-2 px-4 py-2 transition-colors hover:bg-[var(--color-surface-raised)]/60">
+                <span
+                  class="shrink-0 whitespace-pre font-mono text-xs text-[var(--color-muted)]/60"
+                  aria-hidden="true"
+                >{line.prefix || "• "}</span>
+                <div class="min-w-0 flex-1">
+                  <a
+                    href={line.node.href}
+                    rel={line.node.external ? "noopener" : undefined}
+                    target={line.node.external ? "_blank" : undefined}
+                    class="inline-flex items-center gap-1 text-[var(--color-fg)] transition-colors hover:text-[var(--color-primary)]"
+                  >
+                    {line.node.label}
+                    {line.node.external && (
+                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true" class="opacity-60">
+                        <path d="M3 1h6v6M9 1L4 6M1 3v6h6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    )}
+                  </a>
+                  {line.node.desc && (
+                    <span class="ml-2 text-xs text-[var(--color-muted)]"> - {line.node.desc}</span>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  <CTA
+    title="Can't find what you're looking for?"
+    primaryHref="/contact"
+    primaryLabel="Contact us"
+    secondaryHref="https://z4j.dev"
+    secondaryLabel="Search the docs"
+  />
+</BaseLayout>

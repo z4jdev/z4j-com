@@ -1,0 +1,157 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Section from "../components/Section.astro";
+import PageHero from "../components/PageHero.astro";
+import Icon from "../components/Icon.astro";
+
+const channels = [
+  {
+    icon: "invitations",
+    title: "General inquiries",
+    description: "Product questions, partnership discussions, or just to say hello.",
+    action: "hello@z4j.com",
+    href: "mailto:hello@z4j.com",
+  },
+  {
+    icon: "shield",
+    title: "Security",
+    description: "Report a vulnerability. Do not file a public issue. We follow the disclose.io baseline.",
+    action: "security@z4j.com",
+    href: "mailto:security@z4j.com",
+  },
+  {
+    icon: "key",
+    title: "Licensing",
+    description: "Commercial license inquiries for organizations with AGPL-incompatible policies.",
+    action: "licensing@z4j.com",
+    href: "mailto:licensing@z4j.com",
+  },
+  {
+    icon: "lock",
+    title: "Privacy",
+    description: "Data privacy questions or requests.",
+    action: "privacy@z4j.com",
+    href: "mailto:privacy@z4j.com",
+  },
+];
+
+const community = [
+  {
+    icon: "github",
+    title: "GitHub Discussions",
+    description: "Ask questions, propose features, share how you use z4j.",
+    action: "Open a discussion",
+    href: "https://github.com/z4jdev/z4j/discussions",
+  },
+  {
+    icon: "terminal",
+    title: "GitHub Issues",
+    description: "Bug reports, feature requests, and technical issues.",
+    action: "Open an issue",
+    href: "https://github.com/z4jdev/z4j/issues",
+  },
+];
+
+const contactSchema = {
+  "@context": "https://schema.org",
+  "@type": "ContactPage",
+  name: "Contact z4j",
+  url: "https://z4j.com/contact",
+  description: "Reach the z4j team by email or through GitHub.",
+  mainEntity: {
+    "@type": "Organization",
+    name: "z4j",
+    url: "https://z4j.com",
+    contactPoint: channels.map((c) => ({
+      "@type": "ContactPoint",
+      email: c.action,
+      contactType: c.title,
+      availableLanguage: ["English"],
+    })),
+  },
+};
+---
+
+<BaseLayout
+  title="Contact z4j | Email, GitHub, security disclosure"
+  description="Contact the z4j team: general inquiries, security disclosure, licensing, and privacy. Plus GitHub Discussions and Issues for community support."
+  keywords={["contact z4j", "z4j support", "z4j security disclosure", "z4j licensing"]}
+  jsonLd={contactSchema}
+  breadcrumbs={[{ name: "Contact", href: "/contact" }]}
+>
+  <PageHero
+    breadcrumb={[{ label: "Contact" }]}
+    title="Get in touch"
+    subtitle="Reach us by email or through our GitHub community."
+  />
+
+  <Section>
+    <div class="grid gap-5 md:grid-cols-2">
+      {
+        channels.map((ch) => (
+          <a
+            href={ch.href}
+            class="group flex flex-col gap-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 transition-all hover:-translate-y-0.5 hover:border-[var(--color-primary)]/40 hover:shadow-lg hover:shadow-[var(--color-primary)]/5"
+          >
+            <div class="inline-flex size-10 items-center justify-center rounded-lg bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
+              <Icon name={ch.icon} size={20} />
+            </div>
+            <h3 class="text-base font-semibold">{ch.title}</h3>
+            <p class="text-sm leading-relaxed text-[var(--color-muted)]">{ch.description}</p>
+            <span class="mt-auto inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-primary)]">
+              {ch.action}
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 5h8m0 0L5 1m4 4L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </a>
+        ))
+      }
+    </div>
+  </Section>
+
+  <Section
+    eyebrow="Community"
+    title="Join the conversation"
+    subtitle="z4j is built in the open. Development happens on GitHub."
+  >
+    <div class="grid gap-5 md:grid-cols-2">
+      {
+        community.map((ch) => (
+          <a
+            href={ch.href}
+            class="group flex flex-col gap-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 transition-all hover:-translate-y-0.5 hover:border-[var(--color-primary)]/40 hover:shadow-lg hover:shadow-[var(--color-primary)]/5"
+          >
+            <div class="inline-flex size-10 items-center justify-center rounded-lg bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
+              <Icon name={ch.icon} size={20} />
+            </div>
+            <h3 class="text-base font-semibold">{ch.title}</h3>
+            <p class="text-sm leading-relaxed text-[var(--color-muted)]">{ch.description}</p>
+            <span class="mt-auto inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-primary)]">
+              {ch.action}
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h4"/><path d="M9 3h4v4"/><path d="M6 10 13 3"/></svg>
+            </span>
+          </a>
+        ))
+      }
+    </div>
+  </Section>
+
+  <Section>
+    <div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-8 max-w-2xl">
+      <h3 class="text-lg font-semibold mb-3">Response times</h3>
+      <div class="space-y-3 text-sm text-[var(--color-muted)]">
+        <div class="flex items-start gap-3">
+          <Icon name="shield" size={16} class="mt-0.5 text-[var(--color-danger)] shrink-0" />
+          <span><strong class="text-[var(--color-fg)]">Security reports:</strong> acknowledged within 48 hours, triaged within 5 business days.</span>
+        </div>
+        <div class="flex items-start gap-3">
+          <Icon name="invitations" size={16} class="mt-0.5 text-[var(--color-primary)] shrink-0" />
+          <span><strong class="text-[var(--color-fg)]">General inquiries:</strong> we aim to respond within 3 business days.</span>
+        </div>
+        <div class="flex items-start gap-3">
+          <Icon name="github" size={16} class="mt-0.5 text-[var(--color-accent)] shrink-0" />
+          <span><strong class="text-[var(--color-fg)]">GitHub issues:</strong> triaged weekly. Label <code class="rounded bg-[var(--color-surface-raised)] px-1 py-0.5 text-xs">good first issue</code> for new contributors.</span>
+        </div>
+      </div>
+    </div>
+  </Section>
+</BaseLayout>

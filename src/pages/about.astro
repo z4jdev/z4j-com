@@ -1,0 +1,113 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Section from "../components/Section.astro";
+import PageHero from "../components/PageHero.astro";
+import CTA from "../components/CTA.astro";
+---
+
+<BaseLayout
+  title="About z4j | The control plane story"
+  description="z4j is an open-source control plane for Python task queues. We built it because no tool covered all six Python task engines with actions, history, and audit logging."
+  keywords={["about z4j", "task queue control plane", "open source task queue"]}
+>
+  <PageHero
+    breadcrumb={[{ label: "About" }]}
+    title="Why z4j exists."
+    subtitle="Flower is a task viewer. There was no z4j for Python task queues, so we built one."
+  />
+
+  <Section>
+    <div class="prose-like max-w-3xl space-y-4 text-lg text-[var(--color-muted)] leading-relaxed">
+      <p>
+        Every Python shop with non-trivial async work hits the same wall.
+        Flower shows your Celery tasks but can't retry them. It can't do
+        bulk actions. It can't manage schedules. It has no audit log, no
+        RBAC, no persistent history, and it only covers Celery.
+      </p>
+      <p>
+        Meanwhile the ecosystem diversified. RQ, Dramatiq, Huey, arq, taskiq:
+        every one of them has a real user base and zero
+        monitoring/control story beyond the package's own minimal CLI.
+      </p>
+      <p>
+        z4j is a <strong class="text-[var(--color-fg)]">control plane</strong>,
+        not a dashboard. Observation is the easy part. The hard part is a
+        consistent action surface (retry, cancel, bulk-action, purge,
+        restart), RBAC, an audit trail you can defend in a compliance
+        review, and a secrets story that doesn't leak task args into
+        screenshots. That's what z4j does.
+      </p>
+    </div>
+  </Section>
+
+  <Section eyebrow="what z4j is not" title="Honest non-goals">
+    <ul class="space-y-3 max-w-3xl text-[var(--color-muted)]">
+      <li class="flex items-start gap-3">
+        <span class="mt-0.5 text-[var(--color-muted)]">&#x2022;</span>
+        <p>
+          <strong class="text-[var(--color-fg)]">Not a new task queue.</strong> z4j integrates with Celery/RQ/Dramatiq/Huey/arq/taskiq. It does not compete with them.
+        </p>
+      </li>
+      <li class="flex items-start gap-3">
+        <span class="mt-0.5 text-[var(--color-muted)]">&#x2022;</span>
+        <p>
+          <strong class="text-[var(--color-fg)]">Not a replacement for Prometheus/Grafana.</strong> z4j exports metrics so those tools can scrape it; it doesn't try to be a metrics platform.
+        </p>
+      </li>
+      <li class="flex items-start gap-3">
+        <span class="mt-0.5 text-[var(--color-muted)]">&#x2022;</span>
+        <p>
+          <strong class="text-[var(--color-fg)]">Not APM.</strong> We do tasks deeply, not traces broadly. Pair z4j with Sentry / Datadog / OTel. They complement.
+        </p>
+      </li>
+      <li class="flex items-start gap-3">
+        <span class="mt-0.5 text-[var(--color-muted)]">&#x2022;</span>
+        <p>
+          <strong class="text-[var(--color-fg)]">Not Flower.</strong> Flower is a passive viewer. z4j is an active control plane.
+        </p>
+      </li>
+    </ul>
+  </Section>
+
+  <Section eyebrow="license model" title="Split licensing, explained">
+    <div class="prose-like max-w-3xl space-y-4 text-[var(--color-muted)] leading-relaxed">
+      <p>
+        The <strong class="text-[var(--color-fg)]">brain</strong> (server + dashboard) is <code class="rounded bg-[var(--color-surface)] px-1.5 py-0.5 font-mono text-sm">AGPL-3.0</code>.
+        That's the same license Grafana, MinIO, Mattermost, Mastodon, and Bitwarden use. It's OSI-approved open source, and its network-copyleft clause closes the "SaaS loophole" that plain GPL has.
+      </p>
+      <p>
+        Every <strong class="text-[var(--color-fg)]">agent package</strong> (z4j-core, z4j-bare, z4j-celery, z4j-rq, z4j-dramatiq, z4j-huey, z4j-arq, z4j-taskiq, z4j-django, z4j-flask, z4j-fastapi, and every scheduler adapter) is <code class="rounded bg-[var(--color-surface)] px-1.5 py-0.5 font-mono text-sm">Apache-2.0</code>. You can import these into any proprietary application, no license questions.
+      </p>
+      <p>
+        This split is intentional and mirrors Grafana's exactly: the
+        value-bearing service stays under strong copyleft; the SDK/agent
+        layer stays permissive so it can be adopted without friction.
+      </p>
+      <p>
+        Organizations whose policies disallow AGPL can request a commercial license for the brain. See <a href="/pricing" class="text-[var(--color-primary)] hover:underline">Pricing</a>.
+      </p>
+    </div>
+  </Section>
+
+  <Section eyebrow="contributing" title="How to contribute">
+    <div class="prose-like max-w-3xl space-y-4 text-[var(--color-muted)] leading-relaxed">
+      <p>
+        z4j is open source on <a href="https://github.com/z4jdev/z4j" class="text-[var(--color-primary)] hover:underline">github.com/z4jdev/z4j</a>.
+        We accept contributions via pull request. DCO sign-off (<code class="rounded bg-[var(--color-surface)] px-1.5 py-0.5 font-mono text-sm">git commit -s</code>) is required. No CLA.
+      </p>
+      <p>
+        The highest-leverage contribution is a new engine adapter. Each
+        adapter is ~300 LOC and touches zero existing code. See the
+        contributor guide on z4j.dev for the Protocol surface.
+      </p>
+    </div>
+  </Section>
+
+  <CTA
+    title="Say hi"
+    primaryHref="https://github.com/z4jdev/z4j/discussions"
+    primaryLabel="GitHub Discussions"
+    secondaryHref="mailto:hello@z4j.com"
+    secondaryLabel="Email us"
+  />
+</BaseLayout>

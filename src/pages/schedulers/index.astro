@@ -1,0 +1,136 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Section from "../../components/Section.astro";
+import Icon from "../../components/Icon.astro";
+import PageHero from "../../components/PageHero.astro";
+import CodeCopy from "../../components/CodeCopy.astro";
+import CTA from "../../components/CTA.astro";
+import { SCHEDULERS } from "../../data/schedulers";
+import { getEngine } from "../../data/engines";
+---
+
+<BaseLayout
+  title="Scheduler adapters for every engine | z4j"
+  description="z4j ships scheduler adapters for every engine: celery-beat, rq-scheduler, APScheduler, Huey periodic tasks, arq cron_jobs, and taskiq schedule sources. One Schedules page, all of them."
+  keywords={["celery-beat dashboard", "rq-scheduler", "APScheduler", "periodic tasks", "cron jobs", "Huey periodic", "arq cron", "taskiq scheduler"]}
+>
+  <PageHero
+    breadcrumb={[{ label: "Schedulers" }]}
+    title="One Schedules page. Every scheduler."
+    subtitle="z4j ships a dedicated scheduler adapter for every Python task engine. Periodic tasks from celery-beat, rq-scheduler, APScheduler, Huey, arq cron, and taskiq all surface in one consistent UI. Create, edit, pause, resume, and trigger schedules from the dashboard."
+  />
+
+  <Section>
+    <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+      {
+        SCHEDULERS.map((s) => {
+          const engine = getEngine(s.engineSlug);
+          return (
+            <a
+              href={`/schedulers/${s.slug}`}
+              class="group relative flex flex-col rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5 transition-all hover:-translate-y-0.5 hover:border-[var(--color-primary)]/40 hover:shadow-lg hover:shadow-[var(--color-primary)]/5"
+            >
+              <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-3">
+                  {s.logo ? (
+                    <span class="inline-flex size-14 items-center justify-center rounded-xl bg-[var(--color-surface-raised)] p-2">
+                      <img src={s.logo} alt={s.shortName} class="size-10 object-contain" />
+                    </span>
+                  ) : (
+                    <span class="inline-flex size-14 items-center justify-center rounded-xl bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
+                      <Icon name={s.icon} size={28} />
+                    </span>
+                  )}
+                  <h2 class="text-base font-semibold tracking-tight">{s.shortName}</h2>
+                </div>
+                {engine && (
+                  <span class="rounded-full bg-[var(--color-surface-raised)] px-2 py-0.5 text-[10px] font-medium text-[var(--color-muted)]">
+                    {engine.shortName}
+                  </span>
+                )}
+              </div>
+              <p class="mt-3 text-sm leading-relaxed text-[var(--color-muted)]">{s.tagline}</p>
+              <pre class="mt-3 overflow-x-auto rounded bg-[var(--color-code-bg)] p-2 font-mono text-[11px] text-slate-300">pip install {s.pypi}</pre>
+              <span class="mt-auto inline-flex items-center gap-1 pt-3 text-xs font-medium text-[var(--color-primary)]">
+                Details
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 5h8m0 0L5 1m4 4L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+            </a>
+          );
+        })
+      }
+    </div>
+  </Section>
+
+  <Section
+    eyebrow="How to choose"
+    title="Which scheduler for which engine?"
+    subtitle="Every engine has a default pairing. You can also pair any engine with APScheduler if you prefer a single scheduling runtime."
+  >
+    <div class="overflow-hidden rounded-xl border border-[var(--color-border)]">
+      <table class="w-full text-sm">
+        <thead class="bg-[var(--color-surface)]">
+          <tr class="text-left">
+            <th class="px-4 py-3 font-semibold">Engine</th>
+            <th class="px-4 py-3 font-semibold">Default scheduler</th>
+            <th class="px-4 py-3 font-semibold">Capabilities</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            SCHEDULERS.map((s) => {
+              const engine = getEngine(s.engineSlug);
+              return (
+                <tr class="border-t border-[var(--color-border)] transition-colors hover:bg-[var(--color-surface)]/60">
+                  <td class="px-4 py-3 font-medium">
+                    {engine ? <a href={`/engines/${engine.slug}`} class="hover:text-[var(--color-primary)]">{engine.shortName}</a> : "-"}
+                  </td>
+                  <td class="px-4 py-3">
+                    <a href={`/schedulers/${s.slug}`} class="font-semibold hover:text-[var(--color-primary)]">{s.shortName}</a>
+                    <span class="ml-2 font-mono text-xs text-[var(--color-muted)]">{s.pypi}</span>
+                  </td>
+                  <td class="px-4 py-3 text-[var(--color-muted)]">{s.capabilities.join(", ")}</td>
+                </tr>
+              );
+            })
+          }
+        </tbody>
+      </table>
+    </div>
+  </Section>
+
+  <Section eyebrow="Quick install" title="Add a scheduler to your app">
+    <p class="max-w-3xl mb-6 text-[var(--color-muted)] leading-relaxed">
+      Install the scheduler package alongside your engine adapter. The agent auto-discovers periodic tasks on boot and keeps the dashboard in sync.
+    </p>
+    <CodeCopy
+      code={`# Celery + celery-beat
+pip install z4j-celery z4j-celerybeat
+
+# RQ + rq-scheduler
+pip install z4j-rq z4j-rqscheduler
+
+# Dramatiq + APScheduler (engine-agnostic scheduler)
+pip install z4j-dramatiq z4j-apscheduler
+
+# Huey with @periodic_task decorators
+pip install z4j-huey z4j-hueyperiodic
+
+# arq with WorkerSettings.cron_jobs
+pip install z4j-arq z4j-arqcron
+
+# taskiq schedule sources
+pip install z4j-taskiq z4j-taskiqscheduler`}
+      lang="bash"
+    />
+  </Section>
+
+  <CTA
+    title="Need a scheduler for a custom stack?"
+    subtitle="APScheduler works with any engine. Or implement the SchedulerAdapter Protocol: six methods, ~200 LOC."
+    primaryHref="/schedulers/apscheduler"
+    primaryLabel="APScheduler details"
+    secondaryHref="https://z4j.dev/schedulers/overview/"
+    secondaryLabel="Scheduler docs"
+  />
+</BaseLayout>

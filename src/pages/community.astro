@@ -1,0 +1,107 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Section from "../components/Section.astro";
+import Card from "../components/Card.astro";
+import PageHero from "../components/PageHero.astro";
+import CTA from "../components/CTA.astro";
+---
+
+<BaseLayout
+  title="Community | z4j"
+  description="Get involved with z4j: GitHub Discussions, issue tracker, pull requests, public roadmap. Open source, built in the open, contributions welcome with DCO sign-off (no CLA)."
+  keywords={["z4j community", "z4j GitHub", "contribute to z4j", "open source task queue"]}
+>
+  <PageHero
+    breadcrumb={[{ label: "Community" }]}
+    title="Find us."
+    subtitle="z4j is built in the open. Every feature decision, every bug report, every release lives on GitHub."
+  />
+
+  <Section>
+    <div class="grid gap-5 md:grid-cols-2">
+      <Card
+        href="https://github.com/z4jdev/z4j"
+        title="GitHub"
+        icon="globe"
+        description="Source code, issue tracker, pull requests, releases. Star the repo to follow releases."
+      />
+      <Card
+        href="https://github.com/z4jdev/z4j/discussions"
+        title="GitHub Discussions"
+        icon="unified-actions"
+        description="General questions, show-and-tell, RFCs. The primary support channel."
+      />
+      <Card
+        href="https://github.com/z4jdev/z4j/issues"
+        title="Issue tracker"
+        icon="check"
+        description="Bug reports + feature requests. Security issues go to security@z4j.com, not here."
+      />
+      <Card
+        href="https://z4j.dev/roadmap/"
+        title="Public roadmap"
+        icon="trends"
+        description="What's shipped, what's next, what's out of scope. No private roadmap."
+      />
+    </div>
+  </Section>
+
+  <Section eyebrow="contributing" title="How to contribute">
+    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <Card
+        title="Bug fixes"
+        icon="worker-restart"
+        description="Open a PR against main. DCO sign-off required (git commit -s). Tests required for anything non-trivial."
+      />
+      <Card
+        title="New engine adapter"
+        icon="server"
+        description="~300 LOC per adapter. Protocol is public + stable. The existing adapters are the reference."
+      />
+      <Card
+        title="New scheduler adapter"
+        icon="calendar"
+        description="~200 LOC per adapter. Read + lifecycle operations (v1.0), create/update in v1.1."
+      />
+      <Card
+        title="Documentation"
+        icon="terminal"
+        description="docs live in /docs on the main branch. Markdown. z4j.dev is auto-built from that content."
+      />
+      <Card
+        title="Triage"
+        icon="fingerprint"
+        description="Helping new contributors land their first PR, labeling incoming issues, verifying bug reports."
+      />
+      <Card
+        title="Security"
+        icon="shield"
+        description="Find a bug, email security@z4j.com, get credit in the advisory. We welcome adversarial reviews."
+      />
+    </div>
+  </Section>
+
+  <Section eyebrow="code of conduct" title="How we behave here">
+    <div class="prose-like max-w-3xl space-y-4 text-[var(--color-muted)] leading-relaxed">
+      <p>
+        We follow the <a class="text-[var(--color-primary)] hover:underline" href="https://www.contributor-covenant.org/version/2/1/code_of_conduct/">Contributor Covenant 2.1</a>.
+        Translation: be respectful, assume good intent, disagree on the
+        technical merits, let maintainers have the last word when the
+        conversation stops being productive.
+      </p>
+      <p>
+        Harassment, personal attacks, or hostile behavior will get you
+        banned. Reports go to <a href="mailto:conduct@z4j.com" class="text-[var(--color-primary)] hover:underline">conduct@z4j.com</a>.
+      </p>
+    </div>
+  </Section>
+
+  <CTA
+    title="Start contributing"
+    subtitle="The contributor guide walks through the whole workflow in 15 minutes."
+    primaryHref="https://z4j.dev/contributing/"
+    primaryLabel="Contributor guide"
+    secondaryHref="https://github.com/z4jdev/z4j"
+    secondaryLabel="Open GitHub"
+  />
+</BaseLayout>

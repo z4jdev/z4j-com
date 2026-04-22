@@ -1,0 +1,173 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Section from "../../components/Section.astro";
+import Card from "../../components/Card.astro";
+import Icon from "../../components/Icon.astro";
+import Breadcrumb from "../../components/Breadcrumb.astro";
+import CodeCopy from "../../components/CodeCopy.astro";
+import CTA from "../../components/CTA.astro";
+import { PLATFORMS } from "../../data/platforms";
+import { ENGINES } from "../../data/engines";
+
+export function getStaticPaths() {
+  return PLATFORMS.map((p) => ({
+    params: { slug: p.slug },
+    props: { platform: p },
+  }));
+}
+const { platform } = Astro.props;
+const other = PLATFORMS.filter((p) => p.slug !== platform.slug);
+
+const productSchema = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: `z4j for ${platform.shortName}`,
+  applicationCategory: "DeveloperApplication",
+  operatingSystem: "Linux, macOS, Windows",
+  description: platform.description,
+  url: `https://z4j.com/platforms/${platform.slug}`,
+  downloadUrl: `https://pypi.org/project/${platform.pypi.split('[')[0]}/`,
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  author: { "@type": "Organization", name: "z4j", url: "https://z4j.com" },
+  featureList: platform.features,
+};
+
+const metaTitle = `${platform.shortName} integration | z4j`;
+const metaDescription = `${platform.tagline} ${platform.description.slice(0, 140)}`.slice(0, 160);
+---
+
+<BaseLayout
+  title={metaTitle}
+  description={metaDescription}
+  keywords={[platform.shortName, `${platform.shortName} task queue`, `${platform.shortName} Celery`, platform.pypi]}
+  jsonLd={productSchema}
+  breadcrumbs={[
+    { name: "Platforms", href: "/platforms" },
+    { name: platform.shortName, href: `/platforms/${platform.slug}` },
+  ]}
+>
+  <Section compact>
+    <Breadcrumb items={[
+      { label: "Platforms", href: "/platforms" },
+      { label: platform.shortName },
+    ]} />
+    <div class="flex flex-wrap items-center gap-5">
+      {platform.upstreamUrl ? (
+        <a
+          href={platform.upstreamUrl}
+          rel="nofollow noopener"
+          target="_blank"
+          title={`${platform.shortName} upstream project`}
+          class="inline-flex size-16 items-center justify-center rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] transition-colors hover:border-[var(--color-primary)]/40"
+        >
+          {platform.logo ? (
+            <img src={platform.logo} alt={`${platform.shortName} logo`} class="size-10 object-contain" />
+          ) : (
+            <Icon name={platform.icon} size={32} class="text-[var(--color-primary)]" />
+          )}
+        </a>
+      ) : platform.logo ? (
+        <div class="inline-flex size-16 items-center justify-center rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]">
+          <img src={platform.logo} alt={`${platform.shortName} logo`} class="size-10 object-contain" />
+        </div>
+      ) : (
+        <div class="inline-flex size-16 items-center justify-center rounded-xl bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
+          <Icon name={platform.icon} size={32} />
+        </div>
+      )}
+      <div>
+        <h1 class="text-4xl font-bold tracking-tight md:text-5xl">
+          {platform.shortName}
+        </h1>
+        <p class="mt-1 font-mono text-sm text-[var(--color-muted)]">
+          {platform.name}
+          {platform.upstreamUrl && (
+            <>
+              {" "}&middot;{" "}
+              <a
+                href={platform.upstreamUrl}
+                rel="nofollow noopener"
+                target="_blank"
+                class="text-[var(--color-primary)] hover:underline"
+              >
+                Upstream project
+              </a>
+            </>
+          )}
+        </p>
+      </div>
+    </div>
+    <p class="mt-6 max-w-3xl text-xl font-medium text-[var(--color-primary)]">{platform.tagline}</p>
+    <p class="mt-4 max-w-3xl text-lg leading-relaxed text-[var(--color-muted)]">
+      {platform.description}
+    </p>
+  </Section>
+
+  <Section compact>
+    <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+      Install
+    </h2>
+    <CodeCopy code={platform.installCmd} lang="bash" />
+    <h2 class="mt-8 mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+      Wire it in
+    </h2>
+    <CodeCopy code={platform.quickstart} lang="python" />
+  </Section>
+
+  <Section eyebrow="What you get" title={`${platform.shortName}-specific features`}>
+    <div class="grid gap-3 md:grid-cols-2">
+      {
+        platform.features.map((f) => (
+          <div class="flex items-start gap-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+            <Icon name="check" size={16} class="mt-0.5 text-[var(--color-accent)] shrink-0" />
+            <span class="text-sm">{f}</span>
+          </div>
+        ))
+      }
+    </div>
+  </Section>
+
+  <Section
+    eyebrow="Engine pairings"
+    title={`${platform.shortName} works with every z4j engine`}
+    subtitle="The framework adapter handles lifecycle and config. Any engine adapter slots in alongside."
+  >
+    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {
+        ENGINES.map((e) => (
+          <Card
+            href={`/engines/${e.slug}`}
+            title={e.shortName}
+            icon={e.icon}
+            logo={e.logo}
+            description={e.tagline}
+          />
+        ))
+      }
+    </div>
+  </Section>
+
+  <Section eyebrow="Other platforms" title="See also">
+    <div class="grid gap-4 md:grid-cols-2">
+      {
+        other.map((p) => (
+          <Card
+            href={`/platforms/${p.slug}`}
+            title={p.shortName}
+            icon={p.icon}
+            logo={p.logo}
+            description={p.tagline}
+          />
+        ))
+      }
+    </div>
+  </Section>
+
+  <CTA
+    title={`Get started with z4j + ${platform.shortName}`}
+    primaryHref="/install"
+    primaryLabel="Install z4j"
+    secondaryHref={platform.docsHref}
+    secondaryLabel={`${platform.shortName} docs`}
+  />
+</BaseLayout>

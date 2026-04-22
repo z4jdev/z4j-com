@@ -1,0 +1,155 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Section from "../components/Section.astro";
+import PageHero from "../components/PageHero.astro";
+import CTA from "../components/CTA.astro";
+
+const TIERS = [
+  {
+    name: "Open source",
+    price: "$0",
+    priceNote: "forever",
+    description: "Self-hosted. Full feature set. AGPL-3.0 brain, Apache-2.0 adapters. Run it on your own infrastructure.",
+    cta: "Install z4j",
+    ctaHref: "/install",
+    primary: true,
+    features: [
+      "Every feature z4j has, no paywalled edition",
+      "Unlimited projects, unlimited users, unlimited tasks",
+      "Community support via GitHub Discussions",
+      "Security advisories on the same cadence for OSS + commercial",
+      "No telemetry, no 'phone home'",
+      "No CLA. DCO (git commit -s) only",
+    ],
+  },
+  {
+    name: "Commercial license",
+    price: "Contact us",
+    priceNote: "for pricing",
+    description: "For organizations whose policies disallow AGPL. Same software, different license; keeps the brain's network-copyleft clause out of your compliance stack.",
+    cta: "Contact licensing",
+    ctaHref: "mailto:licensing@z4j.com",
+    primary: false,
+    features: [
+      "Commercial (non-AGPL) license for the brain",
+      "Agent packages remain Apache-2.0 (no license needed)",
+      "Same software; no feature differences",
+      "Priority bug reports",
+      "Security embargo coordination",
+      "Optional SLA-backed support add-on",
+    ],
+  },
+  {
+    name: "Managed (cloud)",
+    price: "Planned",
+    priceNote: "v1.x+, no commitment",
+    description: "Hosted z4j on our infrastructure. Agents still run in your cloud. Conditional on community traction; no launch date.",
+    cta: "Join the waitlist",
+    ctaHref: "mailto:cloud@z4j.com",
+    primary: false,
+    features: [
+      "Fully managed brain",
+      "Agents still run in your cloud (tasks stay private)",
+      "Automatic upgrades",
+      "SLA on the control plane",
+      "Billing per-project / per-task-volume (TBD)",
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Pricing: free, open source, self-hosted | z4j"
+  description="z4j is free to self-host. AGPL-3.0 brain, Apache-2.0 agent packages, no feature gates, no telemetry. Commercial licensing available for AGPL-incompatible organizations."
+  keywords={["z4j pricing", "open source task queue", "AGPL commercial license", "self-hosted pricing"]}
+>
+  <PageHero
+    breadcrumb={[{ label: "Pricing" }]}
+    title="Free to self-host. Commercial if you need it."
+    subtitle="z4j's default path is free, open source, self-hosted. Commercial licensing exists for orgs whose policies exclude AGPL. Same software, different license."
+  />
+
+  <Section>
+    <div class="grid gap-6 md:grid-cols-3">
+      {
+        TIERS.map((t) => (
+          <div
+            class={`rounded-xl border p-6 ${t.primary ? "border-[var(--color-primary)] bg-gradient-to-b from-[var(--color-primary)]/10 to-[var(--color-surface)]/40" : "border-[var(--color-border)] bg-[var(--color-surface)]/40"}`}
+          >
+            <h3 class="text-lg font-semibold">{t.name}</h3>
+            <div class="mt-3 flex items-baseline gap-2">
+              <span class="text-3xl font-semibold tracking-tight">{t.price}</span>
+              <span class="text-sm text-[var(--color-muted)]">{t.priceNote}</span>
+            </div>
+            <p class="mt-3 text-sm leading-relaxed text-[var(--color-muted)]">
+              {t.description}
+            </p>
+            <ul class="mt-6 space-y-2">
+              {t.features.map((f) => (
+                <li class="flex items-start gap-2 text-sm">
+                  <span class="mt-0.5 text-[var(--color-accent)]">✓</span>
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
+            <a
+              href={t.ctaHref}
+              class={`mt-6 inline-flex w-full items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-all ${t.primary ? "bg-[var(--color-primary)] text-[var(--color-primary-fg)] hover:opacity-90" : "border border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-primary)]/50"}`}
+            >
+              {t.cta}
+            </a>
+          </div>
+        ))
+      }
+    </div>
+  </Section>
+
+  <Section
+    eyebrow="what we promise"
+    title="License commitments"
+    subtitle="Since z4j will eventually have commercial offerings, we spell these out to avoid ambiguity."
+  >
+    <ul class="space-y-4 max-w-3xl">
+      <li class="flex items-start gap-3">
+        <span class="mt-1 text-[var(--color-accent)]">✓</span>
+        <p class="text-[var(--color-muted)]">
+          <strong class="text-[var(--color-fg)]">Every shipped release keeps its license permanently.</strong>
+          No retroactive re-licensing.
+        </p>
+      </li>
+      <li class="flex items-start gap-3">
+        <span class="mt-1 text-[var(--color-accent)]">✓</span>
+        <p class="text-[var(--color-muted)]">
+          <strong class="text-[var(--color-fg)]">90-day announcement</strong> before any future license change, with public reasoning. Previous releases remain on their original license.
+        </p>
+      </li>
+      <li class="flex items-start gap-3">
+        <span class="mt-1 text-[var(--color-accent)]">✓</span>
+        <p class="text-[var(--color-muted)]">
+          <strong class="text-[var(--color-fg)]">No CLA.</strong> DCO sign-off only (git commit -s). You own your contributions.
+        </p>
+      </li>
+      <li class="flex items-start gap-3">
+        <span class="mt-1 text-[var(--color-accent)]">✓</span>
+        <p class="text-[var(--color-muted)]">
+          <strong class="text-[var(--color-fg)]">Security fixes ship in the open-source release</strong> on the same cadence as any commercial release, never delayed, never gated.
+        </p>
+      </li>
+      <li class="flex items-start gap-3">
+        <span class="mt-1 text-[var(--color-muted)]">&#x2022;</span>
+        <p class="text-[var(--color-muted)]">
+          We do <em>not</em> promise "free forever" or "no paid features ever," and we'll be honest about that. Shipped versions stay shipped; future commercial features are a possibility we'll announce transparently.
+        </p>
+      </li>
+    </ul>
+  </Section>
+
+  <CTA
+    title="Questions about licensing?"
+    subtitle="We answer AGPL questions in plain English. No legal boilerplate."
+    primaryHref="mailto:licensing@z4j.com"
+    primaryLabel="Email licensing"
+    secondaryHref="/about"
+    secondaryLabel="About the project"
+  />
+</BaseLayout>

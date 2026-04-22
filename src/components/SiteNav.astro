@@ -1,0 +1,190 @@
+---
+import ThemeToggle from "./ThemeToggle.astro";
+
+const pathname = Astro.url.pathname;
+function isActive(path: string): boolean {
+  if (path === "/") return pathname === "/";
+  return pathname.startsWith(path);
+}
+
+const links = [
+  { href: "/", label: "Home" },
+  { href: "/features", label: "Features" },
+  { href: "/engines", label: "Engines" },
+  { href: "/platforms", label: "Platforms" },
+  { href: "/schedulers", label: "Schedulers" },
+  { href: "/install", label: "Install" },
+];
+
+const extraLinks = [
+  { href: "https://z4j.dev", label: "Docs", external: true },
+  { href: "https://github.com/z4jdev/z4j", label: "GitHub", external: true },
+];
+---
+
+<header class="sticky top-0 z-50 border-b border-[var(--color-border)] bg-[var(--color-bg)]/80 backdrop-blur-xl">
+  <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-6">
+    <a href="/" class="group flex items-center gap-2.5">
+      <svg
+        width="28"
+        height="28"
+        viewBox="0 0 512 512"
+        xmlns="http://www.w3.org/2000/svg"
+        class="z4j-logo-mark shrink-0"
+        aria-hidden="true"
+      >
+        <path
+          d="M 256 66 L 420.545 161 L 420.545 351 L 256 446 L 91.455 351 L 91.455 161 Z"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="26"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M 162 175 H 350 L 162 337 H 350"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="26"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <circle cx="162" cy="175" r="18" fill="currentColor" />
+        <circle cx="350" cy="337" r="18" fill="currentColor" />
+      </svg>
+      <span class="text-lg font-semibold tracking-tight">z4j</span>
+    </a>
+
+    <ul class="hidden items-center gap-7 md:flex">
+      {
+        links.map((l) => (
+          <li>
+            <a
+              href={l.href}
+              class:list={[
+                "text-sm font-medium transition-colors hover:text-[var(--color-fg)]",
+                isActive(l.href)
+                  ? "text-[var(--color-fg)]"
+                  : "text-[var(--color-muted)]",
+              ]}
+            >
+              {l.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="flex items-center gap-2 md:gap-3">
+      {
+        extraLinks.map((l) => (
+          <a
+            href={l.href}
+            class="hidden text-sm font-medium text-[var(--color-muted)] transition-colors hover:text-[var(--color-fg)] md:inline"
+          >
+            {l.label}
+          </a>
+        ))
+      }
+      <ThemeToggle />
+      <a
+        href="/install"
+        class="inline-flex items-center rounded-lg bg-[var(--color-primary)] px-3 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 md:px-4"
+      >
+        Get started
+      </a>
+      <button
+        type="button"
+        id="mobile-nav-toggle"
+        aria-controls="mobile-nav-panel"
+        aria-expanded="false"
+        aria-label="Open menu"
+        class="inline-flex size-9 items-center justify-center rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-fg)] transition-colors hover:bg-[var(--color-surface-raised)] md:hidden"
+      >
+        <svg data-menu-icon="open" width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
+        </svg>
+        <svg data-menu-icon="close" class="hidden" width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
+  </nav>
+
+  <div
+    id="mobile-nav-panel"
+    hidden
+    class="border-t border-[var(--color-border)] bg-[var(--color-bg)]/95 backdrop-blur-xl md:hidden"
+  >
+    <ul class="mx-auto flex max-w-6xl flex-col px-4 py-2">
+      {
+        links.map((l) => (
+          <li>
+            <a
+              href={l.href}
+              class:list={[
+                "flex items-center justify-between rounded-md px-3 py-3 text-sm font-medium transition-colors",
+                isActive(l.href)
+                  ? "bg-[var(--color-surface)] text-[var(--color-fg)]"
+                  : "text-[var(--color-muted)] hover:bg-[var(--color-surface)] hover:text-[var(--color-fg)]",
+              ]}
+            >
+              <span>{l.label}</span>
+              {isActive(l.href) && (
+                <span class="size-1.5 rounded-full bg-[var(--color-primary)]"></span>
+              )}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <div class="mx-auto flex max-w-6xl flex-wrap items-center gap-4 border-t border-[var(--color-border)] px-7 py-4 text-sm">
+      {
+        extraLinks.map((l) => (
+          <a
+            href={l.href}
+            class="font-medium text-[var(--color-muted)] transition-colors hover:text-[var(--color-fg)]"
+          >
+            {l.label} ↗
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</header>
+
+<script>
+  const toggle = document.getElementById("mobile-nav-toggle");
+  const panel = document.getElementById("mobile-nav-panel");
+  const openIcon = toggle?.querySelector('[data-menu-icon="open"]');
+  const closeIcon = toggle?.querySelector('[data-menu-icon="close"]');
+
+  function setOpen(open: boolean) {
+    if (!toggle || !panel) return;
+    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    if (open) {
+      panel.removeAttribute("hidden");
+      openIcon?.classList.add("hidden");
+      closeIcon?.classList.remove("hidden");
+    } else {
+      panel.setAttribute("hidden", "");
+      openIcon?.classList.remove("hidden");
+      closeIcon?.classList.add("hidden");
+    }
+  }
+
+  toggle?.addEventListener("click", () => {
+    const open = toggle.getAttribute("aria-expanded") !== "true";
+    setOpen(open);
+  });
+
+  panel?.querySelectorAll("a").forEach((a) => {
+    a.addEventListener("click", () => setOpen(false));
+  });
+
+  const mql = window.matchMedia("(min-width: 768px)");
+  mql.addEventListener("change", (e) => {
+    if (e.matches) setOpen(false);
+  });
+</script>

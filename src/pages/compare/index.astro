@@ -1,0 +1,142 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Section from "../../components/Section.astro";
+import PageHero from "../../components/PageHero.astro";
+import Icon from "../../components/Icon.astro";
+import CTA from "../../components/CTA.astro";
+import { COMPETITORS } from "../../data/competitors";
+
+const metaDescription =
+  "How z4j compares to Flower, RQ Dashboard, Grafana/Prometheus, and other Python task-queue dashboards. Capability-by-capability, plus honest trade-offs.";
+---
+
+<BaseLayout
+  title="Compare z4j to other task-queue dashboards"
+  description={metaDescription}
+  keywords={["z4j vs Flower", "z4j vs RQ Dashboard", "Celery dashboard comparison", "task queue dashboard comparison"]}
+>
+  <PageHero
+    breadcrumb={[{ label: "Compare" }]}
+    title="How z4j stacks up."
+    subtitle="Most task-queue dashboards cover one engine and stop at 'view.' z4j covers six engines and keeps going: actions, schedules, RBAC, audit trail, redaction. Here is how we compare, honestly."
+  />
+
+  <Section compact>
+    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {
+        COMPETITORS.map((c) => (
+          <a
+            href={`/compare/${c.slug}`}
+            class="group relative flex flex-col overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5 transition-all hover:-translate-y-0.5 hover:border-[var(--color-primary)]/40 hover:shadow-lg hover:shadow-[var(--color-primary)]/5"
+          >
+            <span
+              aria-hidden="true"
+              class="pointer-events-none absolute inset-y-0 left-0 w-0.5 origin-top scale-y-0 bg-[var(--color-primary)] transition-transform duration-300 group-hover:scale-y-100"
+            />
+            <div class="mb-3 flex items-center justify-between gap-3">
+              <div class="font-mono text-[10px] font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+                vs. {c.name}
+              </div>
+              <span class="rounded-full bg-[var(--color-surface-raised)] px-2 py-0.5 text-[10px] font-semibold text-[var(--color-muted)]">
+                {c.scope}
+              </span>
+            </div>
+            <h2 class="text-lg font-semibold tracking-tight">{c.name}</h2>
+            <p class="mt-1.5 text-sm leading-relaxed text-[var(--color-muted)]">{c.tagline}</p>
+
+            <dl class="mt-4 grid grid-cols-2 gap-x-3 gap-y-2 text-[11px]">
+              <dt class="text-[var(--color-muted)]">Positioning</dt>
+              <dd class="font-medium">{c.positioning}</dd>
+              <dt class="text-[var(--color-muted)]">License</dt>
+              <dd class="font-medium">{c.licensing}</dd>
+            </dl>
+
+            <span class="mt-auto inline-flex items-center gap-1 pt-5 text-sm font-semibold text-[var(--color-primary)]">
+              See full comparison
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 10 10"
+                fill="none"
+                class="transition-transform group-hover:translate-x-0.5"
+              >
+                <path
+                  d="M1 5h8m0 0L5 1m4 4L5 9"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </span>
+          </a>
+        ))
+      }
+    </div>
+  </Section>
+
+  <Section
+    eyebrow="How we compare"
+    title="One table, the whole field"
+    subtitle="A high-level capability row. Click any dashboard above for the deep dive."
+  >
+    <div class="overflow-x-auto rounded-xl border border-[var(--color-border)]">
+      <table class="w-full min-w-[720px] text-sm">
+        <thead class="bg-[var(--color-surface)]">
+          <tr class="text-left">
+            <th class="sticky left-0 bg-[var(--color-surface)] px-4 py-3 font-semibold">Capability</th>
+            {COMPETITORS.map((c) => (
+              <th class="px-4 py-3 font-semibold">{c.name}</th>
+            ))}
+            <th class="px-4 py-3 font-semibold text-[var(--color-primary)]">z4j</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            [
+              { key: "Engine coverage", z4j: "6 engines" },
+              { key: "Persistent history", z4j: "Postgres-backed" },
+              { key: "Retry / cancel actions", z4j: "Universal" },
+              { key: "RBAC / multi-user", z4j: "Built-in" },
+              { key: "Audit log", z4j: "HMAC-chained" },
+              { key: "Historical trends", z4j: "Built-in" },
+            ].map((row) => {
+              const theirs = COMPETITORS.map((c) => {
+                const match = c.capabilityTable.find((r) =>
+                  r.cap.toLowerCase().includes(row.key.toLowerCase().split(" ")[0])
+                );
+                return match?.theirs ?? "-";
+              });
+              return (
+                <tr class="border-t border-[var(--color-border)] transition-colors hover:bg-[var(--color-surface)]/40">
+                  <td class="sticky left-0 bg-[var(--color-bg)] px-4 py-3 font-medium">{row.key}</td>
+                  {theirs.map((t) => (
+                    <td class="px-4 py-3 text-[var(--color-muted)]">{t}</td>
+                  ))}
+                  <td class="px-4 py-3 font-medium text-[var(--color-fg)]">
+                    <span class="flex items-center gap-1.5">
+                      <Icon name="check" size={14} class="shrink-0 text-[var(--color-accent)]" />
+                      {row.z4j}
+                    </span>
+                  </td>
+                </tr>
+              );
+            })
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="mt-4 text-xs text-[var(--color-muted)]">
+      This is a summary. Each dashboard's page has the full capability matrix with honest trade-offs.
+    </p>
+  </Section>
+
+  <CTA
+    title="Still on one of these?"
+    subtitle="Install z4j alongside your existing dashboard. Run both for a week. Keep what you prefer."
+    primaryHref="/install"
+    primaryLabel="Install z4j"
+    secondaryHref="/features"
+    secondaryLabel="See features"
+  />
+</BaseLayout>

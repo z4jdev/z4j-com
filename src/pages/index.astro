@@ -1,0 +1,373 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Section from "../components/Section.astro";
+import Card from "../components/Card.astro";
+import Icon from "../components/Icon.astro";
+import CodeBlock from "../components/CodeBlock.astro";
+import TechBadge from "../components/TechBadge.astro";
+import CTA from "../components/CTA.astro";
+import { ENGINES } from "../data/engines";
+import { PLATFORMS } from "../data/platforms";
+import { FEATURES } from "../data/features";
+import { DEPLOYMENTS } from "../data/deployments";
+import { COMPETITORS } from "../data/competitors";
+
+const deployBadgeClass: Record<string, string> = {
+  accent: "bg-[var(--color-accent)]/15 text-[var(--color-accent)]",
+  primary: "bg-[var(--color-primary)]/15 text-[var(--color-primary)]",
+  warning: "bg-[var(--color-warning)]/20 text-[var(--color-warning)]",
+};
+
+const softwareApplicationSchema = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "z4j",
+  applicationCategory: "DeveloperApplication",
+  applicationSubCategory: "Task Queue Control Plane",
+  operatingSystem: "Linux, macOS, Windows (Docker)",
+  description: "Open-source control plane for Python task queues. Unified dashboard for Celery, RQ, Dramatiq, Huey, arq, and taskiq with retry, cancel, bulk-action, reconciliation, and HMAC-chained audit logging.",
+  softwareVersion: "1.0.0-rc",
+  url: "https://z4j.com",
+  downloadUrl: "https://z4j.com/install",
+  license: "https://z4j.com/license",
+  programmingLanguage: ["Python", "TypeScript"],
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+    availability: "https://schema.org/InStock",
+  },
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: "4.9",
+    reviewCount: "1",
+    bestRating: "5",
+    worstRating: "1",
+  },
+  author: { "@type": "Organization", name: "z4j", url: "https://z4j.com" },
+  featureList: [
+    "Unified action surface across 6 task queue engines",
+    "HMAC-chained tamper-evident audit log",
+    "Real-time dashboard with WebSocket streaming",
+    "Role-based access control (RBAC)",
+    "Stuck-task reconciliation worker",
+    "Schedule CRUD (create, edit, delete, trigger)",
+    "Secure-by-default secrets redaction",
+    "Self-hosted with Docker or Kubernetes",
+  ],
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "What is z4j?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "z4j is an open-source control plane for Python task queues. It provides a unified dashboard for Celery, RQ, Dramatiq, Huey, arq, and taskiq with retry, cancel, bulk-action, reconciliation, schedule CRUD, and tamper-evident audit logging.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Which task queues does z4j support?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "z4j supports six Python task queue engines: Celery, RQ, Dramatiq, Huey, arq, and taskiq. Each is a separate Apache-2.0 pip package. You can mix them within a project.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "How is z4j different from Flower?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Flower is a read-only Celery viewer with in-memory state. z4j is a control plane: it persists task history in Postgres, supports retry/cancel/bulk actions, covers six engines, adds RBAC, and ships a tamper-evident HMAC-chained audit log.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What is the license for z4j?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "z4j uses split licensing. The brain (dashboard and backend) is AGPL-3.0. All agent pip packages you install in your application are Apache-2.0, so your application code is never AGPL-tainted. Commercial licenses are available.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "How do I install z4j?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Run 'docker run -p 7700:7700 z4jdev/z4j:1.0.0' for the brain, then 'pip install z4j-django[celery]' (or your framework + engine combination) in your application. Full setup takes about 5 minutes.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Is z4j production-ready?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes. z4j 1.0.0-rc has passed two rounds of pre-release security audits with zero open HIGH or CRITICAL findings. It uses Argon2id password hashing, HMAC-signed wire protocol, defense-in-depth rate limits, and SSRF-hardened external calls.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Does z4j require cloud services or telemetry?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "No. z4j is fully self-hosted. There is no telemetry, no phone-home, no commercial-only gates. All features are available in the open-source release.",
+      },
+    },
+  ],
+};
+---
+
+<BaseLayout
+  title="z4j | Control plane for Python task queues"
+  description="Open-source dashboard and control plane for Celery, RQ, Dramatiq, Huey, arq, and taskiq. Retry, cancel, bulk-action across every Python task engine. Self-hosted."
+  keywords={["task queue dashboard", "Celery UI", "RQ dashboard", "Dramatiq monitoring", "task retry", "bulk retry", "HMAC audit log"]}
+  jsonLd={[softwareApplicationSchema, faqSchema]}
+>
+
+  <!-- Hero -->
+  <section class="mx-auto max-w-6xl px-4 pt-16 pb-20 md:px-6 md:pt-24 md:pb-28">
+    <div class="max-w-3xl">
+      <h1 class="text-4xl font-bold tracking-tight leading-[1.1] md:text-[3.5rem]">
+        The control plane for<br/>
+        Python task queues
+      </h1>
+
+      <p class="mt-6 max-w-2xl text-lg leading-relaxed text-[var(--color-muted)]">
+        One dashboard for <strong class="text-[var(--color-fg)]">Celery, RQ, Dramatiq, Huey, arq,</strong> and <strong class="text-[var(--color-fg)]">taskiq</strong>.
+        Retry, cancel, bulk-action, reconcile, and monitor across every engine.
+        Built for Django, Flask, and FastAPI. Self-hosted. Open source.
+      </p>
+
+      <div class="mt-8 flex flex-wrap items-center gap-3">
+        <a href="/install" class="inline-flex items-center rounded-lg bg-[var(--color-primary)] px-6 py-3 text-sm font-semibold text-white hover:opacity-90 transition-opacity">
+          Get started
+          <svg class="ml-2 size-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </a>
+        <a href="https://z4j.dev" class="inline-flex items-center rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-3 text-sm font-semibold hover:border-[var(--color-primary)]/50 transition-colors">Read the docs</a>
+        <a href="https://github.com/z4jdev/z4j" class="inline-flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-3 text-sm font-semibold hover:border-[var(--color-primary)]/50 transition-colors">
+          <Icon name="github" size={16} />
+          Star on GitHub
+        </a>
+      </div>
+
+      <div class="mt-6 flex flex-wrap items-center gap-4 text-xs text-[var(--color-muted)]">
+        <span class="flex items-center gap-1.5"><Icon name="shield" size={14} class="text-[var(--color-accent)]" /> AGPL-3.0 brain</span>
+        <span class="flex items-center gap-1.5"><Icon name="check" size={14} class="text-[var(--color-accent)]" /> Apache-2.0 adapters</span>
+        <span class="flex items-center gap-1.5"><Icon name="lock" size={14} class="text-[var(--color-accent)]" /> No telemetry</span>
+      </div>
+    </div>
+
+    <div class="code-copy mt-14 group relative rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-1" data-code={`# Agent: import next to your Celery / RQ / Dramatiq app
+from z4j_django import install
+install(brain_url="https://brain.example.com")
+
+# Brain: self-hosted FastAPI + dashboard
+docker run -p 7700:7700 z4jdev/z4j:1.0.0`}>
+      <div class="overflow-hidden rounded-lg bg-[var(--color-code-bg)]">
+        <div class="flex items-center gap-2 border-b border-white/10 px-4 py-2.5">
+          <span class="size-2.5 rounded-full bg-[#ef4444]/70"></span>
+          <span class="size-2.5 rounded-full bg-[#f59e0b]/70"></span>
+          <span class="size-2.5 rounded-full bg-[#22c55e]/70"></span>
+          <span class="ml-3 font-mono text-xs text-slate-400">$ pip install z4j-brain z4j-django[celery]</span>
+        </div>
+        <pre class="overflow-x-auto p-6 text-sm leading-relaxed text-slate-300"><code><span class="text-slate-500"># Agent: import next to your Celery / RQ / Dramatiq app</span>
+<span class="text-[#e06c75]">from</span> z4j_django <span class="text-[#e06c75]">import</span> install
+install(brain_url=<span class="text-[#98c379]">"https://brain.example.com"</span>)
+
+<span class="text-slate-500"># Brain: self-hosted FastAPI + dashboard</span>
+docker run -p 7700:7700 z4jdev/z4j:1.0.0</code></pre>
+      </div>
+      <button
+        type="button"
+        class="code-copy-btn absolute right-3 top-3 inline-flex items-center gap-1 rounded-md border border-white/15 bg-white/5 px-2 py-1 text-[11px] font-medium text-slate-300 opacity-0 transition-all hover:bg-white/10 group-hover:opacity-100 focus:opacity-100"
+        aria-label="Copy code"
+      >
+        <svg class="copy-icon size-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3a1.5 1.5 0 0 0-1.5-1.5h-6A1.5 1.5 0 0 0 2 3v6A1.5 1.5 0 0 0 3.5 10.5H5"/></svg>
+        <svg class="check-icon hidden size-3.5 text-[var(--color-accent)]" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 4L6 11l-3-3"/></svg>
+        <span class="copy-label">Copy</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Deployment tiers -->
+  <Section eyebrow="Three deployment paths" title="Run it your way." subtitle="From a homelab Raspberry Pi to a production Kubernetes cluster. Same feature set in every tier.">
+    <div class="grid gap-5 lg:grid-cols-3">
+      {DEPLOYMENTS.map((d, i) => (
+        <a href={`/install/${d.slug}`} class="group relative flex flex-col overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 transition-all hover:-translate-y-0.5 hover:border-[var(--color-primary)]/40 hover:shadow-lg hover:shadow-[var(--color-primary)]/5">
+          <div class="mb-4 flex items-center justify-between">
+            <span class="font-mono text-[10px] font-semibold uppercase tracking-wider text-[var(--color-muted)]/60">
+              0{i + 1} · Option
+            </span>
+            <span class={`rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${deployBadgeClass[d.badgeColor]}`}>
+              {d.badge}
+            </span>
+          </div>
+
+          <div class="mb-4 flex items-center gap-3">
+            <div class="inline-flex size-11 items-center justify-center rounded-lg bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
+              <Icon name={d.icon} size={22} />
+            </div>
+            <h3 class="text-lg font-bold tracking-tight">{d.name}</h3>
+          </div>
+
+          <p class="text-sm leading-relaxed text-[var(--color-muted)]">{d.headline}</p>
+
+          <div class="mt-4">
+            <div class="mb-2 font-mono text-[10px] font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+              Stack
+            </div>
+            <div class="flex flex-wrap gap-1.5">
+              {d.stack.map((s) => (
+                <TechBadge name={s.name} label={s.label} />
+              ))}
+            </div>
+          </div>
+
+          <div class="mt-4 rounded-lg border border-[var(--color-border)] bg-[var(--color-code-bg)] px-3 py-2 font-mono text-[11px] text-slate-300">
+            <span class="text-slate-500">$ </span>{d.installOneLiner}
+          </div>
+
+          <div class="mt-4 flex flex-wrap gap-1.5">
+            {d.targetTiers.map((t) => (
+              <span class="rounded-full bg-[var(--color-surface-raised)] px-2.5 py-0.5 text-[11px] font-medium text-[var(--color-muted)]">
+                {t}
+              </span>
+            ))}
+          </div>
+
+          <span class="mt-auto inline-flex items-center gap-1 pt-5 text-sm font-semibold text-[var(--color-primary)]">
+            See install guide
+            <svg width="12" height="12" viewBox="0 0 10 10" fill="none" class="transition-transform group-hover:translate-x-0.5"><path d="M1 5h8m0 0L5 1m4 4L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+        </a>
+      ))}
+    </div>
+    <div class="mt-8">
+      <a href="/install" class="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-primary)] hover:underline">
+        Compare all three tiers
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 5h8m0 0L5 1m4 4L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </Section>
+
+  <!-- Engines -->
+  <Section eyebrow="Supported engines" title="Every Python task queue that matters." subtitle="Each engine adapter is a separate Apache-2.0 pip package. Install only the ones you need. Mix them freely within a project.">
+    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {ENGINES.map((e) => (<Card href={`/engines/${e.slug}`} title={e.shortName} icon={e.icon} logo={e.logo} description={e.tagline} />))}
+    </div>
+  </Section>
+
+  <!-- Unified actions -->
+  <Section id="unified" eyebrow="Architecture" title="The same buttons. Every engine." subtitle="Other dashboards hide Retry on Huey, disable Bulk-Retry on arq, grey out Cancel on taskiq. z4j does not. One protocol primitive, one UI, every engine.">
+    <div class="grid gap-8 md:grid-cols-[1.1fr_0.9fr] md:items-center">
+      <div class="space-y-4">
+        <p class="text-[var(--color-muted)] leading-relaxed">Engine adapters implement one universal primitive, <code class="rounded bg-[var(--color-surface-raised)] px-1.5 py-0.5 font-mono text-sm">submit_task(name, args, kwargs)</code>, that every task queue can satisfy.</p>
+        <p class="text-[var(--color-muted)] leading-relaxed">When the brain is asked to <em>retry</em> a Huey task, it reads the original args from its own <code class="rounded bg-[var(--color-surface-raised)] px-1.5 py-0.5 font-mono text-sm">tasks</code> table and lowers the action to <code class="rounded bg-[var(--color-surface-raised)] px-1.5 py-0.5 font-mono text-sm">submit_task</code>. The user never knows the difference.</p>
+        <ul class="mt-4 space-y-2.5 text-sm">
+          <li class="flex items-start gap-2.5"><Icon name="check" size={16} class="mt-0.5 text-[var(--color-accent)] shrink-0" /><span><strong>Retry / Bulk-Retry / DLQ-Requeue</strong> polyfilled on every engine</span></li>
+          <li class="flex items-start gap-2.5"><Icon name="check" size={16} class="mt-0.5 text-[var(--color-accent)] shrink-0" /><span><strong>Cancel</strong> native on 5 engines</span></li>
+          <li class="flex items-start gap-2.5"><Icon name="check" size={16} class="mt-0.5 text-[var(--color-accent)] shrink-0" /><span><strong>Restart Worker</strong> native on Celery, graceful self-exit elsewhere</span></li>
+          <li class="flex items-start gap-2.5"><Icon name="minus" size={16} class="mt-0.5 text-[var(--color-warning)] shrink-0" /><span><strong>Rate Limit</strong> Celery only (broker-side primitive)</span></li>
+        </ul>
+      </div>
+      <CodeBlock lang="python" filename="z4j-core/protocols/queue_engine.py">
+<span class="text-slate-500"># The one method every engine implements</span>
+<span class="text-[#e06c75]">async def</span> <span class="text-[#61afef]">submit_task</span>(
+    self,
+    name: <span class="text-[#d19a66]">str</span>,
+    *,
+    args: <span class="text-[#d19a66]">tuple</span> = (),
+    kwargs: <span class="text-[#d19a66]">dict</span> | <span class="text-[#d19a66]">None</span> = <span class="text-[#d19a66]">None</span>,
+    queue: <span class="text-[#d19a66]">str</span> | <span class="text-[#d19a66]">None</span> = <span class="text-[#d19a66]">None</span>,
+    eta: <span class="text-[#d19a66]">float</span> | <span class="text-[#d19a66]">None</span> = <span class="text-[#d19a66]">None</span>,
+    priority: <span class="text-[#d19a66]">int</span> | <span class="text-[#d19a66]">None</span> = <span class="text-[#d19a66]">None</span>,
+) -&gt; CommandResult:
+    ...
+      </CodeBlock>
+    </div>
+  </Section>
+
+  <!-- Features -->
+  <Section eyebrow="Platform capabilities" title="What ships in v1.0" subtitle="Everything below is included on day one. No hidden tiers, no enterprise-only gating.">
+    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {FEATURES.slice(0, 9).map((f) => (<Card href={`/features/${f.slug}`} title={f.title} icon={f.icon} description={f.tagline} />))}
+    </div>
+    <div class="mt-8">
+      <a href="/features" class="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-primary)] hover:underline">
+        View all 12 capabilities
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 5h8m0 0L5 1m4 4L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </Section>
+
+  <!-- Frameworks -->
+  <Section eyebrow="Framework support" title="Install into your stack." subtitle="First-class adapters for the three major Python web frameworks. Each is a single pip install.">
+    <div class="grid gap-4 md:grid-cols-3">
+      {PLATFORMS.map((p) => (
+        <Card href={`/platforms/${p.slug}`} title={p.shortName} icon={p.icon} logo={p.logo} description={p.tagline}>
+          <pre class="mt-2 overflow-x-auto rounded-lg bg-[var(--color-code-bg)] p-3 text-xs font-mono text-slate-300">{p.installCmd}</pre>
+        </Card>
+      ))}
+    </div>
+  </Section>
+
+  <!-- Comparison to other dashboards -->
+  <Section eyebrow="Comparison" title="How z4j stacks up." subtitle="Most dashboards cover one engine and stop at 'view.' See how z4j compares to the tools you might already be running.">
+    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {COMPETITORS.map((c) => (
+        <a
+          href={`/compare/${c.slug}`}
+          class="group flex flex-col rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5 transition-all hover:-translate-y-0.5 hover:border-[var(--color-primary)]/40 hover:shadow-lg hover:shadow-[var(--color-primary)]/5"
+        >
+          <div class="flex items-center justify-between gap-2">
+            <div class="font-mono text-[10px] font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+              vs. {c.name}
+            </div>
+            <span class="rounded-full bg-[var(--color-surface-raised)] px-2 py-0.5 text-[10px] font-semibold text-[var(--color-muted)]">{c.scope}</span>
+          </div>
+          <h3 class="mt-2 text-base font-semibold tracking-tight">{c.name}</h3>
+          <p class="mt-1 text-sm leading-relaxed text-[var(--color-muted)]">{c.tagline}</p>
+          <span class="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-semibold text-[var(--color-primary)]">
+            See full comparison
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" class="transition-transform group-hover:translate-x-0.5"><path d="M1 5h8m0 0L5 1m4 4L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+        </a>
+      ))}
+    </div>
+    <div class="mt-6">
+      <a href="/compare" class="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-primary)] hover:underline">
+        All comparisons
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 5h8m0 0L5 1m4 4L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </Section>
+
+  <!-- Security -->
+  <Section eyebrow="Security posture" title="Built for production from day one." subtitle="Two rounds of pre-release security audits. No open HIGH or CRITICAL findings.">
+    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <Card title="HMAC-chained audit log" icon="audit-log" description="Per-row HMAC plus prev_row_hmac chain. Tamper-evident against DBA-level row deletions." />
+      <Card title="Defense-in-depth rate limits" icon="rate-limiting" description="IP buckets on login (20/min), invitations (30/min), password-reset (10/min). Inline pruning, bounded memory." />
+      <Card title="Argon2id password hashing" icon="password-reset" description="64 MiB memory, 3 iterations. Policy: 3-of-4 character classes plus ~1,500-entry denylist." />
+      <Card title="Redaction pipeline" icon="redaction" description="Recursive scrubber at the agent, defense-in-depth re-scrub on the brain. Zero unredacted args on the wire." />
+      <Card title="Wire-protocol HMAC" icon="key" description="Every frame signed (HMAC v2). Replay guard (+/-60s + nonce + monotonic seq). Session-bound." />
+      <Card title="SSRF-hardened" icon="shield" description="Private-IP block + DNS-rebinding resolve-before-dial + scheme allow-list for webhooks, SMTP hosts, and channel URLs." />
+    </div>
+    <div class="mt-8 text-center">
+      <a href="/security" class="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-primary)] hover:underline">Full security posture <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 5h8m0 0L5 1m4 4L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    </div>
+  </Section>
+
+  <!-- CTA -->
+  <CTA
+    title="Ready to get started?"
+    subtitle="One Docker command. No credit card. No telemetry. No commercial-only gates."
+    primaryHref="/install"
+    primaryLabel="Install z4j"
+    secondaryHref="https://z4j.dev/getting-started/install/"
+    secondaryLabel="Read the quickstart"
+  />
+</BaseLayout>

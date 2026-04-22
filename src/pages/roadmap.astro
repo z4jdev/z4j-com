@@ -1,0 +1,87 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Section from "../components/Section.astro";
+import PageHero from "../components/PageHero.astro";
+import CTA from "../components/CTA.astro";
+
+const PHASES = [
+  {
+    version: "v1.0.0 (now)",
+    status: "released",
+    items: [
+      "6 engine adapters + 6 scheduler adapters",
+      "Unified action surface",
+      "Reconciliation worker",
+      "RBAC UI polish + /settings/memberships",
+      "Multi-user invitations + SMTP auto-send",
+      "Password reset flow",
+      "HMAC-chained audit log",
+      "Rate limits on all unauthenticated endpoints",
+      "Gmail + Mailgun + Brevo SMTP presets",
+    ],
+  },
+  {
+    version: "v1.1 (next)",
+    status: "next",
+    items: [
+      "More notification features",
+      "Multi-language",
+      "More adapters",
+    ],
+  },
+];
+
+const STATUS_STYLES: Record<string, string> = {
+  released: "bg-[var(--color-accent)]/15 text-[var(--color-accent)]",
+  next: "bg-[var(--color-primary)]/15 text-[var(--color-primary)]",
+  planned: "bg-[var(--color-border)]/60 text-[var(--color-muted)]",
+  intent: "bg-[var(--color-warning)]/15 text-[var(--color-warning)]",
+  no: "bg-[var(--color-danger)]/10 text-[var(--color-danger)]",
+};
+---
+
+<BaseLayout
+  title="Public roadmap | z4j"
+  description="The z4j public roadmap. What shipped in v1.0 and what's coming in v1.1."
+  keywords={["z4j roadmap", "z4j future", "task queue roadmap", "z4j upcoming features"]}
+>
+  <PageHero
+    breadcrumb={[{ label: "Roadmap" }]}
+    title="Where z4j is going."
+    subtitle="Shipped features are locked. Future work is signaled by community usage, not our imagination."
+  />
+
+  <Section>
+    <div class="space-y-8 max-w-3xl">
+      {
+        PHASES.map((p) => (
+          <article class="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]/40 p-6">
+            <header class="mb-4 flex flex-wrap items-center gap-3">
+              <h2 class="font-mono text-xl font-semibold">{p.version}</h2>
+              <span class={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[p.status]}`}>
+                {p.status}
+              </span>
+            </header>
+            <ul class="space-y-2">
+              {p.items.map((it) => (
+                <li class="flex items-start gap-2 text-sm text-[var(--color-muted)]">
+                  <span class="mt-0.5">•</span>
+                  <span>{it}</span>
+                </li>
+              ))}
+            </ul>
+          </article>
+        ))
+      }
+    </div>
+  </Section>
+
+  <CTA
+    title="Shape the roadmap"
+    subtitle="GitHub Discussions is where we talk about what to build next. We read everything."
+    primaryHref="https://github.com/z4jdev/z4j/discussions"
+    primaryLabel="Discussions"
+    secondaryHref="https://github.com/z4jdev/z4j/issues"
+    secondaryLabel="Open an issue"
+  />
+</BaseLayout>

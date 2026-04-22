@@ -1,0 +1,162 @@
+---
+const year = new Date().getFullYear();
+
+const sections = [
+  {
+    title: "Product",
+    links: [
+      { href: "/features", label: "Features" },
+      { href: "/engines", label: "Engines" },
+      { href: "/platforms", label: "Platforms" },
+      { href: "/schedulers", label: "Schedulers" },
+      { href: "/pricing", label: "Pricing" },
+    ],
+  },
+  {
+    title: "Install",
+    links: [
+      { href: "/install", label: "Install guide" },
+      { href: "/install/pip", label: "Pure Python (pip)" },
+      { href: "/install/z4j", label: "z4j (default)" },
+      { href: "/install/z4j-postgres", label: "z4j + Postgres" },
+      { href: "/install/tls", label: "TLS setup" },
+    ],
+  },
+  {
+    title: "Resources",
+    links: [
+      { href: "https://z4j.dev", label: "Documentation" },
+      { href: "/changelog", label: "Changelog" },
+      { href: "/roadmap", label: "Roadmap" },
+      { href: "/compare", label: "Compare dashboards" },
+      { href: "/sitemap", label: "Sitemap" },
+    ],
+  },
+  {
+    title: "Company",
+    links: [
+      { href: "/about", label: "About" },
+      { href: "/security", label: "Security" },
+      { href: "/community", label: "Community" },
+      { href: "/contact", label: "Contact" },
+    ],
+  },
+];
+
+const socials = [
+  {
+    href: "https://github.com/z4jdev/z4j",
+    label: "GitHub",
+    path: "M12 .5C5.73.5.5 5.73.5 12a11.5 11.5 0 007.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.36-3.88-1.36-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.75 1.18 1.75 1.18 1.02 1.76 2.68 1.25 3.34.95.1-.74.4-1.25.72-1.54-2.56-.29-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.18-3.1-.12-.3-.51-1.47.11-3.07 0 0 .97-.31 3.17 1.18a11 11 0 015.78 0c2.2-1.49 3.17-1.18 3.17-1.18.62 1.6.23 2.77.11 3.07.74.81 1.18 1.84 1.18 3.1 0 4.43-2.7 5.41-5.27 5.69.41.35.78 1.05.78 2.12v3.14c0 .31.21.67.8.56A11.5 11.5 0 0023.5 12C23.5 5.73 18.27.5 12 .5z",
+  },
+  {
+    href: "https://x.com/z4jdev",
+    label: "X",
+    path: "M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z",
+  },
+];
+
+const legal = [
+  { href: "/license", label: "License" },
+  { href: "/privacy", label: "Privacy" },
+  { href: "/terms", label: "Terms" },
+  { href: "/security.txt", label: "security.txt" },
+];
+---
+
+<footer class="mt-24 border-t border-[var(--color-border)] bg-[var(--color-surface)]">
+  <div class="mx-auto max-w-6xl px-4 py-14 md:px-6">
+    <!-- Top: brand + 4 link columns -->
+    <div class="grid gap-10 md:grid-cols-6 md:gap-8">
+      <div class="md:col-span-2">
+        <a href="/" class="flex items-center gap-2.5">
+          <svg width="28" height="28" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="6" fill="oklch(0.38 0.15 260)"/>
+            <path d="M7 9.5H25L8 22.5H25" stroke="white" stroke-width="3.25" stroke-linecap="square" stroke-linejoin="miter" fill="none"/>
+            <rect x="7" y="25" width="4" height="1.5" rx="0.5" fill="white" fill-opacity="0.7"/>
+            <rect x="12.5" y="25" width="7" height="1.5" rx="0.5" fill="white" fill-opacity="0.85"/>
+            <rect x="21" y="25" width="4" height="1.5" rx="0.5" fill="white" fill-opacity="0.55"/>
+          </svg>
+          <span class="text-lg font-semibold tracking-tight">z4j</span>
+        </a>
+        <p class="mt-3 max-w-xs text-sm leading-relaxed text-[var(--color-muted)]">
+          The control plane for Python task queues. One dashboard for every engine.
+        </p>
+        <div class="mt-5 flex items-center gap-2">
+          {socials.map((s) => (
+            <a
+              href={s.href}
+              rel="noopener"
+              target="_blank"
+              aria-label={s.label}
+              title={s.label}
+              class="inline-flex size-9 items-center justify-center rounded-md border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-muted)] transition-colors hover:border-[var(--color-primary)]/40 hover:text-[var(--color-fg)]"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d={s.path} />
+              </svg>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      {
+        sections.map((section) => (
+          <div>
+            <h3 class="text-xs font-semibold uppercase tracking-wider text-[var(--color-fg)]">
+              {section.title}
+            </h3>
+            <ul class="mt-3 space-y-2">
+              {section.links.map((l) => (
+                <li>
+                  <a
+                    href={l.href}
+                    class="text-sm text-[var(--color-muted)] transition-colors hover:text-[var(--color-fg)]"
+                  >
+                    {l.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+
+    <!-- Bottom bar: copyright + legal inline -->
+    <div class="mt-12 border-t border-[var(--color-border)] pt-6">
+      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <p class="text-xs text-[var(--color-muted)]">
+          &copy; {year} z4j contributors. Brain: AGPL-3.0. Agent packages: Apache-2.0.
+        </p>
+        <ul class="flex flex-wrap items-center gap-x-5 gap-y-2">
+          {legal.map((l) => (
+            <li>
+              <a
+                href={l.href}
+                class="text-xs text-[var(--color-muted)] transition-colors hover:text-[var(--color-fg)]"
+              >
+                {l.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <p class="mt-6 text-xs leading-relaxed text-[var(--color-muted)]/80">
+        <a href="https://docs.celeryq.dev/" rel="nofollow" class="hover:text-[var(--color-fg)]">Celery</a>,
+        <a href="https://python-rq.org/" rel="nofollow" class="hover:text-[var(--color-fg)]">RQ</a>,
+        <a href="https://dramatiq.io/" rel="nofollow" class="hover:text-[var(--color-fg)]">Dramatiq</a>,
+        <a href="https://huey.readthedocs.io/" rel="nofollow" class="hover:text-[var(--color-fg)]">Huey</a>,
+        <a href="https://arq-docs.helpmanual.io/" rel="nofollow" class="hover:text-[var(--color-fg)]">arq</a>,
+        <a href="https://taskiq-python.github.io/" rel="nofollow" class="hover:text-[var(--color-fg)]">taskiq</a>,
+        <a href="https://www.djangoproject.com/" rel="nofollow" class="hover:text-[var(--color-fg)]">Django</a>,
+        <a href="https://flask.palletsprojects.com/" rel="nofollow" class="hover:text-[var(--color-fg)]">Flask</a>,
+        and
+        <a href="https://fastapi.tiangolo.com/" rel="nofollow" class="hover:text-[var(--color-fg)]">FastAPI</a>
+        are independent open-source projects. Trademarks are the property of their respective owners.
+        z4j is not endorsed by or affiliated with any of these projects.
+      </p>
+    </div>
+  </div>
+</footer>

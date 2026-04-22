@@ -1,0 +1,35 @@
+---
+import Breadcrumb from "./Breadcrumb.astro";
+
+interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}
+
+interface Props {
+  title: string;
+  subtitle?: string;
+  eyebrow?: string;
+  breadcrumb?: BreadcrumbItem[];
+}
+
+const { title, subtitle, eyebrow, breadcrumb } = Astro.props;
+---
+
+<section class="mx-auto w-full max-w-6xl px-4 pb-10 pt-10 md:px-6 md:pb-14 md:pt-14">
+  {breadcrumb && <Breadcrumb items={breadcrumb} />}
+  <div class="max-w-3xl">
+    {eyebrow && (
+      <div class="mb-4 inline-flex items-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1 text-xs font-medium text-[var(--color-accent)]">
+        {eyebrow}
+      </div>
+    )}
+    <h1 class="text-4xl font-bold tracking-tight md:text-5xl">{title}</h1>
+    {subtitle && (
+      <p class="mt-4 max-w-2xl text-base leading-relaxed text-[var(--color-muted)] md:text-lg">
+        {subtitle}
+      </p>
+    )}
+    <slot />
+  </div>
+</section>

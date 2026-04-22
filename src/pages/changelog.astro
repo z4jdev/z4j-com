@@ -1,0 +1,180 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Section from "../components/Section.astro";
+import PageHero from "../components/PageHero.astro";
+import CTA from "../components/CTA.astro";
+import { CHANGELOG, CATEGORIES, RELEASES } from "../data/changelog";
+
+const typeStyle: Record<string, string> = {
+  added: "bg-[var(--color-accent)]/15 text-[var(--color-accent)] border-[var(--color-accent)]/30",
+  changed: "bg-[var(--color-primary)]/15 text-[var(--color-primary)] border-[var(--color-primary)]/30",
+  fixed: "bg-[oklch(0.7_0.15_25)]/15 text-[oklch(0.65_0.2_25)] border-[oklch(0.7_0.15_25)]/30",
+  security: "bg-[var(--color-warning)]/20 text-[var(--color-warning)] border-[var(--color-warning)]/30",
+  deprecated: "bg-[var(--color-surface-raised)] text-[var(--color-muted)] border-[var(--color-border)]",
+  removed: "bg-[var(--color-surface-raised)] text-[var(--color-muted)] border-[var(--color-border)]",
+};
+
+const current = RELEASES[0];
+const totalEntries = CHANGELOG.reduce((sum, c) => sum + c.entries.length, 0);
+const counts: Record<string, number> = { all: CHANGELOG.length };
+for (const c of CHANGELOG) counts[c.category] = (counts[c.category] ?? 0) + 1;
+---
+
+<BaseLayout
+  title="Changelog | z4j releases"
+  description="Every z4j release, broken down per component. Filter by Core, Brain, Frameworks, Engines, or Schedulers. v1.0.0 initial release."
+  keywords={["z4j changelog", "z4j releases", "z4j v1.0.0", "task queue release notes"]}
+>
+  <PageHero
+    breadcrumb={[{ label: "Changelog" }]}
+    title="Every release, spelled out."
+    subtitle="One timeline per component. Filter by package or see them all. Full Keep-a-Changelog entries live in CHANGELOG.md on GitHub."
+  />
+
+  <Section compact>
+    <div class="flex flex-wrap items-center justify-between gap-6 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6">
+      <div>
+        <div class="font-mono text-[10px] font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+          Latest release
+        </div>
+        <div class="mt-1 flex items-baseline gap-3">
+          <span class="font-mono text-3xl font-semibold tracking-tight text-[var(--color-primary)]">v{current.version}</span>
+          <span class="text-sm text-[var(--color-muted)]">{current.date}</span>
+        </div>
+        <p class="mt-2 max-w-xl text-sm leading-relaxed text-[var(--color-muted)]">
+          {current.headline}
+        </p>
+      </div>
+      <dl class="grid grid-cols-2 gap-x-8 gap-y-1 text-sm">
+        <div>
+          <dt class="font-mono text-[10px] font-semibold uppercase tracking-wider text-[var(--color-muted)]">Components</dt>
+          <dd class="mt-1 text-xl font-semibold">{CHANGELOG.length}</dd>
+        </div>
+        <div>
+          <dt class="font-mono text-[10px] font-semibold uppercase tracking-wider text-[var(--color-muted)]">Entries</dt>
+          <dd class="mt-1 text-xl font-semibold">{totalEntries}</dd>
+        </div>
+      </dl>
+    </div>
+  </Section>
+
+  <Section compact>
+    <div
+      id="changelog-root"
+      data-active-category="all"
+      class="space-y-10"
+    >
+      <div class="sticky top-16 z-10 -mx-4 border-y border-[var(--color-border)] bg-[var(--color-bg)]/90 px-4 py-3 backdrop-blur md:-mx-6 md:px-6">
+        <div class="flex items-center gap-3 overflow-x-auto">
+          <span class="shrink-0 font-mono text-[10px] font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+            Filter:
+          </span>
+          <div role="tablist" class="flex items-center gap-2">
+            {CATEGORIES.map((cat) => (
+              <button
+                type="button"
+                role="tab"
+                data-category-filter={cat.id}
+                aria-selected={cat.id === "all" ? "true" : "false"}
+                class="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1 text-xs font-medium text-[var(--color-muted)] transition-colors hover:border-[var(--color-primary)]/40 hover:text-[var(--color-fg)] aria-selected:border-[var(--color-primary)] aria-selected:bg-[var(--color-primary)] aria-selected:text-white"
+              >
+                {cat.label}
+                <span class="rounded-full bg-[var(--color-bg)]/30 px-1.5 py-0.5 font-mono text-[10px] font-semibold tabular-nums aria-selected:bg-white/20">
+                  {counts[cat.id] ?? 0}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <ol class="space-y-6">
+        {CHANGELOG.map((c) => (
+          <li
+            data-component={c.slug}
+            data-category={c.category}
+            class="changelog-card rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]/60"
+          >
+            <header class="flex flex-wrap items-baseline justify-between gap-3 border-b border-[var(--color-border)] px-6 py-4">
+              <div class="flex items-baseline gap-3">
+                <h2 class="font-mono text-base font-semibold text-[var(--color-fg)]">
+                  {c.name}
+                </h2>
+                <span class="rounded-full bg-[var(--color-surface-raised)] px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+                  {c.categoryLabel}
+                </span>
+              </div>
+              <div class="flex items-baseline gap-3 text-xs text-[var(--color-muted)]">
+                <span class="font-mono font-semibold text-[var(--color-primary)]">v{c.version}</span>
+                <span>{c.date}</span>
+              </div>
+            </header>
+            <ul class="divide-y divide-[var(--color-border)]/50">
+              {c.entries.map((e) => (
+                <li class="flex items-start gap-3 px-6 py-3">
+                  <span class={`mt-0.5 inline-flex shrink-0 items-center rounded-md border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider ${typeStyle[e.type]}`}>
+                    {e.type}
+                  </span>
+                  <span class="text-sm leading-relaxed">{e.summary}</span>
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ol>
+
+      <p id="changelog-empty" hidden class="rounded-lg border border-dashed border-[var(--color-border)] bg-[var(--color-surface)] p-6 text-center text-sm text-[var(--color-muted)]">
+        No entries match this filter.
+      </p>
+    </div>
+  </Section>
+
+  <CTA
+    title="Read the full CHANGELOG"
+    subtitle="Every PR, every fix, every breaking change. Keep-a-Changelog format, SemVer."
+    primaryHref="https://github.com/z4jdev/z4j/blob/main/CHANGELOG.md"
+    primaryLabel="CHANGELOG.md on GitHub"
+    secondaryHref="https://github.com/z4jdev/z4j/releases"
+    secondaryLabel="GitHub Releases"
+  />
+</BaseLayout>
+
+<script>
+  const root = document.getElementById("changelog-root");
+  const emptyState = document.getElementById("changelog-empty");
+  if (root) {
+    const buttons = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-category-filter]"));
+    const cards = Array.from(root.querySelectorAll<HTMLLIElement>(".changelog-card"));
+
+    function apply(category: string) {
+      root!.setAttribute("data-active-category", category);
+      buttons.forEach((b) => {
+        b.setAttribute(
+          "aria-selected",
+          b.getAttribute("data-category-filter") === category ? "true" : "false",
+        );
+      });
+      let visible = 0;
+      cards.forEach((card) => {
+        const match = category === "all" || card.getAttribute("data-category") === category;
+        if (match) {
+          card.removeAttribute("hidden");
+          visible++;
+        } else {
+          card.setAttribute("hidden", "");
+        }
+      });
+      if (emptyState) {
+        if (visible === 0) emptyState.removeAttribute("hidden");
+        else emptyState.setAttribute("hidden", "");
+      }
+    }
+
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const cat = btn.getAttribute("data-category-filter") ?? "all";
+        apply(cat);
+      });
+    });
+  }
+</script>

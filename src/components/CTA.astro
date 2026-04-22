@@ -1,0 +1,45 @@
+---
+interface Props {
+  title: string;
+  subtitle?: string;
+  primaryHref: string;
+  primaryLabel: string;
+  secondaryHref?: string;
+  secondaryLabel?: string;
+}
+const { title, subtitle, primaryHref, primaryLabel, secondaryHref, secondaryLabel } = Astro.props;
+---
+
+<section class="mx-auto my-20 max-w-4xl px-4 md:px-6">
+  <div class="relative overflow-hidden rounded-2xl border border-[var(--color-border)] bg-gradient-to-br from-[var(--color-primary)]/15 via-[var(--color-surface)] to-[var(--color-surface)] p-10 md:p-14">
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--color-primary)/20,_transparent_60%)] pointer-events-none"></div>
+    <div class="relative flex flex-col items-start gap-5 md:flex-row md:items-center md:justify-between">
+      <div>
+        <h2 class="text-2xl font-semibold tracking-tight md:text-3xl">
+          {title}
+        </h2>
+        {subtitle && (
+          <p class="mt-2 max-w-lg text-[var(--color-muted)]">{subtitle}</p>
+        )}
+      </div>
+      <div class="flex flex-wrap gap-3">
+        <a
+          href={primaryHref}
+          class="inline-flex items-center rounded-md bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-[var(--color-primary-fg)] hover:opacity-90 transition-opacity"
+        >
+          {primaryLabel}
+        </a>
+        {
+          secondaryHref && secondaryLabel && (
+            <a
+              href={secondaryHref}
+              class="inline-flex items-center rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2 text-sm font-medium hover:border-[var(--color-primary)]/50 transition-colors"
+            >
+              {secondaryLabel}
+            </a>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</section>

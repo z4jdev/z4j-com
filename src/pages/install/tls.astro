@@ -1,0 +1,394 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Section from "../../components/Section.astro";
+import CodeCopy from "../../components/CodeCopy.astro";
+import Icon from "../../components/Icon.astro";
+import PageHero from "../../components/PageHero.astro";
+import CTA from "../../components/CTA.astro";
+
+const caddyOverlay = `# .env additions
+Z4J_DOMAIN=z4j.example.com
+Z4J_ACME_EMAIL=you@example.com
+Z4J_PUBLIC_URL=https://z4j.example.com
+
+# Bring the stack up with both compose files.
+docker compose \\
+  -f docker-compose.yml \\
+  -f docker-compose.caddy.yml \\
+  up -d`;
+
+const caddyFile = `{
+  email {env.Z4J_ACME_EMAIL}
+}
+
+{env.Z4J_DOMAIN} {
+  encode zstd gzip
+  reverse_proxy z4j-brain:7700
+  header {
+    Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+    X-Content-Type-Options "nosniff"
+    X-Frame-Options "DENY"
+  }
+}`;
+
+const traefikLabels = `# Add these labels to the z4j-brain service in docker-compose.yml.
+# Assumes Traefik is already running with a 'websecure' entrypoint
+# and a 'letsencrypt' cert resolver on the same Docker network.
+services:
+  z4j-brain:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.z4j.rule=Host(\`z4j.example.com\`)"
+      - "traefik.http.routers.z4j.entrypoints=websecure"
+      - "traefik.http.routers.z4j.tls.certresolver=letsencrypt"
+      - "traefik.http.services.z4j.loadbalancer.server.port=7700"
+    networks:
+      - traefik_public`;
+
+const cloudflareTunnel = `# Install cloudflared on the same host as z4j-brain, then:
+cloudflared tunnel login
+cloudflared tunnel create z4j
+cloudflared tunnel route dns z4j z4j.example.com
+
+# Create ~/.cloudflared/config.yml:
+cat > ~/.cloudflared/config.yml <<EOF
+tunnel: z4j
+credentials-file: /root/.cloudflared/<tunnel-uuid>.json
+ingress:
+  - hostname: z4j.example.com
+    service: http://localhost:7700
+  - service: http_status:404
+EOF
+
+# Run the tunnel (supervise with systemd in production).
+cloudflared tunnel run z4j`;
+
+const nginxSnippet = `# /etc/nginx/sites-available/z4j.conf
+server {
+    listen 443 ssl http2;
+    server_name z4j.example.com;
+
+    ssl_certificate     /etc/letsencrypt/live/z4j.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/z4j.example.com/privkey.pem;
+
+    # Required for the agent WebSocket (/ws/agent).
+    location / {
+        proxy_pass         http://127.0.0.1:7700;
+        proxy_http_version 1.1;
+        proxy_set_header   Upgrade \$http_upgrade;
+        proxy_set_header   Connection "upgrade";
+        proxy_set_header   Host               \$host;
+        proxy_set_header   X-Real-IP          \$remote_addr;
+        proxy_set_header   X-Forwarded-For    \$proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto  \$scheme;
+
+        proxy_read_timeout 3600s;
+        proxy_send_timeout 3600s;
+    }
+}
+
+server {
+    listen 80;
+    server_name z4j.example.com;
+    return 301 https://\$host\$request_uri;
+}`;
+
+const patterns = [
+  {
+    id: "caddy",
+    icon: "server",
+    name: "Caddy overlay",
+    tagline: "Zero-config HTTPS via Let's Encrypt. Two extra files.",
+    bestFor: "Solo developers, homelab, single-VM deployments with a public DNS name",
+    effort: "~2 minutes",
+    tradeoffs: [
+      "Auto-provisions and renews TLS certs via ACME HTTP-01",
+      "Needs public port 80 + 443 open to the internet",
+      "Caddy joins the z4j_backend network and proxies internally",
+      "One extra container (~20 MB RAM)",
+    ],
+  },
+  {
+    id: "traefik",
+    icon: "globe",
+    name: "Traefik labels",
+    tagline: "If Traefik already runs in your cluster, just add labels.",
+    bestFor: "Teams with existing Traefik ingress",
+    effort: "~5 minutes (assuming Traefik is already configured)",
+    tradeoffs: [
+      "No extra container",
+      "Labels live on the brain service, no separate config file",
+      "Traefik handles cert resolver, HTTP-to-HTTPS redirect, and HTTP/3",
+      "Requires Traefik configured with a certresolver (Let's Encrypt, step-ca, etc.)",
+    ],
+  },
+  {
+    id: "cloudflare",
+    icon: "shield",
+    name: "Cloudflare Tunnel",
+    tagline: "No public ports. Cloudflare handles TLS at the edge.",
+    bestFor: "Homelabs behind CGNAT, teams with Cloudflare already in place, zero-trust deployments",
+    effort: "~5 minutes",
+    tradeoffs: [
+      "No inbound ports open on your host",
+      "Cloudflare terminates TLS at its edge, tunnels HTTP to your brain",
+      "Runs cloudflared as a persistent sidecar or systemd service",
+      "Cloudflare account required (free tier works fine for small deployments)",
+    ],
+  },
+  {
+    id: "nginx",
+    icon: "terminal",
+    name: "nginx + certbot",
+    tagline: "Classic stack. Works everywhere.",
+    bestFor: "Shops standardized on nginx, Debian/Ubuntu admins, mixed-workload VMs",
+    effort: "~10 minutes",
+    tradeoffs: [
+      "Runs on the host, not in a container",
+      "certbot auto-renews via cron or systemd timer",
+      "Familiar syntax for ops teams already running nginx",
+      "WebSocket upgrade headers required for the agent gateway",
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="TLS setup for z4j | Caddy, Traefik, Cloudflare, nginx"
+  description="Four supported patterns for putting z4j behind HTTPS: Caddy overlay, Traefik labels, Cloudflare Tunnel, and nginx + certbot. Ship the one that fits your stack."
+  keywords={["z4j TLS", "Caddy reverse proxy", "Traefik z4j", "Cloudflare Tunnel", "nginx z4j HTTPS"]}
+  breadcrumbs={[
+    { name: "Install", href: "/install" },
+    { name: "TLS setup", href: "/install/tls" },
+  ]}
+>
+  <PageHero
+    breadcrumb={[
+      { label: "Install", href: "/install" },
+      { label: "TLS setup" },
+    ]}
+    title="Reverse proxy and TLS setup"
+    subtitle="The brain image exposes plain HTTP on port 7700. Put it behind whichever TLS terminator your team already runs, or use the optional Caddy overlay we ship for zero-config auto-HTTPS."
+  >
+    <p class="mt-4 max-w-3xl text-base font-medium text-[var(--color-primary)]">
+      z4j does not bundle a reverse proxy. Here are four patterns that work.
+    </p>
+  </PageHero>
+
+  <Section eyebrow="Why no bundled proxy?" title="Because your infra already has one.">
+    <div class="max-w-3xl space-y-4 text-[var(--color-muted)] leading-relaxed">
+      <p>
+        Most teams deploying z4j already run Traefik, nginx, a Kubernetes ingress controller, a cloud load balancer, or Cloudflare. Bundling Caddy into the primary image would force a double-hop, conflict with port 80 and 443, and break ingress patterns.
+      </p>
+      <p>
+        So we keep the <code class="rounded bg-[var(--color-surface-raised)] px-1.5 py-0.5 font-mono text-sm">z4jdev/z4j</code> image single-purpose (HTTP on 7700) and ship TLS as a composable choice. Homelab users get a one-line Caddy overlay. Everyone else plugs z4j into their existing stack.
+      </p>
+    </div>
+
+    <div class="mt-8 grid gap-4 md:grid-cols-4">
+      {patterns.map((p) => (
+        <a
+          href={`#${p.id}`}
+          class="group flex flex-col rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 transition-all hover:-translate-y-0.5 hover:border-[var(--color-primary)]/40"
+        >
+          <div class="mb-3 inline-flex size-9 items-center justify-center rounded-lg bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
+            <Icon name={p.icon} size={18} />
+          </div>
+          <h3 class="text-base font-semibold">{p.name}</h3>
+          <p class="mt-1 text-xs text-[var(--color-muted)]">{p.bestFor}</p>
+          <p class="mt-3 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-accent)]">
+            {p.effort}
+          </p>
+        </a>
+      ))}
+    </div>
+  </Section>
+
+  <Section id="caddy" eyebrow="Pattern 1" title="Caddy overlay" subtitle="Zero-config HTTPS. Two extra files in the repo. Auto-renewed certs via Let's Encrypt.">
+    <div class="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+      <div>
+        <h3 class="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+          Bring the stack up
+        </h3>
+        <CodeCopy code={caddyOverlay} lang="bash" />
+
+        <h3 class="mt-8 mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+          What lives in deploy/Caddyfile
+        </h3>
+        <CodeCopy code={caddyFile} lang="caddyfile" />
+
+        <p class="mt-3 text-xs text-[var(--color-muted)]">
+          The overlay drops the brain's public port binding and routes 80 plus 443 through Caddy. Certs persist in the z4j_caddy_data volume.
+        </p>
+      </div>
+
+      <div class="space-y-6">
+        <div>
+          <h3 class="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+            What you get
+          </h3>
+          <ul class="space-y-2.5">
+            {patterns[0].tradeoffs.map((t) => (
+              <li class="flex items-start gap-2.5 text-sm">
+                <Icon name="check" size={15} class="mt-0.5 text-[var(--color-accent)] shrink-0" />
+                <span>{t}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div class="rounded-xl border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5 p-5">
+          <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-primary)]">
+            <Icon name="shield" size={14} />
+            Best for
+          </div>
+          <p class="mt-2 text-sm">{patterns[0].bestFor}</p>
+        </div>
+
+        <div class="rounded-xl border border-[var(--color-warning)]/30 bg-[var(--color-warning)]/5 p-5">
+          <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-warning)]">
+            <Icon name="x" size={14} />
+            Skip this when
+          </div>
+          <p class="mt-2 text-sm text-[var(--color-muted)]">
+            You already run Traefik, nginx, or a cloud LB. Running Caddy behind a second TLS terminator creates double encryption overhead with zero benefit.
+          </p>
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <Section id="traefik" eyebrow="Pattern 2" title="Traefik labels" subtitle="If Traefik already runs in your cluster, this is the lowest-friction option. Add labels, done.">
+    <div class="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+      <div>
+        <h3 class="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+          Add to z4j-brain service
+        </h3>
+        <CodeCopy code={traefikLabels} lang="yaml" />
+        <p class="mt-3 text-xs text-[var(--color-muted)]">
+          Assumes Traefik is configured with a 'websecure' entrypoint and a 'letsencrypt' certresolver. Swap them for your actual Traefik entrypoint and resolver names.
+        </p>
+      </div>
+
+      <div class="space-y-6">
+        <div>
+          <h3 class="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+            What you get
+          </h3>
+          <ul class="space-y-2.5">
+            {patterns[1].tradeoffs.map((t) => (
+              <li class="flex items-start gap-2.5 text-sm">
+                <Icon name="check" size={15} class="mt-0.5 text-[var(--color-accent)] shrink-0" />
+                <span>{t}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div class="rounded-xl border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5 p-5">
+          <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-primary)]">
+            <Icon name="shield" size={14} />
+            Best for
+          </div>
+          <p class="mt-2 text-sm">{patterns[1].bestFor}</p>
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <Section id="cloudflare" eyebrow="Pattern 3" title="Cloudflare Tunnel" subtitle="No public ports. Cloudflare terminates TLS at its edge, tunnels HTTP to your brain over an outbound connection.">
+    <div class="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+      <div>
+        <h3 class="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+          Set up the tunnel
+        </h3>
+        <CodeCopy code={cloudflareTunnel} lang="bash" />
+        <p class="mt-3 text-xs text-[var(--color-muted)]">
+          cloudflared can run as a systemd service or in a sidecar container. Either way, no inbound ports open on your host.
+        </p>
+      </div>
+
+      <div class="space-y-6">
+        <div>
+          <h3 class="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+            What you get
+          </h3>
+          <ul class="space-y-2.5">
+            {patterns[2].tradeoffs.map((t) => (
+              <li class="flex items-start gap-2.5 text-sm">
+                <Icon name="check" size={15} class="mt-0.5 text-[var(--color-accent)] shrink-0" />
+                <span>{t}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div class="rounded-xl border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5 p-5">
+          <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-primary)]">
+            <Icon name="shield" size={14} />
+            Best for
+          </div>
+          <p class="mt-2 text-sm">{patterns[2].bestFor}</p>
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <Section id="nginx" eyebrow="Pattern 4" title="nginx + certbot" subtitle="The classic stack. Works on any Linux distro. Familiar to every ops team.">
+    <div class="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+      <div>
+        <h3 class="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+          /etc/nginx/sites-available/z4j.conf
+        </h3>
+        <CodeCopy code={nginxSnippet} lang="nginx" />
+        <p class="mt-3 text-xs text-[var(--color-muted)]">
+          Run certbot once to obtain the cert, then symlink into sites-enabled and reload nginx. The WebSocket upgrade headers are required for the agent gateway at /ws/agent.
+        </p>
+      </div>
+
+      <div class="space-y-6">
+        <div>
+          <h3 class="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+            What you get
+          </h3>
+          <ul class="space-y-2.5">
+            {patterns[3].tradeoffs.map((t) => (
+              <li class="flex items-start gap-2.5 text-sm">
+                <Icon name="check" size={15} class="mt-0.5 text-[var(--color-accent)] shrink-0" />
+                <span>{t}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div class="rounded-xl border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5 p-5">
+          <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-primary)]">
+            <Icon name="shield" size={14} />
+            Best for
+          </div>
+          <p class="mt-2 text-sm">{patterns[3].bestFor}</p>
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <Section eyebrow="Kubernetes" title="On Kubernetes: use your ingress controller">
+    <div class="max-w-3xl space-y-4 text-[var(--color-muted)] leading-relaxed">
+      <p>
+        If you run z4j on Kubernetes, do not install Caddy inside the cluster. Expose the brain Service on port 7700 and route traffic through your existing ingress (nginx-ingress, Traefik, Contour, Istio, cert-manager plus Let's Encrypt).
+      </p>
+      <p>
+        A Helm chart is on the z4j v1.1 roadmap. Until it ships, a plain Deployment plus Service plus Ingress is straightforward; the brain image is stateless apart from its Postgres connection.
+      </p>
+    </div>
+  </Section>
+
+  <CTA
+    title="Still not sure which to pick?"
+    subtitle="Homelab on one VM: Caddy overlay. Existing Traefik cluster: labels. Behind CGNAT: Cloudflare Tunnel. Classic ops team: nginx."
+    primaryHref="/install/z4j"
+    primaryLabel="Back to z4j (default)"
+    secondaryHref="https://z4j.dev/guides/self-hosting/"
+    secondaryLabel="Full deployment guide"
+  />
+</BaseLayout>

@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#080b14"/>
+      <stop offset="100%" stop-color="#1a1033"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.3" cy="0.2" r="0.8">
+      <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#7c3aed" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+
+  <!-- Logo mark -->
+  <g transform="translate(80, 80)">
+    <rect width="96" height="96" rx="22" fill="#7c3aed"/>
+    <path d="M24 30h42l-30 36h42" stroke="white" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="200" y="148" font-family="Inter, system-ui, sans-serif" font-size="56" font-weight="700" fill="white">z4j</text>
+
+  <!-- Main headline -->
+  <text x="80" y="320" font-family="Inter, system-ui, sans-serif" font-size="72" font-weight="800" fill="white">
+    <tspan x="80" dy="0">The control plane for</tspan>
+    <tspan x="80" dy="88">Python task queues</tspan>
+  </text>
+
+  <!-- Subtitle -->
+  <text x="80" y="520" font-family="Inter, system-ui, sans-serif" font-size="28" font-weight="400" fill="#94a3b8">
+    Celery. RQ. Dramatiq. Huey. arq. taskiq.
+  </text>
+
+  <!-- Badge -->
+  <g transform="translate(80, 552)">
+    <rect width="220" height="40" rx="20" fill="#7c3aed" fill-opacity="0.15" stroke="#7c3aed" stroke-opacity="0.4"/>
+    <text x="20" y="26" font-family="Inter, system-ui, sans-serif" font-size="16" font-weight="600" fill="#a78bfa">
+      Self-hosted . Open source
+    </text>
+  </g>
+
+  <!-- URL -->
+  <text x="1120" y="582" font-family="JetBrains Mono, monospace" font-size="20" font-weight="500" fill="#64748b" text-anchor="end">
+    z4j.com
+  </text>
+</svg>

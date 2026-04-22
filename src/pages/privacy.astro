@@ -1,0 +1,59 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Section from "../components/Section.astro";
+import PageHero from "../components/PageHero.astro";
+---
+
+<BaseLayout
+  title="Privacy Policy | z4j"
+  description="z4j collects almost nothing. No cookies on z4j.com, no telemetry in z4j-brain, no third-party analytics. Self-hosted deployments keep all data inside your infrastructure."
+  keywords={["z4j privacy", "no telemetry", "self-hosted privacy"]}
+>
+  <PageHero
+    breadcrumb={[{ label: "Privacy" }]}
+    title="Privacy policy"
+    subtitle="Last updated: April 2026"
+  />
+
+  <Section>
+    <div class="prose prose-invert max-w-3xl text-sm text-[var(--color-muted)] space-y-6">
+
+      <div>
+        <h2 class="text-base font-semibold text-[var(--color-text)] mb-2">What z4j.com collects</h2>
+        <p>This marketing website is fully static and hosted on Cloudflare Pages. We do not use cookies, analytics trackers, or third-party scripts. Cloudflare may log standard HTTP request metadata (IP, user-agent, timestamp) under their own privacy policy.</p>
+      </div>
+
+      <div>
+        <h2 class="text-base font-semibold text-[var(--color-text)] mb-2">What z4j-brain collects (self-hosted)</h2>
+        <p>When you self-host z4j-brain, all data stays in your infrastructure. The brain stores:</p>
+        <ul class="list-disc list-inside space-y-1 mt-2">
+          <li>User accounts (email, display name, argon2id password hash)</li>
+          <li>Task events (with secrets redacted before leaving your agent)</li>
+          <li>Audit log entries (admin actions, auth events)</li>
+          <li>Agent metadata (hostname, capabilities)</li>
+        </ul>
+        <p class="mt-2">None of this data is transmitted to z4j.com or any external service. You own your data.</p>
+      </div>
+
+      <div>
+        <h2 class="text-base font-semibold text-[var(--color-text)] mb-2">Telemetry</h2>
+        <p>z4j-brain does not phone home. There is no telemetry, no usage reporting, no license-check call. The brain works fully air-gapped.</p>
+      </div>
+
+      <div>
+        <h2 class="text-base font-semibold text-[var(--color-text)] mb-2">Email</h2>
+        <p>If you contact us at licensing@z4j.com or security@z4j.com, we retain your email for correspondence. We do not subscribe you to marketing lists.</p>
+      </div>
+
+      <div>
+        <h2 class="text-base font-semibold text-[var(--color-text)] mb-2">Changes</h2>
+        <p>We may update this policy. Changes are committed to the public repository and noted in the changelog.</p>
+      </div>
+
+      <div>
+        <h2 class="text-base font-semibold text-[var(--color-text)] mb-2">Contact</h2>
+        <p>Privacy questions: <a href="mailto:privacy@z4j.com" class="text-[var(--color-primary)] hover:underline">privacy@z4j.com</a></p>
+      </div>
+    </div>
+  </Section>
+</BaseLayout>

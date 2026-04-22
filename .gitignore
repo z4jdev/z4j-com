@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.astro/
+.wrangler/
+.cache/
+.vercel/
+.next/
+test-results/
+playwright-report/
+*.tsbuildinfo
+.DS_Store
+.env
+.env.local
+.env.*.local
+.vscode/
+.idea/
