@@ -7,7 +7,7 @@ import CodeBlock from "../components/CodeBlock.astro";
 import TechBadge from "../components/TechBadge.astro";
 import CTA from "../components/CTA.astro";
 import { ENGINES } from "../data/engines";
-import { PLATFORMS } from "../data/platforms";
+import { FRAMEWORKS } from "../data/frameworks";
 import { FEATURES } from "../data/features";
 import { DEPLOYMENTS } from "../data/deployments";
 import { COMPETITORS } from "../data/competitors";
@@ -26,7 +26,7 @@ const softwareApplicationSchema = {
   applicationSubCategory: "Task Queue Control Plane",
   operatingSystem: "Linux, macOS, Windows (Docker)",
   description: "Open-source control plane for Python task queues. Unified dashboard for Celery, RQ, Dramatiq, Huey, arq, and taskiq with retry, cancel, bulk-action, reconciliation, and HMAC-chained audit logging.",
-  softwareVersion: "1.0.0-rc",
+  softwareVersion: "1.0.5",
   url: "https://z4j.com",
   downloadUrl: "https://z4j.com/install",
   license: "https://z4j.com/license",
@@ -98,7 +98,7 @@ const faqSchema = {
       name: "How do I install z4j?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Run 'docker run -p 7700:7700 z4jdev/z4j:1.0.0' for the brain, then 'pip install z4j-django[celery]' (or your framework + engine combination) in your application. Full setup takes about 5 minutes.",
+        text: "Two commands. 'pip install z4j && z4j serve' for an evaluator install on a laptop, or 'docker compose up -d' from the z4jdev/z4j repo for a Docker install. In your application, 'pip install z4j-django z4j-celery z4j-celerybeat' (or your framework + engine combination). Full setup takes about 5 minutes.",
       },
     },
     {
@@ -106,7 +106,7 @@ const faqSchema = {
       name: "Is z4j production-ready?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes. z4j 1.0.0-rc has passed two rounds of pre-release security audits with zero open HIGH or CRITICAL findings. It uses Argon2id password hashing, HMAC-signed wire protocol, defense-in-depth rate limits, and SSRF-hardened external calls.",
+        text: "Yes. z4j 1.0.5 has passed two rounds of pre-release security audits plus a full v1.0.5 end-to-end audit (44/44 checks across CLI surface, lifecycle, server runtime, UX flows, state recovery, and security). Argon2id password hashing, HMAC-signed wire protocol, defense-in-depth rate limits, SSRF-hardened external calls.",
       },
     },
     {
@@ -148,7 +148,7 @@ const faqSchema = {
           <svg class="ml-2 size-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
         </a>
         <a href="https://z4j.dev" class="inline-flex items-center rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-3 text-sm font-semibold hover:border-[var(--color-primary)]/50 transition-colors">Read the docs</a>
-        <a href="https://github.com/z4jdev/z4j" class="inline-flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-3 text-sm font-semibold hover:border-[var(--color-primary)]/50 transition-colors">
+        <a href="https://github.com/z4jdev" class="inline-flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-3 text-sm font-semibold hover:border-[var(--color-primary)]/50 transition-colors">
           <Icon name="github" size={16} />
           Star on GitHub
         </a>
@@ -161,25 +161,29 @@ const faqSchema = {
       </div>
     </div>
 
-    <div class="code-copy mt-14 group relative rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-1" data-code={`# Agent: import next to your Celery / RQ / Dramatiq app
-from z4j_django import install
-install(brain_url="https://brain.example.com")
+    <div class="code-copy mt-14 group relative rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-1" data-code={`# Brain: bundled SQLite, dashboard, API. First boot prints a setup URL.
+pip install z4j && z4j serve
 
-# Brain: self-hosted FastAPI + dashboard
-docker run -p 7700:7700 z4jdev/z4j:1.0.0`}>
+# Or via Docker:
+docker compose up -d
+
+# Then in your Django/Flask/FastAPI app:
+pip install z4j-django z4j-celery z4j-celerybeat`}>
       <div class="overflow-hidden rounded-lg bg-[var(--color-code-bg)]">
         <div class="flex items-center gap-2 border-b border-white/10 px-4 py-2.5">
           <span class="size-2.5 rounded-full bg-[#ef4444]/70"></span>
           <span class="size-2.5 rounded-full bg-[#f59e0b]/70"></span>
           <span class="size-2.5 rounded-full bg-[#22c55e]/70"></span>
-          <span class="ml-3 font-mono text-xs text-slate-400">$ pip install z4j-brain z4j-django[celery]</span>
+          <span class="ml-3 font-mono text-xs text-slate-400">$ z4j serve  &nbsp;# starts on :7700, prints setup URL to stderr</span>
         </div>
-        <pre class="overflow-x-auto p-6 text-sm leading-relaxed text-slate-300"><code><span class="text-slate-500"># Agent: import next to your Celery / RQ / Dramatiq app</span>
-<span class="text-[#e06c75]">from</span> z4j_django <span class="text-[#e06c75]">import</span> install
-install(brain_url=<span class="text-[#98c379]">"https://brain.example.com"</span>)
+        <pre class="overflow-x-auto p-6 text-sm leading-relaxed text-slate-300"><code><span class="text-slate-500"># Brain: bundled SQLite, dashboard, API. First boot prints a setup URL.</span>
+pip install z4j <span class="text-[#e06c75]">&amp;&amp;</span> z4j serve
 
-<span class="text-slate-500"># Brain: self-hosted FastAPI + dashboard</span>
-docker run -p 7700:7700 z4jdev/z4j:1.0.0</code></pre>
+<span class="text-slate-500"># Or via Docker (multi-arch: amd64 + arm64):</span>
+docker compose up -d
+
+<span class="text-slate-500"># Then in your Django/Flask/FastAPI app:</span>
+pip install z4j-django z4j-celery z4j-celerybeat</code></pre>
       </div>
       <button
         type="button"
@@ -307,8 +311,8 @@ docker run -p 7700:7700 z4jdev/z4j:1.0.0</code></pre>
   <!-- Frameworks -->
   <Section eyebrow="Framework support" title="Install into your stack." subtitle="First-class adapters for the three major Python web frameworks. Each is a single pip install.">
     <div class="grid gap-4 md:grid-cols-3">
-      {PLATFORMS.map((p) => (
-        <Card href={`/platforms/${p.slug}`} title={p.shortName} icon={p.icon} logo={p.logo} description={p.tagline}>
+      {FRAMEWORKS.map((p) => (
+        <Card href={`/frameworks/${p.slug}`} title={p.shortName} icon={p.icon} logo={p.logo} description={p.tagline}>
           <pre class="mt-2 overflow-x-auto rounded-lg bg-[var(--color-code-bg)] p-3 text-xs font-mono text-slate-300">{p.installCmd}</pre>
         </Card>
       ))}

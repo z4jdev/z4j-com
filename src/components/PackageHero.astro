@@ -1,0 +1,189 @@
+---
+/**
+ * Unified hero block for engine / platform / scheduler detail pages.
+ *
+ * Pulls EVERY package-level fact (version, license, release date, PyPI URL,
+ * GitHub URL, upstream URL, install command) from `data/packages.ts`.
+ * Domain-specific copy (tagline, description, icon, logo) is passed in by
+ * the calling page from the engines.ts / platforms.ts / schedulers.ts
+ * data file.
+ *
+ * Render order:
+ *   1. Breadcrumb
+ *   2. Logo + name + version badge + license badge
+ *   3. PyPI name (with optional Upstream link)
+ *   4. Tagline
+ *   5. Description
+ *   6. Action row: Docs button, PyPI link, GitHub link, Upstream link
+ *   7. Meta strip: Latest version + Released date
+ *   8. Install code block
+ */
+
+import Section from "./Section.astro";
+import Breadcrumb from "./Breadcrumb.astro";
+import Icon from "./Icon.astro";
+import CodeCopy from "./CodeCopy.astro";
+import { getPackage } from "../data/packages";
+
+interface Props {
+  /** PyPI distribution name. Used as the lookup key in packages.ts. */
+  packageName: string;
+  /** Human display name shown as the page H1 (e.g. "Celery"). */
+  shortName: string;
+  /** Lucide icon id, used when no logo is provided. */
+  icon: string;
+  /** Optional logo image URL. */
+  logo?: string;
+  /** One-line value-prop displayed below the title in the brand colour. */
+  tagline: string;
+  /** Multi-paragraph description below the tagline. */
+  description: string;
+  /** Breadcrumb items rendered above the title. */
+  breadcrumb: { label: string; href?: string }[];
+}
+
+const {
+  packageName,
+  shortName,
+  icon,
+  logo,
+  tagline,
+  description,
+  breadcrumb,
+} = Astro.props;
+
+const pkg = getPackage(packageName);
+---
+
+<Section compact>
+  <Breadcrumb items={breadcrumb} />
+
+  <!-- Logo + title + badges -->
+  <div class="flex flex-wrap items-center gap-5">
+    {pkg.upstream ? (
+      <a
+        href={pkg.upstream}
+        rel="nofollow noopener"
+        target="_blank"
+        title={`${shortName} upstream project`}
+        class="inline-flex size-16 items-center justify-center rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] transition-colors hover:border-[var(--color-primary)]/40"
+      >
+        {logo ? (
+          <img src={logo} alt={`${shortName} logo`} class="size-10 object-contain" />
+        ) : (
+          <Icon name={icon} size={32} class="text-[var(--color-primary)]" />
+        )}
+      </a>
+    ) : logo ? (
+      <div class="inline-flex size-16 items-center justify-center rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]">
+        <img src={logo} alt={`${shortName} logo`} class="size-10 object-contain" />
+      </div>
+    ) : (
+      <div class="inline-flex size-16 items-center justify-center rounded-xl bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
+        <Icon name={icon} size={32} />
+      </div>
+    )}
+
+    <div class="min-w-0 flex-1">
+      <div class="flex flex-wrap items-center gap-3">
+        <h1 class="text-4xl font-bold tracking-tight md:text-5xl">
+          {shortName}
+        </h1>
+        <span class="rounded-full bg-[var(--color-primary)]/15 px-2.5 py-0.5 font-mono text-xs font-semibold text-[var(--color-primary)]">
+          v{pkg.latest}
+        </span>
+        <span class="rounded-full bg-[var(--color-surface-raised)] px-2.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+          {pkg.license}
+        </span>
+      </div>
+      <p class="mt-1 font-mono text-sm text-[var(--color-muted)]">
+        {pkg.name}
+        {pkg.upstream && (
+          <>
+            {" · "}
+            <a
+              href={pkg.upstream}
+              rel="nofollow noopener"
+              target="_blank"
+              class="text-[var(--color-primary)] hover:underline"
+            >
+              Upstream project
+            </a>
+          </>
+        )}
+      </p>
+    </div>
+  </div>
+
+  <p class="mt-6 max-w-3xl text-xl font-medium text-[var(--color-primary)]">
+    {tagline}
+  </p>
+  <p class="mt-4 max-w-3xl text-lg leading-relaxed text-[var(--color-muted)]">
+    {description}
+  </p>
+
+  <!-- Action row -->
+  <div class="mt-8 flex flex-wrap gap-3">
+    {pkg.docs && (
+      <a
+        href={pkg.docs}
+        class="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-primary)] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 transition-opacity"
+      >
+        Docs
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 5h8m0 0L5 1m4 4L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    )}
+    <a
+      href={pkg.pypi}
+      rel="noopener"
+      target="_blank"
+      class="inline-flex items-center rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-2.5 text-sm font-semibold hover:border-[var(--color-primary)]/50 transition-colors"
+    >
+      PyPI: {pkg.name}
+    </a>
+    <a
+      href={pkg.github}
+      rel="noopener"
+      target="_blank"
+      class="inline-flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-2.5 text-sm font-semibold hover:border-[var(--color-primary)]/50 transition-colors"
+    >
+      <Icon name="github" size={15} class="text-[var(--color-muted)]" />
+      Source
+    </a>
+    {pkg.upstream && (
+      <a
+        href={pkg.upstream}
+        rel="nofollow noopener"
+        target="_blank"
+        class="inline-flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-2.5 text-sm font-semibold hover:border-[var(--color-primary)]/50 transition-colors"
+      >
+        <Icon name="external" size={15} class="text-[var(--color-muted)]" />
+        Upstream
+      </a>
+    )}
+  </div>
+
+  <!-- Meta strip -->
+  <dl class="mt-6 flex flex-wrap gap-x-8 gap-y-2 text-sm">
+    <div class="flex items-baseline gap-2">
+      <dt class="font-mono text-[10px] font-semibold uppercase tracking-wider text-[var(--color-muted)]">Latest</dt>
+      <dd class="font-mono font-semibold">v{pkg.latest}</dd>
+    </div>
+    <div class="flex items-baseline gap-2">
+      <dt class="font-mono text-[10px] font-semibold uppercase tracking-wider text-[var(--color-muted)]">Released</dt>
+      <dd>{pkg.releaseDate}</dd>
+    </div>
+    <div class="flex items-baseline gap-2">
+      <dt class="font-mono text-[10px] font-semibold uppercase tracking-wider text-[var(--color-muted)]">License</dt>
+      <dd>{pkg.license}</dd>
+    </div>
+  </dl>
+</Section>
+
+<!-- Install -->
+<Section compact>
+  <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+    Install
+  </h2>
+  <CodeCopy code={`pip install ${pkg.name}`} lang="bash" />
+</Section>

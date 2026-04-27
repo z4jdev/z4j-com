@@ -31,24 +31,42 @@ export const DEPLOYMENTS: DeploymentMeta[] = [
     icon: "terminal",
     badge: "Lightest",
     badgeColor: "accent",
-    name: "Pure Python (pip)",
-    tagline: "One pip install. No Docker. No container runtime.",
-    headline: "Install from PyPI. Runs as a single Python process with a local SQLite file.",
+    name: "Pip (SQLite)",
+    tagline: "Pure Python. No container runtime required.",
+    headline: "Install from PyPI. Runs as a single Python process with a local SQLite file. Two commands from zero to dashboard.",
     stack: [
       { name: "pypi", label: "PyPI package" },
       { name: "python", label: "Python 3.11+" },
-      { name: "sqlite", label: "SQLite" },
+      { name: "sqlite", label: "SQLite (local file)" },
     ],
-    installOneLiner: "pip install z4j-brain",
+    installOneLiner: "pip install z4j && z4j serve",
     audience: "Solo developers, homelab, local dev, bare-metal servers, CI",
     targetTiers: ["Homelab", "Solo developer"],
-    install: `# Install the brain (dashboard and backend bundled, SQLite by default)
-pip install z4j-brain
+    install: `# Install the brain + umbrella (dashboard, backend, SQLite, all bundled)
+pip install z4j
 
-# Boot with an admin account. Auto-runs migrations, generates secrets.
-z4j-brain serve \\
-  --admin-email you@example.com \\
-  --admin-password change-me`,
+# Start it. First boot auto-mints HMAC secrets, runs migrations, and prints
+# a one-time setup URL to stderr. Open the URL to create the first admin.
+# z4j auto-detects the server's hostname, FQDN, and LAN IPs - so you can
+# reach the dashboard via any of them out of the box.
+z4j serve
+
+# Then open http://<your-server>:7700 in your browser.
+
+# Adding a public domain (e.g. tasks.example.com pointed via reverse proxy):
+z4j allowed-hosts add tasks.example.com    # persisted to ~/.z4j/allowed-hosts
+z4j allowed-hosts list                      # show what's whitelisted
+z4j allowed-hosts remove old-host.example   # idempotent
+# Restart z4j serve to pick up changes.
+
+# Useful CLI commands (z4j and z4j-brain are aliases - same entry point):
+z4j check               # config + DB + migrations at head
+z4j status              # version, DB URL, user/project/agent counts
+z4j createsuperuser     # provision an admin without the setup URL
+z4j changepassword      # reset a user password
+z4j migrate upgrade head    # run alembic migrations explicitly
+z4j audit verify        # verify the HMAC-chained audit log
+z4j reset-setup         # mint a fresh setup URL (e.g. expired token)`,
     installLang: "bash",
     containers: [
       { name: "One Python process", purpose: "z4j-brain serves the FastAPI API, the WebSocket agent gateway, and the React dashboard from a single process. SQLite lives on local disk." },
@@ -88,9 +106,9 @@ z4j-brain serve \\
     icon: "server",
     badge: "Default",
     badgeColor: "primary",
-    name: "z4j",
-    tagline: "One container. Bundled SQLite. Zero required env vars.",
-    headline: "A single Docker image with SQLite baked in. docker compose up and you are done.",
+    name: "Docker (SQLite)",
+    tagline: "One container. SQLite bundled in the image. No env vars required.",
+    headline: "Single docker compose file. SQLite bundled, auto-mints secrets on first boot, auto-runs migrations. One command from clone to dashboard.",
     stack: [
       { name: "docker", label: "Docker image" },
       { name: "sqlite", label: "SQLite (bundled)" },
@@ -98,16 +116,20 @@ z4j-brain serve \\
     installOneLiner: "docker compose up -d",
     audience: "Homelab, small teams, evaluation, proof-of-concept",
     targetTiers: ["Homelab", "Small team", "Evaluation"],
-    install: `# The default. One file. docker compose up.
-# No secrets to set, no Postgres, no broker. It just works.
+    install: `# The default. One file. SQLite bundled in the image.
+git clone https://github.com/z4jdev/z4j.git && cd z4j
+cp .env.example .env       # fill Z4J_SECRET + Z4J_SESSION_SECRET
 docker compose up -d
 
 # Tail logs for the first-boot admin setup URL.
 docker compose logs -f z4j-brain
 
-# Or skip the interactive setup with env vars in .env:
+# Or skip interactive setup with bootstrap env vars in .env:
 #   Z4J_BOOTSTRAP_ADMIN_EMAIL=you@example.com
-#   Z4J_BOOTSTRAP_ADMIN_PASSWORD=change-me`,
+#   Z4J_BOOTSTRAP_ADMIN_PASSWORD=<long random>
+
+# Add Caddy auto-HTTPS on top:
+docker compose -f docker-compose.yml -f docker-compose.caddy.yml up -d`,
     installLang: "bash",
     containers: [
       { name: "z4j-brain", image: "z4jdev/z4j:latest", purpose: "One image. Bundles the FastAPI backend, the React dashboard, and the SQLite driver. Auto-generates secrets on first boot, persists them to the z4j_data volume, auto-runs migrations. Exposes port 7700." },
@@ -149,9 +171,9 @@ docker compose logs -f z4j-brain
     icon: "database",
     badge: "Production",
     badgeColor: "warning",
-    name: "z4j + Postgres",
-    tagline: "Two services. Same image. Horizontal-scale ready.",
-    headline: "The same Docker image pointed at PostgreSQL for central backups, partitioning, and horizontal replicas.",
+    name: "Docker (Postgres)",
+    tagline: "Same image, external Postgres. Horizontal-scale ready.",
+    headline: "Two services: the z4j image + a Postgres sidecar. Central backups via pg_dump, range partitioning on events, horizontal brain replicas behind a load balancer.",
     stack: [
       { name: "docker", label: "Docker image" },
       { name: "postgres", label: "PostgreSQL 17+" },
@@ -159,21 +181,30 @@ docker compose logs -f z4j-brain
     installOneLiner: "docker compose -f docker-compose.postgres.yml up -d",
     audience: "Medium and larger businesses, regulated environments, compliance-sensitive teams",
     targetTiers: ["Small business", "Medium business", "Enterprise"],
-    install: `# Two services. The z4j-brain image is the SAME one from the default
-# compose file; it auto-switches to Postgres because Z4J_DATABASE_URL
-# is set. No separate image, no custom build.
+    install: `# Two services. Same z4jdev/z4j image as the default compose; it auto-
+# switches to Postgres because Z4J_DATABASE_URL is set. No build required.
 
-# Set your secrets in .env first:
+git clone https://github.com/z4jdev/z4j.git && cd z4j
+cp .env.example .env
+
+# Edit .env and fill in your secrets:
 #   POSTGRES_PASSWORD=<long random>
-#   Z4J_SECRET=<openssl rand -hex 48>
-#   Z4J_SESSION_SECRET=<openssl rand -hex 48>
+#   Z4J_SECRET=$(openssl rand -hex 32)
+#   Z4J_SESSION_SECRET=$(openssl rand -hex 32)
 #   Z4J_PUBLIC_URL=https://z4j.yourdomain.com
-#   Z4J_ALLOWED_HOSTS=["z4j.yourdomain.com"]
+#   Z4J_ALLOWED_HOSTS=z4j.yourdomain.com
 
-docker compose -f docker-compose.postgres.yml up -d --build
+docker compose -f docker-compose.postgres.yml up -d
 
-# First-boot admin URL is in the brain logs.
-docker compose -f docker-compose.postgres.yml logs -f z4j-brain`,
+# Capture the first-boot setup URL from the brain logs:
+docker compose -f docker-compose.postgres.yml logs -f z4j-brain
+
+# Or skip interactive setup entirely with bootstrap env vars in .env:
+#   Z4J_BOOTSTRAP_ADMIN_EMAIL=you@example.com
+#   Z4J_BOOTSTRAP_ADMIN_PASSWORD=<long random>
+
+# Layer Caddy auto-HTTPS on top:
+docker compose -f docker-compose.postgres.yml -f docker-compose.caddy.yml up -d`,
     installLang: "bash",
     containers: [
       { name: "z4j-brain", image: "z4jdev/z4j:latest", purpose: "Same image as the default. Bundles backend plus dashboard. Connects to external Postgres via Z4J_DATABASE_URL." },

@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import { ENGINES } from "../data/engines";
-import { PLATFORMS } from "../data/platforms";
+import { FRAMEWORKS } from "../data/frameworks";
 import { SCHEDULERS } from "../data/schedulers";
 import { FEATURES } from "../data/features";
 import { DEPLOYMENTS } from "../data/deployments";
@@ -22,7 +22,7 @@ function buildEntries(): Entry[] {
   const highValue = [
     "/features",
     "/engines",
-    "/platforms",
+    "/frameworks",
     "/schedulers",
     "/install",
     "/install/tls",
@@ -36,7 +36,7 @@ function buildEntries(): Entry[] {
 
   for (const f of FEATURES) entries.push({ path: `/features/${f.slug}`, priority: 0.8, changefreq: "weekly" });
   for (const e of ENGINES) entries.push({ path: `/engines/${e.slug}`, priority: 0.8, changefreq: "weekly" });
-  for (const p of PLATFORMS) entries.push({ path: `/platforms/${p.slug}`, priority: 0.8, changefreq: "weekly" });
+  for (const p of FRAMEWORKS) entries.push({ path: `/frameworks/${p.slug}`, priority: 0.8, changefreq: "weekly" });
   for (const s of SCHEDULERS) entries.push({ path: `/schedulers/${s.slug}`, priority: 0.8, changefreq: "weekly" });
   for (const d of DEPLOYMENTS) entries.push({ path: `/install/${d.slug}`, priority: 0.8, changefreq: "weekly" });
   for (const c of COMPETITORS) entries.push({ path: `/compare/${c.slug}`, priority: 0.7, changefreq: "weekly" });

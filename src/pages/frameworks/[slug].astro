@@ -1,0 +1,199 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Section from "../../components/Section.astro";
+import Card from "../../components/Card.astro";
+import Icon from "../../components/Icon.astro";
+import CodeCopy from "../../components/CodeCopy.astro";
+import CTA from "../../components/CTA.astro";
+import PackageHero from "../../components/PackageHero.astro";
+import { FRAMEWORKS, FRAMEWORK_ENGINE_EXTRAS } from "../../data/frameworks";
+import { ENGINES } from "../../data/engines";
+import { getPackage } from "../../data/packages";
+
+export function getStaticPaths() {
+  return FRAMEWORKS.map((f) => ({
+    params: { slug: f.slug },
+    props: { framework: f },
+  }));
+}
+const { framework } = Astro.props;
+const pkg = getPackage(framework.name);
+const other = FRAMEWORKS.filter((f) => f.slug !== framework.slug);
+
+const productSchema = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: `z4j for ${framework.shortName}`,
+  applicationCategory: "DeveloperApplication",
+  operatingSystem: "Linux, macOS, Windows",
+  description: framework.description,
+  softwareVersion: pkg.latest,
+  url: pkg.landing ?? `https://z4j.com/frameworks/${framework.slug}`,
+  downloadUrl: pkg.pypi,
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  author: { "@type": "Organization", name: "z4j", url: "https://z4j.com" },
+  featureList: framework.features,
+};
+
+const metaTitle = `${framework.shortName} integration | z4j`;
+const metaDescription = `${framework.tagline} ${framework.description.slice(0, 140)}`.slice(0, 160);
+---
+
+<BaseLayout
+  title={metaTitle}
+  description={metaDescription}
+  keywords={[framework.shortName, `${framework.shortName} task queue`, `${framework.shortName} Celery`, pkg.name]}
+  jsonLd={productSchema}
+  breadcrumbs={[
+    { name: "Frameworks", href: "/frameworks" },
+    { name: framework.shortName, href: `/frameworks/${framework.slug}` },
+  ]}
+>
+  <PackageHero
+    packageName={framework.name}
+    shortName={framework.shortName}
+    icon={framework.icon}
+    logo={framework.logo}
+    tagline={framework.tagline}
+    description={framework.description}
+    breadcrumb={[
+      { label: "Frameworks", href: "/frameworks" },
+      { label: framework.shortName },
+    ]}
+  />
+
+  <Section
+    eyebrow="Pick an engine"
+    title={`${framework.shortName} + any task engine`}
+    subtitle="Every extra pulls the engine adapter AND its companion scheduler in one shot, so a fresh install never needs a second command."
+  >
+    <div class="overflow-hidden rounded-xl border border-[var(--color-border)]">
+      <table class="w-full text-sm">
+        <thead class="bg-[var(--color-surface)] text-left text-xs uppercase tracking-wider text-[var(--color-muted)]">
+          <tr>
+            <th class="px-4 py-3 font-mono">Engine</th>
+            <th class="px-4 py-3 font-mono">Install command</th>
+            <th class="px-4 py-3 font-mono">Bundled scheduler</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[var(--color-border)]/50">
+          {FRAMEWORK_ENGINE_EXTRAS.map((e) => {
+            const isRecommended = e.extra === framework.recommendedEngine;
+            return (
+              <tr class={isRecommended ? "bg-[var(--color-primary)]/5" : ""}>
+                <td class="px-4 py-3">
+                  <span class="font-semibold">{e.label}</span>
+                  {isRecommended && (
+                    <span class="ml-2 rounded-full bg-[var(--color-accent)]/15 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-[var(--color-accent)]">
+                      recommended
+                    </span>
+                  )}
+                </td>
+                <td class="px-4 py-3">
+                  <code class="rounded bg-[var(--color-surface-raised)] px-1.5 py-0.5 font-mono text-xs">
+                    pip install {framework.name}[{e.extra}]
+                  </code>
+                </td>
+                <td class="px-4 py-3 text-[var(--color-muted)]">{e.bundled}</td>
+              </tr>
+            );
+          })}
+          <tr>
+            <td class="px-4 py-3">
+              <span class="font-semibold">Every engine</span>
+              <span class="ml-2 text-xs text-[var(--color-muted)]">(CI / kitchen sink)</span>
+            </td>
+            <td class="px-4 py-3">
+              <code class="rounded bg-[var(--color-surface-raised)] px-1.5 py-0.5 font-mono text-xs">
+                pip install {framework.name}[all]
+              </code>
+            </td>
+            <td class="px-4 py-3 text-[var(--color-muted)]">all of the above</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="mt-3 text-xs text-[var(--color-muted)]">
+      <code class="rounded bg-[var(--color-surface-raised)] px-1.5 py-0.5 font-mono">pip install {framework.name}</code>
+      with no extra installs only the framework adapter. Pick an engine extra
+      for the normal case.
+    </p>
+  </Section>
+
+  <Section compact>
+    <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+      Wire it in
+    </h2>
+    <CodeCopy code={framework.quickstart} lang="python" />
+  </Section>
+
+  <Section
+    compact
+    eyebrow="Verify"
+    title="Confirm the agent reaches the brain"
+    subtitle="Run the doctor as the same user the service runs under. It probes brain DNS / TCP / TLS / WebSocket upgrade, the on-disk buffer path, and reports auto-detected engines - exits 0 on all-green, 1 on any failure."
+  >
+    <CodeCopy
+      code={
+        framework.slug === "django"
+          ? "python manage.py z4j_doctor"
+          : `python -m ${framework.name.replace("-", "_")} doctor`
+      }
+      lang="bash"
+    />
+    <p class="mt-3 text-xs text-[var(--color-muted)]">
+      Catches the gunicorn-under-<code class="rounded bg-[var(--color-surface-raised)] px-1 py-0.5 font-mono text-xs">www-data</code> silent startup failure (the agent now auto-relocates the buffer to <code class="rounded bg-[var(--color-surface-raised)] px-1 py-0.5 font-mono text-xs">$TMPDIR/z4j-{`{uid}`}</code> when <code class="rounded bg-[var(--color-surface-raised)] px-1 py-0.5 font-mono text-xs">$HOME</code> is unwritable), NAT / firewall / cert mismatches, and wrong-token / wrong-project_id problems with a specific failure reason. Add <code class="rounded bg-[var(--color-surface-raised)] px-1 py-0.5 font-mono text-xs">--no-websocket</code> to skip the WS round-trip, <code class="rounded bg-[var(--color-surface-raised)] px-1 py-0.5 font-mono text-xs">--json</code> for scripts. <a class="underline" href={`https://z4j.dev/frameworks/${framework.slug}/#verify-with-doctor`}>Reference</a>.
+    </p>
+  </Section>
+
+  <Section eyebrow="What you get" title={`${framework.shortName}-specific features`}>
+    <div class="grid gap-3 md:grid-cols-2">
+      {framework.features.map((f) => (
+        <div class="flex items-start gap-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+          <Icon name="check" size={16} class="mt-0.5 text-[var(--color-accent)] shrink-0" />
+          <span class="text-sm">{f}</span>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  <Section
+    eyebrow="Engine pairings"
+    title={`${framework.shortName} works with every z4j engine`}
+    subtitle="The framework adapter handles lifecycle and config. Any engine adapter slots in alongside."
+  >
+    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {ENGINES.map((e) => (
+        <Card
+          href={`/engines/${e.slug}`}
+          title={e.shortName}
+          icon={e.icon}
+          logo={e.logo}
+          description={e.tagline}
+        />
+      ))}
+    </div>
+  </Section>
+
+  <Section eyebrow="Other frameworks" title="See also">
+    <div class="grid gap-4 md:grid-cols-2">
+      {other.map((f) => (
+        <Card
+          href={`/frameworks/${f.slug}`}
+          title={f.shortName}
+          icon={f.icon}
+          logo={f.logo}
+          description={f.tagline}
+        />
+      ))}
+    </div>
+  </Section>
+
+  <CTA
+    title={`Get started with z4j + ${framework.shortName}`}
+    primaryHref="/install"
+    primaryLabel="Install z4j"
+    secondaryHref={pkg.docs ?? "https://z4j.dev"}
+    secondaryLabel={`${framework.shortName} docs`}
+  />
+</BaseLayout>

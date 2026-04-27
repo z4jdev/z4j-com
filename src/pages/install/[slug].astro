@@ -8,7 +8,8 @@ import Breadcrumb from "../../components/Breadcrumb.astro";
 import CTA from "../../components/CTA.astro";
 import { DEPLOYMENTS } from "../../data/deployments";
 import { ENGINES } from "../../data/engines";
-import { PLATFORMS } from "../../data/platforms";
+import { FRAMEWORKS } from "../../data/frameworks";
+import { getPackage } from "../../data/packages";
 
 export function getStaticPaths() {
   return DEPLOYMENTS.map((d) => ({
@@ -19,6 +20,13 @@ export function getStaticPaths() {
 
 const { deployment } = Astro.props;
 const other = DEPLOYMENTS.filter((d) => d.slug !== deployment.slug);
+
+// Every tier installs the z4j umbrella one way or another: pip pulls
+// from PyPI, the Docker tiers pull the same image from Docker Hub.
+// The z4j umbrella entry in packages.ts carries PyPI + GitHub + Docker
+// Hub links + the latest version, so this page is a thin view over it.
+const z4jPkg = getPackage("z4j");
+const isDocker = deployment.slug !== "pip";
 
 const badgeClass: Record<string, string> = {
   accent: "bg-[var(--color-accent)]/15 text-[var(--color-accent)]",
@@ -88,6 +96,76 @@ const metaDescription = `${deployment.tagline} Best for: ${deployment.audience}.
     </div>
   </Section>
 
+  <Section compact>
+    <div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 class="font-mono text-[10px] font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+            Sources
+          </h2>
+          <p class="mt-1 text-sm text-[var(--color-muted)]">
+            Current release: <span class="font-mono font-semibold text-[var(--color-primary)]">v{z4jPkg.latest}</span> <span class="text-xs">(released {z4jPkg.releaseDate})</span>
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          {isDocker && z4jPkg.dockerhub && (
+            <a
+              href={z4jPkg.dockerhub}
+              rel="noopener"
+              target="_blank"
+              class="inline-flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-2 text-sm font-semibold hover:border-[var(--color-primary)]/50 transition-colors"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="color: #2496ED;"><path d="M13.983 11.078h2.119a.186.186 0 00.186-.185V9.006a.186.186 0 00-.186-.186h-2.119a.185.185 0 00-.185.185v1.888c0 .102.083.185.185.185m-2.954-5.43h2.118a.186.186 0 00.186-.186V3.574a.186.186 0 00-.186-.185h-2.118a.185.185 0 00-.185.185v1.887c0 .102.082.185.185.186m0 2.716h2.118a.187.187 0 00.186-.186V6.29a.186.186 0 00-.186-.185h-2.118a.185.185 0 00-.185.185v1.887c0 .102.082.185.185.186m-2.93 0h2.12a.186.186 0 00.184-.186V6.29a.185.185 0 00-.185-.185H8.1a.185.185 0 00-.185.185v1.887c0 .102.083.185.185.186m-2.964 0h2.119a.186.186 0 00.185-.186V6.29a.185.185 0 00-.185-.185H5.136a.186.186 0 00-.186.185v1.887c0 .102.084.185.186.186m5.893 2.715h2.118a.186.186 0 00.186-.185V9.006a.186.186 0 00-.186-.186h-2.118a.185.185 0 00-.185.185v1.888c0 .102.082.185.185.185m-2.93 0h2.12a.185.185 0 00.184-.185V9.006a.185.185 0 00-.184-.186h-2.12a.185.185 0 00-.184.185v1.888c0 .102.083.185.185.185m-2.964 0h2.119a.185.185 0 00.185-.185V9.006a.185.185 0 00-.184-.186h-2.12a.186.186 0 00-.186.186v1.887c0 .102.084.185.186.185m-2.92 0h2.12a.185.185 0 00.184-.185V9.006a.185.185 0 00-.184-.186h-2.12a.185.185 0 00-.184.185v1.888c0 .102.082.185.185.185M23.763 9.89c-.065-.051-.672-.51-1.954-.51-.338.001-.676.03-1.01.087-.248-1.7-1.653-2.53-1.716-2.566l-.344-.199-.226.327c-.284.438-.49.922-.612 1.43-.23.97-.09 1.882.403 2.661-.595.332-1.55.413-1.744.42H.751a.751.751 0 00-.75.748 11.376 11.376 0 00.692 4.062c.545 1.428 1.355 2.48 2.41 3.124 1.18.723 3.1 1.137 5.275 1.137.983.003 1.963-.086 2.93-.266a12.248 12.248 0 003.823-1.389c.98-.567 1.86-1.288 2.61-2.136 1.252-1.418 1.998-2.997 2.553-4.4h.221c1.372 0 2.215-.549 2.68-1.009.309-.293.55-.65.707-1.046l.098-.288Z"/></svg>
+              Docker Hub
+            </a>
+          )}
+          {!isDocker && (
+            <a
+              href={z4jPkg.pypi}
+              rel="noopener"
+              target="_blank"
+              class="inline-flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-2 text-sm font-semibold hover:border-[var(--color-primary)]/50 transition-colors"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="color: #3775A9;"><path d="M12 0L1.605 6v12L12 24l10.395-6V6L12 0zm-1.605 4.395L12 3.39l1.605.99v3.21L12 8.58l-1.605-.99V4.395zm-6 3.6l1.605-.99v3.21l-1.605.99V7.995zm1.605 4.41l-1.605-.99V8.2l1.605 1.005v3.2zM12 20.61l-1.605-.99v-3.21L12 15.42l1.605.99v3.21L12 20.61zm0-7.005l-1.605-.99v-3.21L12 8.415l1.605.99v3.21L12 13.605zm6.4 5.415l-1.605-.99v-3.21l1.605-.99v3.21l-.005 1.98z"/></svg>
+              PyPI
+            </a>
+          )}
+          <a
+            href={z4jPkg.github}
+            rel="noopener"
+            target="_blank"
+            class="inline-flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-2 text-sm font-semibold hover:border-[var(--color-primary)]/50 transition-colors"
+          >
+            <Icon name="github" size={16} class="text-[var(--color-muted)]" />
+            GitHub
+          </a>
+          {isDocker && (
+            <a
+              href={z4jPkg.pypi}
+              rel="noopener"
+              target="_blank"
+              class="inline-flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-2 text-sm font-semibold hover:border-[var(--color-primary)]/50 transition-colors"
+              title="PyPI - useful for agent installs in your app"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="color: #3775A9;"><path d="M12 0L1.605 6v12L12 24l10.395-6V6L12 0zm-1.605 4.395L12 3.39l1.605.99v3.21L12 8.58l-1.605-.99V4.395zm-6 3.6l1.605-.99v3.21l-1.605.99V7.995zm1.605 4.41l-1.605-.99V8.2l1.605 1.005v3.2zM12 20.61l-1.605-.99v-3.21L12 15.42l1.605.99v3.21L12 20.61zm0-7.005l-1.605-.99v-3.21L12 8.415l1.605.99v3.21L12 13.605zm6.4 5.415l-1.605-.99v-3.21l1.605-.99v3.21l-.005 1.98z"/></svg>
+              PyPI
+            </a>
+          )}
+        </div>
+      </div>
+      {isDocker && z4jPkg.dockerhub && (
+        <div class="mt-4 rounded-lg bg-[var(--color-code-bg)] p-3">
+          <p class="font-mono text-xs text-slate-400">
+            Image: <span class="text-slate-300">z4jdev/z4j:{z4jPkg.latest}</span> (pin version) or <span class="text-slate-300">z4jdev/z4j:latest</span> (track current)
+          </p>
+          <p class="mt-1 font-mono text-xs text-slate-500">
+            Multi-arch: <span class="text-slate-400">linux/amd64</span>, <span class="text-slate-400">linux/arm64</span>. The SAME image handles SQLite and Postgres - the database is selected at runtime via <code>Z4J_DATABASE_URL</code>.
+          </p>
+        </div>
+      )}
+    </div>
+  </Section>
+
   <Section
     eyebrow="Architecture"
     title={`What runs: ${deployment.containers.length} ${deployment.containers.length === 1 ? "process" : "services"}`}
@@ -120,6 +198,90 @@ const metaDescription = `${deployment.tagline} Best for: ${deployment.audience}.
     <p class="mt-3 text-xs text-[var(--color-muted)]">
       After the brain is running, open <code class="rounded bg-[var(--color-surface-raised)] px-1.5 py-0.5 font-mono text-xs">http://localhost:7700</code> and sign in.
     </p>
+  </Section>
+
+  <Section
+    compact
+    eyebrow="Verify"
+    title="Confirm everything is wired up"
+    subtitle="Each framework adapter ships a `doctor` command that probes brain reachability, TLS, WebSocket upgrade, and the on-disk buffer path. Run it as the same user the service runs under."
+  >
+    <div class="grid gap-3 md:grid-cols-2">
+      <div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+        <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">Django</h3>
+        <CodeCopy code="python manage.py z4j_doctor" lang="bash" />
+      </div>
+      <div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+        <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">Flask</h3>
+        <CodeCopy code="python -m z4j_flask doctor" lang="bash" />
+      </div>
+      <div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+        <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">FastAPI</h3>
+        <CodeCopy code="python -m z4j_fastapi doctor" lang="bash" />
+      </div>
+      <div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+        <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">Bare / Celery / RQ / etc.</h3>
+        <CodeCopy code="python -m z4j_bare doctor" lang="bash" />
+      </div>
+    </div>
+    <p class="mt-3 text-xs text-[var(--color-muted)]">
+      Exits 0 on all-green, 1 on any failure. Add <code class="rounded bg-[var(--color-surface-raised)] px-1.5 py-0.5 font-mono text-xs">--no-websocket</code> to skip the WS round-trip, <code class="rounded bg-[var(--color-surface-raised)] px-1.5 py-0.5 font-mono text-xs">--json</code> for scripts. Catches the common <code class="rounded bg-[var(--color-surface-raised)] px-1.5 py-0.5 font-mono text-xs">www-data</code>-can't-write-<code class="rounded bg-[var(--color-surface-raised)] px-1.5 py-0.5 font-mono text-xs">$HOME</code> startup failure (the agent now auto-relocates the buffer to <code class="rounded bg-[var(--color-surface-raised)] px-1.5 py-0.5 font-mono text-xs">$TMPDIR/z4j-{`{uid}`}</code> and logs a single WARNING). See <a class="underline" href="https://z4j.dev/operations/service-user-deployments/">service-user deployments</a>.
+    </p>
+  </Section>
+
+  <Section
+    eyebrow="Hostname / domain access"
+    title="Reach the brain via any name you want"
+    subtitle="The brain validates the HTTP `Host:` header on every request to defend against cache-poisoning. Auto-detect handles the common cases; the `z4j allowed-hosts` CLI handles the rest."
+  >
+    <div class="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
+      <div class="space-y-4">
+        <div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
+          <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+            What's auto-allowed (no config)
+          </h3>
+          <ul class="space-y-1.5 text-sm">
+            <li class="flex items-start gap-2"><Icon name="check" size={15} class="mt-0.5 text-[var(--color-accent)] shrink-0" /><span><code class="rounded bg-[var(--color-surface-raised)] px-1 py-0.5 font-mono text-xs">localhost</code>, <code class="rounded bg-[var(--color-surface-raised)] px-1 py-0.5 font-mono text-xs">127.0.0.1</code>, <code class="rounded bg-[var(--color-surface-raised)] px-1 py-0.5 font-mono text-xs">[::1]</code></span></li>
+            <li class="flex items-start gap-2"><Icon name="check" size={15} class="mt-0.5 text-[var(--color-accent)] shrink-0" /><span>The system <strong>hostname</strong> + <strong>FQDN</strong> (incl. Tailscale's <code class="rounded bg-[var(--color-surface-raised)] px-1 py-0.5 font-mono text-xs">&lt;host&gt;.&lt;tailnet&gt;.ts.net</code>)</span></li>
+            <li class="flex items-start gap-2"><Icon name="check" size={15} class="mt-0.5 text-[var(--color-accent)] shrink-0" /><span>Every <strong>LAN IP</strong> bound on the host (covers <code class="rounded bg-[var(--color-surface-raised)] px-1 py-0.5 font-mono text-xs">192.168.x.x</code>, Docker bridges, Tailscale)</span></li>
+          </ul>
+        </div>
+        <div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
+          <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+            Adding a custom domain (one-time, persisted)
+          </h3>
+          <p class="mb-3 text-sm text-[var(--color-muted)]">
+            For a public DNS name (reverse proxy, Cloudflare Tunnel, internal LB), persist it once via the CLI:
+          </p>
+          <CodeCopy
+            code={`z4j allowed-hosts add tasks.example.com\nz4j allowed-hosts list                  # show current set\nz4j allowed-hosts remove old.example     # idempotent\nz4j allowed-hosts path                   # ~/.z4j/allowed-hosts\n# Restart \`z4j serve\` to pick up the change.`}
+            lang="bash"
+          />
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
+          <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+            Precedence (highest first)
+          </h3>
+          <ol class="space-y-1.5 text-sm list-decimal pl-5 text-[var(--color-muted)]">
+            <li><code class="rounded bg-[var(--color-surface-raised)] px-1 py-0.5 font-mono text-xs">Z4J_ALLOWED_HOSTS</code> env <span class="text-xs">- pins the list, replaces auto-detect</span></li>
+            <li><code class="rounded bg-[var(--color-surface-raised)] px-1 py-0.5 font-mono text-xs">--allowed-host</code> CLI flag <span class="text-xs">- additive, repeatable</span></li>
+            <li><code class="rounded bg-[var(--color-surface-raised)] px-1 py-0.5 font-mono text-xs">~/.z4j/allowed-hosts</code> file <span class="text-xs">- persistent, additive</span></li>
+            <li>Auto-detect <span class="text-xs">- localhost + hostname + FQDN + LAN IPs</span></li>
+          </ol>
+        </div>
+        <div class="rounded-xl border border-[var(--color-warning)]/30 bg-[var(--color-warning)]/5 p-5">
+          <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-warning)]">
+            Security
+          </h3>
+          <p class="text-sm text-[var(--color-muted)]">
+            Rejected requests get a generic 400 in production mode (no internal hostname leakage). Dev mode shows a verbose response with the rejected host and a fix command. Operators always get the verbose detail in the server log via <code class="rounded bg-[var(--color-surface-raised)] px-1 py-0.5 font-mono text-xs">request_id</code> correlation.
+          </p>
+        </div>
+      </div>
+    </div>
   </Section>
 
   <Section>
@@ -243,9 +405,9 @@ const metaDescription = `${deployment.tagline} Best for: ${deployment.audience}.
     <h3 class="mb-3 text-sm font-semibold text-[var(--color-muted)]">Framework adapters</h3>
     <div class="grid gap-4 md:grid-cols-3">
       {
-        PLATFORMS.map((p) => (
+        FRAMEWORKS.map((p) => (
           <Card
-            href={`/platforms/${p.slug}`}
+            href={`/frameworks/${p.slug}`}
             title={p.shortName}
             icon={p.icon}
             logo={p.logo}

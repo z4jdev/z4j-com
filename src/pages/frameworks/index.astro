@@ -4,7 +4,7 @@ import Section from "../../components/Section.astro";
 import Card from "../../components/Card.astro";
 import PageHero from "../../components/PageHero.astro";
 import CTA from "../../components/CTA.astro";
-import { PLATFORMS } from "../../data/platforms";
+import { FRAMEWORKS } from "../../data/frameworks";
 ---
 
 <BaseLayout
@@ -13,26 +13,24 @@ import { PLATFORMS } from "../../data/platforms";
   keywords={["Django task queue", "Flask Celery", "FastAPI arq", "framework adapters"]}
 >
   <PageHero
-    breadcrumb={[{ label: "Platforms" }]}
+    breadcrumb={[{ label: "Frameworks" }]}
     title="Django. Flask. FastAPI."
     subtitle="Framework adapters handle discovery + lifecycle integration so you don't have to hand-wire anything. Pick your stack."
   />
 
   <Section>
     <div class="grid gap-6 md:grid-cols-3">
-      {
-        PLATFORMS.map((p) => (
-          <Card
-            href={`/platforms/${p.slug}`}
-            title={p.shortName}
-            icon={p.icon}
-            logo={p.logo}
-            description={p.tagline}
-          >
-            <pre class="mt-2 overflow-x-auto rounded bg-[var(--color-code-bg)] p-3 text-xs font-mono text-slate-300">{p.installCmd}</pre>
-          </Card>
-        ))
-      }
+      {FRAMEWORKS.map((f) => (
+        <Card
+          href={`/frameworks/${f.slug}`}
+          title={f.shortName}
+          icon={f.icon}
+          logo={f.logo}
+          description={f.tagline}
+        >
+          <pre class="mt-2 overflow-x-auto rounded bg-[var(--color-code-bg)] p-3 text-xs font-mono text-slate-300">{f.installCmd}</pre>
+        </Card>
+      ))}
     </div>
   </Section>
 
@@ -41,7 +39,7 @@ import { PLATFORMS } from "../../data/platforms";
     subtitle="z4j-bare works with any Python project, no framework adapter required. Direct agent install."
     primaryHref="https://z4j.dev/frameworks/bare/"
     primaryLabel="Use z4j-bare"
-    secondaryHref="https://github.com/z4jdev/z4j"
+    secondaryHref="https://github.com/z4jdev"
     secondaryLabel="Request an adapter"
   />
 </BaseLayout>

@@ -7,7 +7,7 @@ import Icon from "../../components/Icon.astro";
 import PageHero from "../../components/PageHero.astro";
 import CTA from "../../components/CTA.astro";
 import { DEPLOYMENTS } from "../../data/deployments";
-import { PLATFORMS } from "../../data/platforms";
+import { FRAMEWORKS } from "../../data/frameworks";
 import { ENGINES } from "../../data/engines";
 
 const badgeClass: Record<string, string> = {
@@ -262,9 +262,9 @@ const tlsPatterns = [
   >
     <div class="grid gap-4 md:grid-cols-3">
       {
-        PLATFORMS.map((p) => (
+        FRAMEWORKS.map((p) => (
           <Card
-            href={`/platforms/${p.slug}`}
+            href={`/frameworks/${p.slug}`}
             title={p.shortName}
             icon={p.icon}
             logo={p.logo}
@@ -320,7 +320,7 @@ const tlsPatterns = [
       <article class="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6">
         <h3 class="text-base font-semibold">Then what are the image tags for?</h3>
         <p class="mt-2 text-sm leading-relaxed text-[var(--color-muted)]">
-          Tags pin <strong>versions</strong>, not modes. Use <code class="rounded bg-[var(--color-surface-raised)] px-1.5 py-0.5 font-mono text-xs">:latest</code> for the most recent release, <code class="rounded bg-[var(--color-surface-raised)] px-1.5 py-0.5 font-mono text-xs">:1.0.0</code> to pin a specific version, and <code class="rounded bg-[var(--color-surface-raised)] px-1.5 py-0.5 font-mono text-xs">:edge</code> for pre-releases.
+          Tags pin <strong>versions</strong>, not modes. Use <code class="rounded bg-[var(--color-surface-raised)] px-1.5 py-0.5 font-mono text-xs">:latest</code> for the most recent release (currently <code class="rounded bg-[var(--color-surface-raised)] px-1.5 py-0.5 font-mono text-xs">1.0.5</code>), or pin a specific version like <code class="rounded bg-[var(--color-surface-raised)] px-1.5 py-0.5 font-mono text-xs">:1.0.5</code> for reproducible deploys. Multi-arch: linux/amd64 + linux/arm64.
         </p>
       </article>
 

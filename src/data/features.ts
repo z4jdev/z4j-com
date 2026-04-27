@@ -71,6 +71,26 @@ export const FEATURES: FeatureMeta[] = [
     ],
   },
   {
+    slug: "notifications",
+    icon: "notifications",
+    title: "Notifications",
+    tagline: "Email, Slack, PagerDuty, Discord, Telegram, webhook.",
+    summary:
+      "Six native channels and six triggers (task.failed, task.succeeded, task.retried, task.slow, agent.offline, agent.online). Project-scoped channels for the team plus per-user personal channels. Filter by priority, task name pattern, or queue. Every channel has a Test button and SSRF / DNS-pinning protection out of the box.",
+    bullets: [
+      "Six channels: SMTP email, Slack, PagerDuty (Events API v2), Discord, Telegram bot, generic HTTPS webhook with HMAC signing",
+      "Six triggers cover task lifecycle (failed / succeeded / retried / slow) and agent state (online / offline)",
+      "Project + personal channels with the same schema; users mute or cooldown without affecting teammates",
+      "Test endpoint dispatches a canned payload through the real provider so credentials are verified before save",
+      "Delivery audit log captures status, response code, and sanitized error body for every send",
+    ],
+    highlights: [
+      "PagerDuty: native Events API v2, severity_map per trigger, dedup keys collapse repeats",
+      "Webhook: HMAC-SHA256 signature in X-Z4J-Signature for replay-safe delivery",
+      "All channels: SSRF + DNS-pin guard against rebind, 16 KiB config cap, 10s/5s HTTP timeouts",
+    ],
+  },
+  {
     slug: "rbac",
     icon: "rbac",
     title: "RBAC built-in",

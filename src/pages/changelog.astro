@@ -3,7 +3,14 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import Section from "../components/Section.astro";
 import PageHero from "../components/PageHero.astro";
 import CTA from "../components/CTA.astro";
-import { CHANGELOG, CATEGORIES, RELEASES } from "../data/changelog";
+import {
+  PACKAGES,
+  RELEASES,
+  CATEGORY_ORDER,
+  Z4J_HEADLINE_VERSION,
+  type PackageRelease,
+  type PackageMeta,
+} from "../data/packages";
 
 const typeStyle: Record<string, string> = {
   added: "bg-[var(--color-accent)]/15 text-[var(--color-accent)] border-[var(--color-accent)]/30",
@@ -14,41 +21,85 @@ const typeStyle: Record<string, string> = {
   removed: "bg-[var(--color-surface-raised)] text-[var(--color-muted)] border-[var(--color-border)]",
 };
 
-const current = RELEASES[0];
-const totalEntries = CHANGELOG.reduce((sum, c) => sum + c.entries.length, 0);
-const counts: Record<string, number> = { all: CHANGELOG.length };
-for (const c of CHANGELOG) counts[c.category] = (counts[c.category] ?? 0) + 1;
+// Sort releases newest-first within each package using SemVer-aware compare,
+// then by date as tiebreaker.
+const sortedReleases: PackageRelease[] = [...RELEASES].sort((a, b) => {
+  if (a.package !== b.package) return a.package.localeCompare(b.package);
+  return b.version.localeCompare(a.version, undefined, { numeric: true });
+});
+
+interface ReleaseCardProps {
+  release: PackageRelease;
+  pkg: PackageMeta;
+}
+
+const cards: ReleaseCardProps[] = sortedReleases
+  .map((r) => {
+    const pkg = PACKAGES[r.package];
+    if (!pkg) return null;
+    return { release: r, pkg };
+  })
+  .filter((x): x is ReleaseCardProps => x !== null)
+  // Cross-package: newest releases on top by date desc, then by package name.
+  .sort((a, b) => {
+    if (a.release.date !== b.release.date) {
+      return b.release.date.localeCompare(a.release.date);
+    }
+    return a.pkg.name.localeCompare(b.pkg.name);
+  });
+
+const totalEntries = cards.reduce((sum, c) => sum + c.release.entries.length, 0);
+
+const counts: Record<string, number> = { all: cards.length };
+for (const c of cards) {
+  counts[c.pkg.category] = (counts[c.pkg.category] ?? 0) + 1;
+}
+
+const categories = [{ id: "all", label: "All" }, ...CATEGORY_ORDER];
+
+// Per-package latest summary table at top of page.
+const allPackages = CATEGORY_ORDER.flatMap(({ id, label }) =>
+  Object.values(PACKAGES)
+    .filter((p) => p.category === id)
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((p) => ({ ...p, categoryLabel: label })),
+);
 ---
 
 <BaseLayout
   title="Changelog | z4j releases"
-  description="Every z4j release, broken down per component. Filter by Core, Brain, Frameworks, Engines, or Schedulers. v1.0.0 initial release."
-  keywords={["z4j changelog", "z4j releases", "z4j v1.0.0", "task queue release notes"]}
+  description="Every z4j package release in one place. Filter by Brain, Core, Frameworks, Engines, or Schedulers. Single source of truth shared with z4j.dev."
+  keywords={["z4j changelog", "z4j releases", "z4j v1.0.5", "task queue release notes"]}
 >
   <PageHero
     breadcrumb={[{ label: "Changelog" }]}
     title="Every release, spelled out."
-    subtitle="One timeline per component. Filter by package or see them all. Full Keep-a-Changelog entries live in CHANGELOG.md on GitHub."
+    subtitle="One card per package version. Filter by category. Synced with the docs site from one canonical data file."
   />
 
+  <!-- Headline strip -->
   <Section compact>
     <div class="flex flex-wrap items-center justify-between gap-6 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6">
       <div>
         <div class="font-mono text-[10px] font-semibold uppercase tracking-wider text-[var(--color-muted)]">
-          Latest release
+          Headline release
         </div>
         <div class="mt-1 flex items-baseline gap-3">
-          <span class="font-mono text-3xl font-semibold tracking-tight text-[var(--color-primary)]">v{current.version}</span>
-          <span class="text-sm text-[var(--color-muted)]">{current.date}</span>
+          <span class="font-mono text-3xl font-semibold tracking-tight text-[var(--color-primary)]">v{Z4J_HEADLINE_VERSION}</span>
+          <span class="text-sm text-[var(--color-muted)]">brain + agent stack</span>
         </div>
         <p class="mt-2 max-w-xl text-sm leading-relaxed text-[var(--color-muted)]">
-          {current.headline}
+          Every package below ships independently. The "headline" version tracks <code class="rounded bg-[var(--color-surface-raised)] px-1.5 py-0.5 font-mono text-xs">z4j-brain</code>, since the brain is the canonical control plane.
         </p>
       </div>
       <dl class="grid grid-cols-2 gap-x-8 gap-y-1 text-sm">
         <div>
-          <dt class="font-mono text-[10px] font-semibold uppercase tracking-wider text-[var(--color-muted)]">Components</dt>
-          <dd class="mt-1 text-xl font-semibold">{CHANGELOG.length}</dd>
+          <dt class="font-mono text-[10px] font-semibold uppercase tracking-wider text-[var(--color-muted)]">Packages</dt>
+          <dd class="mt-1 text-xl font-semibold">{Object.keys(PACKAGES).length}</dd>
+        </div>
+        <div>
+          <dt class="font-mono text-[10px] font-semibold uppercase tracking-wider text-[var(--color-muted)]">Releases</dt>
+          <dd class="mt-1 text-xl font-semibold">{cards.length}</dd>
         </div>
         <div>
           <dt class="font-mono text-[10px] font-semibold uppercase tracking-wider text-[var(--color-muted)]">Entries</dt>
@@ -58,6 +109,54 @@ for (const c of CHANGELOG) counts[c.category] = (counts[c.category] ?? 0) + 1;
     </div>
   </Section>
 
+  <!-- Per-package latest table -->
+  <Section compact>
+    <div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6">
+      <h2 class="font-mono text-[10px] font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+        Latest of every package
+      </h2>
+      <div class="mt-4 overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="text-left text-xs uppercase tracking-wider text-[var(--color-muted)]">
+            <tr class="border-b border-[var(--color-border)]">
+              <th class="py-2 pr-4 font-mono">Package</th>
+              <th class="py-2 pr-4 font-mono">Latest</th>
+              <th class="py-2 pr-4 font-mono">Released</th>
+              <th class="py-2 pr-4 font-mono">Category</th>
+              <th class="py-2 pr-4 font-mono">License</th>
+              <th class="py-2 pr-4 font-mono">Links</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[var(--color-border)]/50">
+            {allPackages.map((p) => (
+              <tr>
+                <td class="py-2 pr-4 font-mono text-xs">{p.name}</td>
+                <td class="py-2 pr-4 font-mono text-xs font-semibold text-[var(--color-primary)]">{p.latest}</td>
+                <td class="py-2 pr-4 text-xs text-[var(--color-muted)]">{p.releaseDate}</td>
+                <td class="py-2 pr-4 text-xs">{p.categoryLabel}</td>
+                <td class="py-2 pr-4 text-xs">{p.license}</td>
+                <td class="py-2 pr-4 text-xs">
+                  <a href={p.pypi} class="text-[var(--color-primary)] hover:underline">PyPI</a>
+                  <span class="mx-1 text-[var(--color-muted)]">·</span>
+                  <a href={p.github} class="text-[var(--color-primary)] hover:underline">GitHub</a>
+                  {p.docs && <>
+                    <span class="mx-1 text-[var(--color-muted)]">·</span>
+                    <a href={p.docs} class="text-[var(--color-primary)] hover:underline">Docs</a>
+                  </>}
+                  {p.upstream && <>
+                    <span class="mx-1 text-[var(--color-muted)]">·</span>
+                    <a href={p.upstream} class="text-[var(--color-muted)] hover:underline">Upstream</a>
+                  </>}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </Section>
+
+  <!-- Per-release cards -->
   <Section compact>
     <div
       id="changelog-root"
@@ -70,7 +169,7 @@ for (const c of CHANGELOG) counts[c.category] = (counts[c.category] ?? 0) + 1;
             Filter:
           </span>
           <div role="tablist" class="flex items-center gap-2">
-            {CATEGORIES.map((cat) => (
+            {categories.map((cat) => (
               <button
                 type="button"
                 role="tab"
@@ -89,28 +188,33 @@ for (const c of CHANGELOG) counts[c.category] = (counts[c.category] ?? 0) + 1;
       </div>
 
       <ol class="space-y-6">
-        {CHANGELOG.map((c) => (
+        {cards.map(({ release, pkg }) => (
           <li
-            data-component={c.slug}
-            data-category={c.category}
+            data-component={`${pkg.name}-${release.version}`}
+            data-category={pkg.category}
             class="changelog-card rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]/60"
           >
             <header class="flex flex-wrap items-baseline justify-between gap-3 border-b border-[var(--color-border)] px-6 py-4">
               <div class="flex items-baseline gap-3">
-                <h2 class="font-mono text-base font-semibold text-[var(--color-fg)]">
-                  {c.name}
-                </h2>
+                <a href={pkg.pypi} class="font-mono text-base font-semibold text-[var(--color-fg)] hover:text-[var(--color-primary)]">
+                  {pkg.name}
+                </a>
                 <span class="rounded-full bg-[var(--color-surface-raised)] px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-[var(--color-muted)]">
-                  {c.categoryLabel}
+                  {CATEGORY_ORDER.find((c) => c.id === pkg.category)?.label ?? pkg.category}
                 </span>
+                {release.version === pkg.latest && (
+                  <span class="rounded-full bg-[var(--color-accent)]/15 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-[var(--color-accent)]">
+                    latest
+                  </span>
+                )}
               </div>
               <div class="flex items-baseline gap-3 text-xs text-[var(--color-muted)]">
-                <span class="font-mono font-semibold text-[var(--color-primary)]">v{c.version}</span>
-                <span>{c.date}</span>
+                <span class="font-mono font-semibold text-[var(--color-primary)]">v{release.version}</span>
+                <span>{release.date}</span>
               </div>
             </header>
             <ul class="divide-y divide-[var(--color-border)]/50">
-              {c.entries.map((e) => (
+              {release.entries.map((e) => (
                 <li class="flex items-start gap-3 px-6 py-3">
                   <span class={`mt-0.5 inline-flex shrink-0 items-center rounded-md border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider ${typeStyle[e.type]}`}>
                     {e.type}
@@ -130,12 +234,12 @@ for (const c of CHANGELOG) counts[c.category] = (counts[c.category] ?? 0) + 1;
   </Section>
 
   <CTA
-    title="Read the full CHANGELOG"
-    subtitle="Every PR, every fix, every breaking change. Keep-a-Changelog format, SemVer."
-    primaryHref="https://github.com/z4jdev/z4j/blob/main/CHANGELOG.md"
-    primaryLabel="CHANGELOG.md on GitHub"
-    secondaryHref="https://github.com/z4jdev/z4j/releases"
-    secondaryLabel="GitHub Releases"
+    title="Browse the source"
+    subtitle="Each package has its own GitHub repo and PyPI page. Click the package name on any card above."
+    primaryHref="https://github.com/z4jdev"
+    primaryLabel="z4jdev on GitHub"
+    secondaryHref="https://pypi.org/user/z4jdev/"
+    secondaryLabel="z4jdev on PyPI"
   />
 </BaseLayout>
 

@@ -3,10 +3,11 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import Section from "../../components/Section.astro";
 import Card from "../../components/Card.astro";
 import Icon from "../../components/Icon.astro";
-import Breadcrumb from "../../components/Breadcrumb.astro";
 import CTA from "../../components/CTA.astro";
+import PackageHero from "../../components/PackageHero.astro";
 import { SCHEDULERS } from "../../data/schedulers";
 import { getEngine } from "../../data/engines";
+import { getPackage } from "../../data/packages";
 
 export function getStaticPaths() {
   return SCHEDULERS.map((s) => ({
@@ -15,6 +16,7 @@ export function getStaticPaths() {
   }));
 }
 const { scheduler } = Astro.props;
+const pkg = getPackage(scheduler.name);
 const engine = getEngine(scheduler.engineSlug);
 const other = SCHEDULERS.filter((s) => s.slug !== scheduler.slug).slice(0, 3);
 
@@ -25,7 +27,9 @@ const productSchema = {
   applicationCategory: "DeveloperApplication",
   operatingSystem: "Linux, macOS, Windows",
   description: scheduler.description,
-  url: `https://z4j.com/schedulers/${scheduler.slug}`,
+  softwareVersion: pkg.latest,
+  url: pkg.landing ?? `https://z4j.com/schedulers/${scheduler.slug}`,
+  downloadUrl: pkg.pypi,
   offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
   author: { "@type": "Organization", name: "z4j", url: "https://z4j.com" },
   featureList: scheduler.capabilities,
@@ -45,35 +49,18 @@ const metaDescription = `${scheduler.tagline} ${scheduler.description.slice(0, 1
     { name: scheduler.shortName, href: `/schedulers/${scheduler.slug}` },
   ]}
 >
-  <Section compact>
-    <Breadcrumb items={[
+  <PackageHero
+    packageName={scheduler.name}
+    shortName={scheduler.shortName}
+    icon={scheduler.icon}
+    logo={scheduler.logo}
+    tagline={scheduler.tagline}
+    description={scheduler.description}
+    breadcrumb={[
       { label: "Schedulers", href: "/schedulers" },
       { label: scheduler.shortName },
-    ]} />
-    <div class="flex flex-wrap items-center gap-5">
-      {scheduler.logo ? (
-        <div class="inline-flex size-16 items-center justify-center rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-2">
-          <img src={scheduler.logo} alt={`${scheduler.shortName} logo`} class="size-12 object-contain" />
-        </div>
-      ) : (
-        <div class="inline-flex size-16 items-center justify-center rounded-xl bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
-          <Icon name={scheduler.icon} size={32} />
-        </div>
-      )}
-      <div>
-        <h1 class="text-4xl font-bold tracking-tight md:text-5xl">
-          {scheduler.shortName}
-        </h1>
-        <p class="mt-1 font-mono text-sm text-[var(--color-muted)]">
-          {scheduler.name}
-        </p>
-      </div>
-    </div>
-    <p class="mt-6 max-w-3xl text-xl font-medium text-[var(--color-primary)]">{scheduler.tagline}</p>
-    <p class="mt-4 max-w-3xl text-lg leading-relaxed text-[var(--color-muted)]">
-      {scheduler.description}
-    </p>
-  </Section>
+    ]}
+  />
 
   <Section compact>
     <div class="grid gap-6 md:grid-cols-2">
@@ -90,53 +77,47 @@ const metaDescription = `${scheduler.tagline} ${scheduler.description.slice(0, 1
           ))}
         </ul>
       </div>
-      {
-        scheduler.limitations.length > 0 && (
-          <div>
-            <h2 class="mb-4 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">
-              Limitations
-            </h2>
-            <ul class="space-y-2.5">
-              {scheduler.limitations.map((l) => (
-                <li class="flex items-start gap-2.5 text-sm text-[var(--color-muted)]">
-                  <Icon name="minus" size={15} class="mt-0.5 shrink-0" />
-                  <span>{l}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )
-      }
+      {scheduler.limitations.length > 0 && (
+        <div>
+          <h2 class="mb-4 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+            Limitations
+          </h2>
+          <ul class="space-y-2.5">
+            {scheduler.limitations.map((l) => (
+              <li class="flex items-start gap-2.5 text-sm text-[var(--color-muted)]">
+                <Icon name="minus" size={15} class="mt-0.5 shrink-0" />
+                <span>{l}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   </Section>
 
-  {
-    engine && (
-      <Section eyebrow="Paired engine" title={`Runs tasks on ${engine.shortName}`}>
-        <Card
-          href={`/engines/${engine.slug}`}
-          title={engine.shortName}
-          icon={engine.icon}
-          logo={engine.logo}
-          description={engine.tagline}
-        />
-      </Section>
-    )
-  }
+  {engine && (
+    <Section eyebrow="Paired engine" title={`Runs tasks on ${engine.shortName}`}>
+      <Card
+        href={`/engines/${engine.slug}`}
+        title={engine.shortName}
+        icon={engine.icon}
+        logo={engine.logo}
+        description={engine.tagline}
+      />
+    </Section>
+  )}
 
   <Section eyebrow="More schedulers" title="See also">
     <div class="grid gap-4 md:grid-cols-3">
-      {
-        other.map((s) => (
-          <Card
-            href={`/schedulers/${s.slug}`}
-            title={s.shortName}
-            icon={s.icon}
-            logo={s.logo}
-            description={s.tagline}
-          />
-        ))
-      }
+      {other.map((s) => (
+        <Card
+          href={`/schedulers/${s.slug}`}
+          title={s.shortName}
+          icon={s.icon}
+          logo={s.logo}
+          description={s.tagline}
+        />
+      ))}
     </div>
   </Section>
 
@@ -144,7 +125,7 @@ const metaDescription = `${scheduler.tagline} ${scheduler.description.slice(0, 1
     title="Wire it up"
     primaryHref="/install"
     primaryLabel="Install z4j"
-    secondaryHref={scheduler.docsHref}
+    secondaryHref={pkg.docs ?? "https://z4j.dev"}
     secondaryLabel={`${scheduler.shortName} docs`}
   />
 </BaseLayout>

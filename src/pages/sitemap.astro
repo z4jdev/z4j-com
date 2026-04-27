@@ -4,7 +4,7 @@ import Section from "../components/Section.astro";
 import PageHero from "../components/PageHero.astro";
 import CTA from "../components/CTA.astro";
 import { ENGINES } from "../data/engines";
-import { PLATFORMS } from "../data/platforms";
+import { FRAMEWORKS } from "../data/frameworks";
 import { SCHEDULERS } from "../data/schedulers";
 import { FEATURES } from "../data/features";
 import { DEPLOYMENTS } from "../data/deployments";
@@ -64,13 +64,13 @@ const product: Node[] = [
     })),
   },
   {
-    label: "Platforms",
-    href: "/platforms",
+    label: "Frameworks",
+    href: "/frameworks",
     desc: "Framework adapters",
-    badge: `${PLATFORMS.length}`,
-    children: PLATFORMS.map((p) => ({
+    badge: `${FRAMEWORKS.length}`,
+    children: FRAMEWORKS.map((p) => ({
       label: p.shortName,
-      href: `/platforms/${p.slug}`,
+      href: `/frameworks/${p.slug}`,
       desc: p.tagline,
     })),
   },
@@ -134,7 +134,7 @@ const legal: Node[] = [
 
 const external: Node[] = [
   { label: "Documentation", href: "https://z4j.dev", external: true, desc: "Full technical docs" },
-  { label: "GitHub", href: "https://github.com/z4jdev/z4j", external: true, desc: "Source, issues, PRs" },
+  { label: "GitHub", href: "https://github.com/z4jdev", external: true, desc: "All z4j repositories" },
   { label: "XML sitemap", href: "/sitemap.xml", external: true, desc: "Machine-readable sitemap" },
 ];
 
@@ -147,7 +147,7 @@ const totalPages =
   1 +
   1 + FEATURES.length +
   1 + ENGINES.length +
-  1 + PLATFORMS.length +
+  1 + FRAMEWORKS.length +
   1 + SCHEDULERS.length +
   2 + DEPLOYMENTS.length +
   1 + COMPETITORS.length +
