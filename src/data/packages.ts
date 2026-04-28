@@ -93,10 +93,10 @@ export interface PackageRelease {
 // ---------------------------------------------------------------------------
 
 /** Headline version for "z4j" as a project. The brain version is canonical. */
-export const Z4J_HEADLINE_VERSION = "1.0.14";
+export const Z4J_HEADLINE_VERSION = "1.1.0";
 
-/** Minor line that all v1.0.x packages share. */
-export const Z4J_LINE = "1.0";
+/** Minor line that all v1.1.x ecosystem-anchor packages share. */
+export const Z4J_LINE = "1.1";
 
 // ---------------------------------------------------------------------------
 // Packages
@@ -108,8 +108,8 @@ export const PACKAGES: Record<string, PackageMeta> = {
     name: "z4j",
     category: "umbrella",
     license: "AGPL-3.0",
-    latest: "1.0.14",
-    releaseDate: "2026-04-24",
+    latest: "1.1.0",
+    releaseDate: "2026-04-28",
     pypi: "https://pypi.org/project/z4j/",
     github: "https://github.com/z4jdev/z4j",
     dockerhub: "https://hub.docker.com/r/z4jdev/z4j",
@@ -123,8 +123,8 @@ export const PACKAGES: Record<string, PackageMeta> = {
     name: "z4j-brain",
     category: "brain",
     license: "AGPL-3.0",
-    latest: "1.0.14",
-    releaseDate: "2026-04-24",
+    latest: "1.1.0",
+    releaseDate: "2026-04-28",
     pypi: "https://pypi.org/project/z4j-brain/",
     github: "https://github.com/z4jdev/z4j-brain",
     dockerhub: "https://hub.docker.com/r/z4jdev/z4j",
@@ -137,18 +137,29 @@ export const PACKAGES: Record<string, PackageMeta> = {
     name: "z4j-core",
     category: "core",
     license: "Apache-2.0",
-    latest: "1.0.5",
-    releaseDate: "2026-04-24",
+    latest: "1.1.0",
+    releaseDate: "2026-04-28",
     pypi: "https://pypi.org/project/z4j-core/",
     github: "https://github.com/z4jdev/z4j-core",
     description: "Shared protocol types, models, redaction engine.",
+  },
+  "z4j-scheduler": {
+    name: "z4j-scheduler",
+    category: "core",
+    license: "Apache-2.0",
+    latest: "1.1.0",
+    releaseDate: "2026-04-28",
+    pypi: "https://pypi.org/project/z4j-scheduler/",
+    github: "https://github.com/z4jdev/z4j-scheduler",
+    docs: "https://z4j.dev/scheduler/",
+    description: "Engine-agnostic dynamic scheduler companion process.",
   },
   "z4j-bare": {
     name: "z4j-bare",
     category: "core",
     license: "Apache-2.0",
-    latest: "1.0.7",
-    releaseDate: "2026-04-24",
+    latest: "1.1.0",
+    releaseDate: "2026-04-28",
     pypi: "https://pypi.org/project/z4j-bare/",
     github: "https://github.com/z4jdev/z4j-bare",
     docs: "https://z4j.dev/frameworks/bare/",
@@ -160,8 +171,8 @@ export const PACKAGES: Record<string, PackageMeta> = {
     name: "z4j-django",
     category: "framework",
     license: "Apache-2.0",
-    latest: "1.0.7",
-    releaseDate: "2026-04-24",
+    latest: "1.1.0",
+    releaseDate: "2026-04-28",
     pypi: "https://pypi.org/project/z4j-django/",
     github: "https://github.com/z4jdev/z4j-django",
     landing: "https://z4j.com/frameworks/django",
@@ -173,8 +184,8 @@ export const PACKAGES: Record<string, PackageMeta> = {
     name: "z4j-flask",
     category: "framework",
     license: "Apache-2.0",
-    latest: "1.0.4",
-    releaseDate: "2026-04-24",
+    latest: "1.1.0",
+    releaseDate: "2026-04-28",
     pypi: "https://pypi.org/project/z4j-flask/",
     github: "https://github.com/z4jdev/z4j-flask",
     landing: "https://z4j.com/frameworks/flask",
@@ -186,8 +197,8 @@ export const PACKAGES: Record<string, PackageMeta> = {
     name: "z4j-fastapi",
     category: "framework",
     license: "Apache-2.0",
-    latest: "1.0.4",
-    releaseDate: "2026-04-24",
+    latest: "1.1.0",
+    releaseDate: "2026-04-28",
     pypi: "https://pypi.org/project/z4j-fastapi/",
     github: "https://github.com/z4jdev/z4j-fastapi",
     landing: "https://z4j.com/frameworks/fastapi",
@@ -201,8 +212,8 @@ export const PACKAGES: Record<string, PackageMeta> = {
     name: "z4j-celery",
     category: "engine",
     license: "Apache-2.0",
-    latest: "1.0.3",
-    releaseDate: "2026-04-24",
+    latest: "1.1.0",
+    releaseDate: "2026-04-28",
     pypi: "https://pypi.org/project/z4j-celery/",
     github: "https://github.com/z4jdev/z4j-celery",
     landing: "https://z4j.com/engines/celery",
@@ -240,8 +251,8 @@ export const PACKAGES: Record<string, PackageMeta> = {
     name: "z4j-huey",
     category: "engine",
     license: "Apache-2.0",
-    latest: "1.0.1",
-    releaseDate: "2026-04-22",
+    latest: "1.1.0",
+    releaseDate: "2026-04-28",
     pypi: "https://pypi.org/project/z4j-huey/",
     github: "https://github.com/z4jdev/z4j-huey",
     landing: "https://z4j.com/engines/huey",
@@ -281,8 +292,8 @@ export const PACKAGES: Record<string, PackageMeta> = {
     name: "z4j-celerybeat",
     category: "scheduler",
     license: "Apache-2.0",
-    latest: "1.0.2",
-    releaseDate: "2026-04-23",
+    latest: "1.1.0",
+    releaseDate: "2026-04-28",
     pypi: "https://pypi.org/project/z4j-celerybeat/",
     github: "https://github.com/z4jdev/z4j-celerybeat",
     landing: "https://z4j.com/schedulers/celery-beat",
@@ -362,6 +373,300 @@ export const PACKAGES: Record<string, PackageMeta> = {
 // ---------------------------------------------------------------------------
 
 export const RELEASES: PackageRelease[] = [
+  // -------------------------------------------------------------------------
+  // 2026-04-28 v1.1.0 wave-2 - round-6 audit + framework auto-discovery
+  // expansion + Huey submit_task fix + cross-stack first-class support.
+  //
+  // Round-6 audit: 10 HIGH security + availability findings closed
+  // across the brain ↔ agent transport, agent crash isolation, and
+  // migration safety surfaces. Plus the MEDIUM batch (frame caps,
+  // Slack/Discord host-lock, email CRLF guard).
+  //
+  // Framework expansion: z4j-flask + z4j-fastapi now auto-discover
+  // all 6 engine adapters (celery + rq + arq + dramatiq + huey +
+  // taskiq), not just celery. Cross-stack combos like Flask + RQ and
+  // FastAPI + arq are first-class supported with 0/0 failures across
+  // an 11-project docker e2e (4 framework × celery + 5 engine × bare
+  // + 2 cross-stack).
+  //
+  // Bugs fixed: z4j-huey submit_task was broken on Huey 2.x/3.x
+  // (Task class instantiation pattern). z4j-celery submit_task now
+  // honors task_always_eager via apply_async-when-locally-registered.
+  // z4j-bare's schedule.fire dispatcher routes to engine.submit_task
+  // (was sending to scheduler adapter which a worker doesn't have).
+  //
+  // Six framework + engine packages bump from 1.0.x to 1.1.0 to ship
+  // with the family: bare 1.0.7→1.1.0, django 1.0.7→1.1.0, flask
+  // 1.0.4→1.1.0, fastapi 1.0.4→1.1.0, celery 1.0.3→1.1.0,
+  // celerybeat 1.0.2→1.1.0, huey 1.0.1→1.1.0. Engine adapters
+  // without production-code changes (rq, arq, dramatiq, taskiq +
+  // 5 scheduler adapters) stay at 1.0.1.
+  // -------------------------------------------------------------------------
+  {
+    package: "z4j-brain",
+    version: "1.1.0",
+    date: "2026-04-28",
+    entries: [
+      { type: "security", summary: "WS-HIGH-1 (round-6): drain-race double-deliver closed. Pre-fix websocket/gateway.py:466 pushed the command frame BEFORE marking it dispatched; the reconcile loop concurrently pushed the same un-dispatched command. Agent in-memory dedup caught it within 300s, but a process restart between the two pushes could deliver destructive commands (purge_queue, restart_worker, bulk_retry) twice. Fix: mark_dispatched runs BEFORE push in both gateway.py and main.py reconcile loop." },
+      { type: "security", summary: "WS-HIGH-2 (round-6): long-poll re-includes DISPATCHED commands on reconnect. Pre-fix a long-poll/WS handler that marked a command DISPATCHED but failed to deliver bytes (HTTP write error, WS drop) left the command stranded - only recovered via CommandTimeoutWorker minutes later. New agent_longpoll_redispatch_seconds window pulls DISPATCHED commands back into the long-poll response on reconnect." },
+      { type: "security", summary: "WS-HIGH-3 (round-6): rate limit on /ws/agent + /api/v1/agent/events. Pre-fix a leaked bearer could connect unboundedly. New _agent_connect_bucket (600/min/IP) caps reconnect storms; 1000 agents reconnecting simultaneously would have opened 3000 concurrent DB sessions before any drain ran." },
+      { type: "security", summary: "Mig-HIGH-1 (round-6): events DROP TABLE idempotent guard. The 0001 initial migration did DROP TABLE events then re-created as partitioned - 'safe because table is empty' only on first run. A partial-failure recovery hit this and destroyed an existing populated events table. Now guarded with a row-count check + IF EXISTS." },
+      { type: "security", summary: "Mig-HIGH-2 (round-6): CREATE INDEX CONCURRENTLY discipline + transaction_per_migration=True. Stops migrations from taking write locks on potentially-50M-row tables for the duration of a re-application. Combined with the 3-second db_lock_timeout_ms, prevents every concurrent INSERT from failing during migration." },
+      { type: "security", summary: "Mig-HIGH-3 (round-6): downgrade no-op for _drop_extensions. Pre-fix migrate downgrade base did DROP EXTENSION pg_trgm/citext/pgcrypto. Operators sharing a Postgres cluster got those silently broken. Now a documented no-op - extensions stay installed across upgrade/downgrade." },
+      { type: "security", summary: "SR-HIGH (round-6): multi-key acceptance for Z4J_SECRET rotation. Pre-fix rotating the master secret invalidated every prior audit-log row's HMAC, breaking compliance for operators with 90-day mandatory rotation. New Z4J_PREVIOUS_SECRETS and Z4J_PREVIOUS_SESSION_SECRETS env vars accept comma-separated old keys for verify-only fallback, enabling zero-downtime rotation." },
+      { type: "security", summary: "Notif-HIGH (round-6): user-channel test endpoints now write user_notifications.channel.test audit rows. Pre-fix /api/v1/user/channels/{id}/test and /api/v1/user/channels/test (unsaved-config preflight) dispatched real notifications to operator-controlled URLs but left no audit row, defeating the security review trail." },
+      { type: "security", summary: "MEDIUM batch (round-6): WebSocket frame_router caps adapter_health keys at 256, queue_depths inner entries at 1024, event_batch at 1000 frames per inbound. Slack outbound webhooks host-locked to hooks.slack.com; Discord webhooks host-locked to four official Discord webhook hosts. Email Subject/From/To headers now stripped of CR/LF before SMTP send (closes header injection)." },
+    ],
+  },
+  {
+    package: "z4j-celery",
+    version: "1.1.0",
+    date: "2026-04-28",
+    entries: [
+      { type: "security", summary: "Agent-HIGH-1 (round-6): broker poison-message ack+drop+counter. Pre-fix events/broker.py:166 requeued a poisoned message AND re-raised into Kombu, causing a tight ~2s reconnect loop in the customer's Celery worker - visible CPU/IO storm. Now the agent's broker-events listener acks the poisoned message, drops it, and bumps z4j_celery.broker_events_poisoned_total." },
+      { type: "security", summary: "Agent-HIGH-2 (round-6): PID-guard prefork stale loop. engine.py:122 captured the asyncio loop reference in the parent process; Celery's prefork pool then forked workers that inherited the stale ref. Every task in prefork mode logged an error stacktrace; events could be silently dropped if the parent had moved on. New PID-guard refuses to use a captured loop from a different PID and re-creates the sink lazily in the child." },
+      { type: "fixed", summary: "submit_task now honors task_always_eager. Pre-fix the adapter unconditionally called app.send_task(name, ...) which bypasses the local task registry - so task_always_eager=True (CI / dev mode) had no effect on brain-dispatched fires. Now prefers app.tasks[name].apply_async(...) when the task is locally registered, falling back to send_task for at-distance scheduling. Also picks up the task's decorator options (default queue, retry policy, time limits)." },
+      { type: "changed", summary: "Family bump to 1.1.0. Floors: z4j-core>=1.1.0, z4j-bare>=1.1.0. Brain 1.1.0 + scheduler 1.1.0 + celery 1.0.3 was unsupported (the schedule.fire dispatcher fix lives in z4j-bare 1.1.0). The new floor refuses that mixed install." },
+    ],
+  },
+  {
+    package: "z4j-bare",
+    version: "1.1.0",
+    date: "2026-04-28",
+    entries: [
+      { type: "fixed", summary: "schedule.fire dispatcher routes to engine.submit_task. Pre-1.1 the agent dispatcher routed every schedule.* action to _dispatch_scheduler, which only handled enable/disable/trigger_now/delete. The brain-side z4j-scheduler 1.1.0 emits schedule.fire on every tick, and the agent always rejected it with one of two errors: 'unrecognized schedule action schedule.fire' or 'no scheduler adapter registered for None' (a Celery WORKER agent doesn't register a SchedulerAdapter - celery-beat is a separate process). Result: every brain-side scheduled tick produced a command.failed audit row, and no scheduled work ever ran end-to-end. New _dispatch_schedule_fire routes to QueueEngineAdapter.submit_task using the payload the brain populates. Verified live in multi-engine docker e2e." },
+      { type: "changed", summary: "Family bump 1.0.7→1.1.0. Floor z4j-core>=1.1.0." },
+    ],
+  },
+  {
+    package: "z4j-huey",
+    version: "1.1.0",
+    date: "2026-04-28",
+    entries: [
+      { type: "fixed", summary: "submit_task now actually enqueues on Huey 2.x and 3.x. Pre-1.1 the adapter called callable_obj(*args, **kwargs) against the registry entry, which works only if Huey stores the TaskWrapper decorator in _registry._registry. Both supported Huey lines actually store the underlying Task subclass there, and instantiating the class with task args directly trips Task.__init__() (which accepts args/kwargs as keyword tuples, not splatted task arguments). The brain-side z4j-scheduler 1.1.0 schedule.fire dispatcher relies on this method. New flow: instantiate Task(args=..., kwargs=..., eta=..., priority=...) then huey.enqueue(task_instance). Verified end-to-end in docker (huey-app project, 100% completion)." },
+      { type: "changed", summary: "Family bump 1.0.1→1.1.0. Floor z4j-core>=1.1.0." },
+    ],
+  },
+  {
+    package: "z4j-flask",
+    version: "1.1.0",
+    date: "2026-04-28",
+    entries: [
+      { type: "added", summary: "Engine auto-discovery for all 6 engines (celery + rq + arq + dramatiq + huey + taskiq), not just celery. Z4J(app) now reads app.config['RQ_REDIS_URL'] / ARQ_REDIS_SETTINGS / DRAMATIQ_BROKER / HUEY / TASKIQ_BROKER alongside CELERY_APP. Real-world combos like Flask + RQ are now first-class supported. Verified end-to-end in docker (flask-rq-app project, 100% completion)." },
+      { type: "changed", summary: "Family bump 1.0.4→1.1.0. Floors z4j-core>=1.1.0, z4j-bare>=1.1.0." },
+    ],
+  },
+  {
+    package: "z4j-fastapi",
+    version: "1.1.0",
+    date: "2026-04-28",
+    entries: [
+      { type: "added", summary: "Engine auto-discovery for all 6 engines via z4j_lifespan(...) and install_z4j(...). New kwargs: rq_app, arq_redis_settings, arq_function_names, arq_queue_name, dramatiq_broker, huey, taskiq_broker. Real-world combos like FastAPI + arq (the classic async stack) are now first-class supported. Verified end-to-end in docker (fastapi-arq-app project, 100% completion)." },
+      { type: "changed", summary: "Family bump 1.0.4→1.1.0. Floors z4j-core>=1.1.0, z4j-bare>=1.1.0." },
+    ],
+  },
+  {
+    package: "z4j-django",
+    version: "1.1.0",
+    date: "2026-04-28",
+    entries: [
+      { type: "changed", summary: "Family bump 1.0.7→1.1.0 to align with the v1.1.0 ecosystem. Floors z4j-core>=1.1.0, z4j-bare>=1.1.0. The driving fix lives in z4j-bare 1.1.0: the agent dispatcher correctly routes schedule.fire to the queue engine's submit_task, instead of rejecting every brain-side scheduler tick. Operators on brain 1.1.0 + scheduler 1.1.0 with z4j-django 1.0.x had every scheduled task silently fail." },
+    ],
+  },
+  {
+    package: "z4j-celerybeat",
+    version: "1.1.0",
+    date: "2026-04-28",
+    entries: [
+      { type: "changed", summary: "Family bump 1.0.2→1.1.0. Floors z4j-core>=1.1.0, z4j-bare>=1.1.0. The brain-side z4j-scheduler 1.1.0 takes over the 'fire next tick' responsibility this adapter used to share with celery-beat's own loop; this adapter still owns the schedule CRUD path against the django-celery-beat tables." },
+    ],
+  },
+
+  // -------------------------------------------------------------------------
+  // 2026-04-27 v1.1.0 - coordinated ecosystem baseline release.
+  // Four anchor packages (z4j-core, z4j-brain, z4j-scheduler, z4j umbrella)
+  // ship at 1.1.0 simultaneously. v1.0.x had real upgrade/downgrade hazards
+  // (1.0.18 -> 1.0.17 alembic flap loops, scheduler workers eating
+  // connection-pool slots, stale SPA index.html, extra='forbid' rolling-
+  // upgrade traps). v1.1.0 fixes all of them and codifies the contract
+  // (docs/MIGRATIONS.md) - every patch within v1.1.x upgrades AND
+  // downgrades cleanly to/from every other v1.1.x patch. Also lands the
+  // embedded scheduler sidecar feature, the new Schedule.catch_up/source/
+  // source_hash fields + CatchUpPolicy enum, the gRPC too_many_pings
+  // keepalive fix, and z4j-scheduler's first PyPI publish. Adapter
+  // packages (z4j-celery, z4j-django, z4j-flask, etc.) stay at their
+  // current versions - none have changes worth shipping in this wave.
+  // -------------------------------------------------------------------------
+  {
+    package: "z4j-brain",
+    version: "1.1.0",
+    date: "2026-04-27",
+    entries: [
+      { type: "fixed", summary: "Schema-version skew now warns instead of raising. startup_version.check_and_update_schema_version previously raised SchemaVersionError if the DB's z4j_meta.schema_version was newer than the running code, killing boot. After downgrade (1.0.18 -> 1.0.17) this caused systemd flap loops. Now logs a warning and continues - old code can boot against forward-migrated DBs. The SchemaVersionError class is kept as a back-compat shim." },
+      { type: "fixed", summary: "auto-migrate detects unknown DB head before invoking alembic. When the DB is stamped at a revision the running wheel doesn't ship (downgrade scenario), alembic exited with `Can't locate revision identified by '...'` and the brain flap-looped. Now _detect_unknown_db_head pre-flights the DB's alembic_version against the code's known revisions and raises a clean _UnknownDBRevisionError that the serve handler catches → warns + continues boot." },
+      { type: "fixed", summary: "Scheduler workers gated behind Z4J_SCHEDULER_GRPC_ENABLED. v1.0.18 shipped 3 unconditional periodic workers (pending_fires_replay, schedule_circuit_breaker, schedule_fires_prune) that consumed connection-pool slots. Operators reported agents flapping to 'offline' after upgrade because the heartbeat path couldn't get a slot. These three workers now only register when the gRPC scheduler service is opted in. Default-off operators get zero scheduler-worker activity." },
+      { type: "fixed", summary: "SubscriptionFilters relaxed to extra='ignore'. Pre-1.1 used extra='forbid' so a newer dashboard adding any unknown filter key would 422 against an older brain. Now unknown keys are silently dropped. The two security-relevant extra='forbid' schemas (BulkDeleteRequest, UserSubscriptionCreate - both R3 audit defenses against project_id/user_id smuggling) are deliberately NOT relaxed." },
+      { type: "fixed", summary: "SPA fallback index.html ships Cache-Control: no-cache, no-store, must-revalidate. Pre-1.1 the dashboard SPA entry point was served with default caching, so browsers held a stale index.html (referencing hashed asset filenames that no longer existed) after a brain upgrade. Hashed assets under /assets/ keep their long-lived caching, by design." },
+      { type: "fixed", summary: "gRPC too_many_pings reconnect storm. The brain's SchedulerGrpcServer used stock defaults for keepalive_min_recv_ping_interval_without_data_ms (300_000 ms), so the scheduler client's 30s keepalive was treated as abuse and the server sent GOAWAY too_many_pings every ~150 seconds. The watch stream then reconnected and re-issued a full sync. Net effect: 12-20 spurious watch reconnects per hour silently churning the cache. Now sets matching server options (10_000 ms intervals, max_ping_strikes=0)." },
+      { type: "fixed", summary: "mTLS interceptor accepted bytes-keyed AuthContext only. _enforce_cn looked up the peer cert under auth_ctx.get(b'x509_common_name', []). grpc.aio 1.6+ returns the same logical entries under str keys, so every CN check silently returned [] and any client cert was rejected as 'peer CNs []'. Both interceptors now look up under both shapes and decode bytes/str values defensively. Mirrored fix on the scheduler-side trigger interceptor." },
+      { type: "added", summary: "Embedded scheduler sidecar (Z4J_EMBEDDED_SCHEDULER=true). Brain spawns z4j-scheduler serve as a supervised subprocess in its own lifespan when the flag is set. Auto-mints loopback mTLS certs at boot, supervises with bounded auto-restart and graceful SIGTERM-then-SIGKILL teardown. Default-off (per the new contract: every supervised subprocess is opt-in). Intended for the single-container homelab deploy." },
+      { type: "added", summary: "Schedule fire-history fields (source, catch_up, source_hash) surfaced on SchedulePublic. Wire-protocol additive; older clients ignore the fields. Schema additions in z4j-core 1.1.0 let external SDK consumers deserialize the responses cleanly." },
+      { type: "added", summary: "POST /projects/{slug}/schedules:diff - dry-run preview of the :import reconciler. Returns four buckets (insert/update/unchanged/delete) with proposed + current shapes. ADMIN-gated (mirrors :import); writes no audit row. Backed by a new dashboard route /projects/{slug}/schedules/reconcile with paste-box, mode selector, source filter, and color-coded result panel." },
+      { type: "added", summary: "z4j-brain migrate sync - recovery escape hatch for operators who land in DB-ahead-of-code state in spite of the new contract. Default behavior shows the drift and refuses to act; with --allow-future-schema --i-know-this-can-corrupt-data it stamps the DB to the code's head and drops unknown tables. Documented in docs/MIGRATIONS.md." },
+    ],
+  },
+  {
+    package: "z4j-core",
+    version: "1.1.0",
+    date: "2026-04-27",
+    entries: [
+      { type: "added", summary: "Schedule model gains catch_up, source, source_hash to match the brain's SQLAlchemy schema. Without these, every external SDK consumer that called GET /api/schedules against a brain on the new schema would have failed Pydantic validation (the model uses extra='forbid'). All three fields ship with defaults so callers building a Schedule from scratch don't need to pass them." },
+      { type: "added", summary: "CatchUpPolicy StrEnum (skip/fire_one_missed/fire_all_missed) for type-safe access to the new field. Exported from z4j_core.models." },
+    ],
+  },
+  {
+    package: "z4j-scheduler",
+    version: "1.1.0",
+    date: "2026-04-27",
+    entries: [
+      { type: "added", summary: "First PyPI release. Engine-agnostic dynamic scheduler companion process that talks to z4j-brain over gRPC. Supports cron + interval + one-shot triggers, leader election via Postgres advisory lock, /health /ready /metrics /info endpoints, and migration importers for celery beat, django-celery-beat, rq-scheduler, APScheduler 3.x/4.x, and system crontab files. Joins the v1.1.x ecosystem baseline." },
+      { type: "added", summary: "Defensive periodic full re-sync (15-min default). The WatchStream spawns a parallel timer that runs _full_sync() on a fixed cadence even when the watch event stream is healthy. Catches missed DELETE events. Cadence: Z4J_SCHEDULER_RECONCILE_INTERVAL_SECONDS=900 (set to 0 to disable). Idempotent under _sync_lock." },
+      { type: "fixed", summary: "Exporters emitted JSON literals where Python literals were expected. exporters/celery.py, exporters/rq.py, and exporters/apscheduler.py used json.dumps() for args/kwargs, emitting true/false/null rather than True/False/None. Operators pasting the rendered output into a Python module hit NameError. Extracted a shared py_repr() helper; all three Python-target exporters now produce valid Python source. Round-trip pinned by tests that exec() the rendered output." },
+      { type: "fixed", summary: "mTLS interceptor accepted bytes-keyed AuthContext only - same fix as the brain side, mirrored for the scheduler-side trigger-gRPC interceptor." },
+    ],
+  },
+  {
+    package: "z4j",
+    version: "1.1.0",
+    date: "2026-04-27",
+    entries: [
+      { type: "changed", summary: "Bumps z4j-brain pin to >=1.1.0,<1.2 and z4j-core pin to >=1.1.0,<1.2. v1.1.0 is the always-works ecosystem baseline - every patch within v1.1.x is bidirectionally upgrade/downgrade compatible per docs/MIGRATIONS.md. Adapter packages (z4j-celery, z4j-django, z4j-flask, etc.) stay at their current versions; the umbrella's adapter extras pin compatible floors." },
+      { type: "added", summary: "z4j-scheduler joins the ecosystem at 1.1.0. First PyPI release of the engine-agnostic dynamic scheduler companion. Operators who want the embedded single-container deploy set Z4J_EMBEDDED_SCHEDULER=true on the brain; operators who want a separate scheduler process install pip install z4j-scheduler and connect via gRPC. Either way the brain's SchedulerService stays gated behind Z4J_SCHEDULER_GRPC_ENABLED so default installs pay nothing." },
+    ],
+  },
+  // -------------------------------------------------------------------------
+  // 2026-04-27 v1.0.18 - notification settings reorganization (Option C) +
+  // edit flows for personal subscriptions and project defaults + new
+  // personal Delivery History endpoint + filter parity between the two
+  // surfaces. Pure UI/UX release: zero schema changes, all endpoints
+  // backwards-compatible. The five separate notification routes
+  // collapse into two role-based hubs (Global Notifications for
+  // personal scope, Project Notifications for admin scope), with all
+  // five old URLs redirecting permanently so bookmarks survive.
+  // -------------------------------------------------------------------------
+  {
+    package: "z4j-brain",
+    version: "1.0.18",
+    date: "2026-04-27",
+    entries: [
+      { type: "added", summary: "Edit personal subscriptions in the dashboard. Pre-1.0.18 the /settings/notifications page only let users toggle is_active + delete; adjusting channels, filters, cooldown, or trigger required delete-and-recreate. Now: pencil icon next to the trash icon on each row opens the unified create/edit dialog with all fields prefilled. Backend extended PATCH /api/v1/user/subscriptions/{id} with a `trigger` field for full parity with the project-defaults edit endpoint shipped in this release; (user_id, project_id, trigger) uniqueness defended with a clean 409 on rename collision (race-safe via IntegrityError fallback)." },
+      { type: "added", summary: "Edit project default subscriptions in the dashboard (mirror of the personal-sub fix). Pencil + unified create/edit dialog wired against the new PATCH /api/v1/projects/{slug}/notifications/defaults/{id} endpoint. Pinned by 7 tests covering add-channel-to-existing, partial-update, trigger rename, trigger collision 409, foreign-channel 409, IDOR cross-project 404, and empty-body noop." },
+      { type: "added", summary: "GET /api/v1/user/deliveries - personal delivery history across all the user's projects. Mirror of the per-project audit log, scoped to the calling user via a join to user_subscriptions.user_id. Cursor-paginated (50/page) with optional ?project_slug= filter. Includes deliveries from projects the user is no longer a member of (audit data outlives membership; the dashboard renders ex-membership rows with a 'you left this project' badge so the row reads honestly). 6 regression tests covering cross-project listing, filter, IDOR isolation, ex-membership, pagination." },
+      { type: "added", summary: "Filter parity between personal subscriptions and project defaults dialogs. Backend SubscriptionFilters has supported priority + task_name_pattern + queue since v1.0.x but the dashboard exposed only some on each surface. v1.0.18 adds: project defaults gain priority + task_name_pattern + queue (none were rendered); personal subs gain queue (priority + task_name were already there). Both dialogs now show inline help on the priority filter explaining the @z4j_meta(priority='critical') annotation requirement so users understand why the filter silently matches nothing if their task code doesn't annotate priority. Personal sub dialog also gained the project-channels picker so members can route personal subs through admin-managed shared channels." },
+      { type: "added", summary: "DeliveryPublic.project_id field exposed so the new personal Delivery History tab can group by project and badge ex-membership rows. Backwards-compatible additive field." },
+      { type: "changed", summary: "Notification settings reorganized into role-based hubs (Option C). Pre-1.0.18 the dashboard exposed five separate notification routes whose ownership was confusing. Two channel pages were 1252+1256 lines of nearly duplicated UI. Collapsed by ROLE: /settings/notifications becomes 'Global Notifications' hub with three tabs (My Subscriptions / My Channels / My Delivery History - personal scope only); /projects/{slug}/settings/notifications becomes 'Project Notifications' hub (admin-gated, three tabs: Project Channels / Default Subscriptions / Delivery Log). All five old URLs permanently redirect to the appropriate ?tab= of the new hubs. Zero data-model changes, same DB tables, same API endpoints, same permissions. Non-admin project members lose visibility of the project Notifications sidebar entry - they manage their notifications from the personal hub instead." },
+      { type: "fixed", summary: "Latent cursor off-by-one in the project delivery-log endpoint silently skipped one row per page boundary. Fixed in both the project endpoint and the new personal /user/deliveries endpoint (encode the last visible row, not the overflow row). Pre-existing bug; nobody had a regression test against it before v1.0.18." },
+    ],
+  },
+  {
+    package: "z4j",
+    version: "1.0.18",
+    date: "2026-04-27",
+    entries: [
+      { type: "added", summary: "Bumps z4j-brain floor to >=1.0.18,<1.1 which lands edit flows for personal subscriptions + project defaults (no more delete-and-recreate to change channels), the new GET /api/v1/user/deliveries endpoint (personal cross-project audit log), and filter parity between personal subs and project defaults (priority + task_name + queue inputs on both, with inline @z4j_meta help)." },
+      { type: "changed", summary: "Notification settings reorganized into role-based hubs (Option C). Five notification routes collapse into two tabbed hubs: 'Global Notifications' (personal scope, three tabs) and 'Project Notifications' (admin scope, three tabs). Old URLs redirect permanently so bookmarks survive. Pure UI reorganization - zero schema changes, all endpoints backwards-compatible. See z4j-brain 1.0.18 CHANGELOG." },
+      { type: "fixed", summary: "Latent cursor off-by-one in the project delivery-log endpoint silently skipped one row per page boundary. Fixed in both endpoints." },
+    ],
+  },
+  // -------------------------------------------------------------------------
+  // 2026-04-27 v1.0.17 - SQLite hotfix for a latent v1.0.0 bug. Saving a
+  // default subscription (or per-user subscription) with channel ids
+  // 500'd because the SQLite uuid_array() fallback couldn't JSON-
+  // serialize uuid.UUID instances. Postgres path was unaffected.
+  // SQLite-only fix; bumps a TypeDecorator that converts UUIDs <-> strings
+  // transparently. Reported live by an operator on tasks.jfk.work.
+  // -------------------------------------------------------------------------
+  {
+    package: "z4j-brain",
+    version: "1.0.17",
+    date: "2026-04-27",
+    entries: [
+      { type: "fixed", summary: "SQLite default-subscription save with channel ids no longer 500s. POST /api/v1/projects/{slug}/notifications/defaults with a non-empty project_channel_ids list raised TypeError: Object of type UUID is not JSON serializable on commit and surfaced as {\"error\":\"internal_error\"}. The uuid_array() column adapter fell back to plain SQLAlchemy JSON on SQLite, which calls json.dumps on the bind value - and json.dumps doesn't know how to serialize uuid.UUID. Wrapped the SQLite variant in a TypeDecorator that converts UUIDs to strings on write and back to UUIDs on read. Bug present in v1.0.0..v1.0.16; SQLite-only (Postgres unaffected). Three columns affected: user_subscriptions.project_channel_ids, user_subscriptions.user_channel_ids, project_default_subscriptions.project_channel_ids. Operator action: `pip install -U z4j-brain` and restart - no DB migrations, no env changes." },
+    ],
+  },
+  {
+    package: "z4j",
+    version: "1.0.17",
+    date: "2026-04-27",
+    entries: [
+      { type: "fixed", summary: "Bumps z4j-brain floor to >=1.0.17,<1.1 which fixes a SQLite bug: saving a default or per-user subscription with channel ids 500'd because the uuid_array() SQLite fallback couldn't JSON-serialize uuid.UUID instances. Bug present in v1.0.0..v1.0.16; SQLite-only (Postgres unaffected). Operator action: `pip install -U z4j` and restart." },
+    ],
+  },
+  // -------------------------------------------------------------------------
+  // 2026-04-27 v1.0.16 - hotfix for the v1.0.11 SPA-bundle regression
+  // that re-emerged in the 1.0.15 release-split script. The 1.0.15 wheel
+  // on PyPI was missing dashboard/dist/ entirely so GET / returned
+  // {"detail":"Not Found"} on every fresh `pip install z4j-brain`. Pure
+  // packaging fix; no Python code change. Belt-and-suspenders: the
+  // release script now refuses to publish a z4j-brain wheel that contains
+  // fewer than 100 SPA asset entries, so this regression cannot reach
+  // PyPI again. Docker users were unaffected.
+  // -------------------------------------------------------------------------
+  {
+    package: "z4j-brain",
+    version: "1.0.16",
+    date: "2026-04-27",
+    entries: [
+      { type: "fixed", summary: "Wheel ships the bundled dashboard SPA again (v1.0.11 regression). The 1.0.15 wheel on PyPI was missing dashboard/dist/ entirely so `pip install z4j-brain && z4j-brain serve` returned {\"detail\":\"Not Found\"} for GET / on every fresh install. Pure packaging defect: the release-split script's rsync `--exclude='dist'` rule was unanchored and matched the SPA's bundle directory at backend/src/z4j_brain/dashboard/dist/ along with the intended top-level dist/ build output. Fixed by anchoring the exclude to the package root only. Belt-and-suspenders: the release script now refuses to publish a z4j-brain wheel that's missing the SPA. Operator action: `pip install -U z4j-brain` and restart - no DB migrations, no env changes. API endpoints, /metrics, WebSocket gateway, CLI, and migrations all worked correctly in 1.0.15 - only the dashboard HTML was missing. Docker users were unaffected." },
+    ],
+  },
+  {
+    package: "z4j",
+    version: "1.0.16",
+    date: "2026-04-27",
+    entries: [
+      { type: "fixed", summary: "Bumps z4j-brain floor to >=1.0.16,<1.1 which restores the dashboard SPA in the wheel. The 1.0.15 wheel on PyPI was missing dashboard/dist/ (a v1.0.11 packaging regression that re-emerged in the release-split script) so GET / returned {\"detail\":\"Not Found\"} on every fresh install. Operator action: `pip install -U z4j` and restart - no DB migrations, no env changes. Docker users were unaffected." },
+    ],
+  },
+  // -------------------------------------------------------------------------
+  // 2026-04-27 v1.0.15 - enterprise-grade hardening release. Closes the
+  // P-1 batched-heartbeat-upsert performance gap explicitly deferred from
+  // v1.0.14 (one INSERT...ON CONFLICT per batch instead of N+1 round-trips
+  // per event), hardens the SPA catch-all so typo'd /api/ URLs return
+  // clean 404 JSON instead of HTML, fixes the SQLite migration downgrade
+  // path via batch_alter_table, and closes a HIGH mTLS-allow-list
+  // bypass (lstrip-vs-removeprefix) in an internal opt-in service.
+  // Test gate: 402 brain unit + 1019 cross-package unit + 26 brain
+  // integration on Postgres 18 + full migration roundtrip + E2E P-1
+  // verified against a live brain (50 events / 3 workers collapse to
+  // 3 worker rows, heartbeat-at-max delta 0.000s).
+  // -------------------------------------------------------------------------
+  {
+    package: "z4j-brain",
+    version: "1.0.15",
+    date: "2026-04-27",
+    entries: [
+      { type: "security", summary: "mTLS allow-list bypass closed in an internal opt-in gRPC service. The interceptor used `str.lstrip(\"DNS:\")` which strips a SET of characters; any leading D/N/S/colon got eaten from the CN itself. A legitimate cert with CN starting with one of those characters would silently fail the allow-list match (locking out a legitimate cert); a hostile cert whose mangled CN happened to coincide with an allow-list entry would have been accepted. Switched to `str.removeprefix`. The affected service is dormant by default; only deployments that explicitly opt in were ever exposed." },
+      { type: "changed", summary: "P-1 batched heartbeat upsert: replaces N+1 worker upsert round-trips per event batch with a single INSERT...ON CONFLICT DO UPDATE on Postgres + SQLite (≥3.24). Dedupes (engine, worker_name) tuples in the EventIngestor accumulator, preserves no-key-no-touch semantics (a heartbeat-only batch can't blank hostname/concurrency), and runs inside a begin_nested savepoint with per-row fallback on OperationalError so a deadlock can't poison the outer transaction. Heartbeat now carries max(occurred_at) so cross-replica now() skew can't reorder agent liveness. 200-event batch issues exactly one INSERT against workers (was 200 SELECTs + up to 200 INSERTs/UPDATEs)." },
+      { type: "changed", summary: "Replay-worker N+1 batched: the pending-fires replay worker's catch-up logic used to call schedules_repo.get(...) once per distinct schedule in the batch; replaced with a single WHERE id IN (...) lookup. 5-schedule batch issues one SELECT instead of five." },
+      { type: "fixed", summary: "Trigger-schedule route no longer reaches into a private attribute of CommandDispatcher to find the brain's Settings. Replaced with proper Depends(get_settings) injection plus a process-wide singleton on app.state. Eliminates a fragile private-API access path that would silently break if CommandDispatcher's layout changes." },
+      { type: "security", summary: "SPA catch-all hardening: any unmatched path under /api/, /ws/, /metrics, /auth/, /setup/, /healthz, /.well-known/, /openapi.json, /docs, /redoc, /assets/ now returns a clean 404 instead of serving the dashboard SPA index.html. Pre-1.0.15 a typo'd /api/v1/typoo returned 200 text/html and frontend code choked on 'Unexpected token <' trying to parse HTML as JSON." },
+      { type: "fixed", summary: "Migration 2026_04_26_0004-scheduler_columns downgrade is now SQLite-safe (uses op.batch_alter_table). SQLite's ALTER TABLE DROP COLUMN does a full table rebuild and re-evaluates remaining constraints; dropping the four scheduler columns one by one would fail with 'no such column: catch_up' on the rebuild. Postgres path unchanged. Required for the test_migration downgrade-roundtrip suite and any operator on SQLite who needs to roll back." },
+      { type: "fixed", summary: "Latent ImportError on certain personal-notification 403 paths (api/user_notifications.py imported a non-existent ForbiddenError, raising HTTP 500 instead of HTTP 403). Switched to AuthorizationError so the 403 envelope actually fires." },
+      { type: "added", summary: "Brain-side gRPC SchedulerService (dormant in 1.0.15): registered behind Z4J_SCHEDULER_GRPC_ENABLED=False (default). When disabled, grpcio is never imported and port 7701 is never bound - existing deployments see zero behavior change. When enabled (`pip install z4j-brain[scheduler-grpc]` + Z4J_SCHEDULER_GRPC_ENABLED=1), accepts mTLS-protected gRPC connections from the forthcoming z4j-scheduler companion package (alpha; see docs/SCHEDULER.md). Implements ListSchedules, WatchSchedules, FireSchedule, AcknowledgeFireResult, Ping. Operator mints client certs via `z4j-brain mint-scheduler-cert`." },
+      { type: "added", summary: "/metrics regression test coverage: explicitly verifies 401 without bearer, 401 with wrong bearer, and 200 with correct bearer. Closes the gap that allowed v1.0.13 to ship with a stale metrics_returns_prometheus_text test that asserted 200 unconditionally." },
+      { type: "added", summary: "Settings.disable_spa_fallback (default False) - test fixtures set this to True so include_router can register API routes after build time without the SPA catch-all shadowing them." },
+    ],
+  },
+  {
+    package: "z4j",
+    version: "1.0.15",
+    date: "2026-04-27",
+    entries: [
+      { type: "security", summary: "Bumps z4j-brain floor to >=1.0.15,<1.1 which closes a HIGH mTLS allow-list bypass (lstrip-vs-removeprefix bug) in an internal opt-in service. Default-off path is untouched - no shipping deployment was exposed." },
+      { type: "changed", summary: "Bumps z4j-brain floor to >=1.0.15,<1.1 which lands the P-1 batched-heartbeat upsert (one INSERT...ON CONFLICT per event batch instead of N+1 round-trips), the SPA catch-all hardening (typo'd /api/ returns 404 JSON not HTML), and the SQLite-safe migration downgrade. See z4j-brain 1.0.15 CHANGELOG for the full breakdown." },
+    ],
+  },
   // -------------------------------------------------------------------------
   // 2026-04-24 v1.0.14 - notification-channel feature wave + 21-item
   // security audit hardening pass. Adds PagerDuty + Discord native

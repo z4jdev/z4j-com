@@ -18,6 +18,25 @@ export function getStaticPaths() {
 const { feature } = Astro.props;
 const related = FEATURES.filter((f) => f.slug !== feature.slug).slice(0, 3);
 
+// Slugs that have a hand-rolled SVG mockup in FeatureScreenshot.astro.
+// Anything not in this list gets the Preview section hidden so we don't
+// render an empty black box on the page.
+const SLUGS_WITH_MOCKUP = new Set([
+  "unified-actions",
+  "reconciliation",
+  "trends",
+  "visual-dag",
+  "rbac",
+  "invitations",
+  "password-reset",
+  "redaction",
+  "audit-log",
+  "rate-limiting",
+  "worker-restart",
+  "redis-streams",
+]);
+const hasMockup = SLUGS_WITH_MOCKUP.has(feature.slug);
+
 const techArticleSchema = {
   "@context": "https://schema.org",
   "@type": "TechArticle",
@@ -67,15 +86,17 @@ const metaDescription = `${feature.tagline} ${feature.summary.slice(0, 140)}`.sl
     </div>
   </Section>
 
-  <Section compact>
-    <figcaption class="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">
-      Preview
-    </figcaption>
-    <FeatureScreenshot slug={feature.slug} title={feature.title} />
-    <p class="mt-3 text-xs text-[var(--color-muted)]">
-      Mockup of the dashboard view for this feature. Live-reloading and themed to match your dashboard.
-    </p>
-  </Section>
+  {hasMockup && (
+    <Section compact>
+      <figcaption class="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+        Preview
+      </figcaption>
+      <FeatureScreenshot slug={feature.slug} title={feature.title} />
+      <p class="mt-3 text-xs text-[var(--color-muted)]">
+        Mockup of the dashboard view for this feature. Live-reloading and themed to match your dashboard.
+      </p>
+    </Section>
+  )}
 
   <Section compact>
     <div class="grid gap-8 md:grid-cols-2">

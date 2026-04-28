@@ -1,0 +1,623 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Section from "../../components/Section.astro";
+import PackageHero from "../../components/PackageHero.astro";
+import Card from "../../components/Card.astro";
+import CodeCopy from "../../components/CodeCopy.astro";
+import CTA from "../../components/CTA.astro";
+import Icon from "../../components/Icon.astro";
+import { getPackage } from "../../data/packages";
+import { SCHEDULERS } from "../../data/schedulers";
+
+const pkg = getPackage("z4j-scheduler");
+
+const tagline = "Engine-agnostic dynamic scheduler. One service for every Python engine.";
+const description = "z4j-scheduler is a separate companion process that fires schedules against any of the six engines z4j supports. Schedules live in z4j-brain's database; the dashboard creates, edits, pauses, resumes, and renames them without a daemon restart. The scheduler ticks once per second, dispatches due fires over gRPC to brain, and brain delivers the schedule.fire command to the agent, which enqueues the task on whichever broker the engine uses.";
+
+const CAPABILITIES = [
+  "Engine-agnostic dispatch (Celery, RQ, Dramatiq, Huey, arq, taskiq)",
+  "Live edit from dashboard, declarative config, or REST",
+  "Per-schedule catch-up policy (skip / fire-one-missed / fire-all-missed)",
+  "Importer + exporter for every native scheduler (round-trip pinned by tests)",
+  "Postgres advisory-lock leader for HA",
+  "Tamper-evident HMAC-chained audit log of schedule edits",
+  "Cron, interval, one-shot, and solar (sunrise/sunset) triggers",
+  "Embedded mode (brain-supervised subprocess) or standalone process",
+];
+
+const LIMITATIONS = [
+  "Adds one process to your stack (or one subprocess in embedded mode)",
+  "Brain becomes a hard dependency for schedule edits",
+  "First PyPI release is 1.1.0 (2026-04-28); not yet battle-tested at scale, operate with a fast-response posture for the first weeks",
+];
+
+const otherSchedulers = SCHEDULERS.slice(0, 3);
+
+// Six categorized comparison tables. Cell shape:
+//   { v: "yes" | "no" | "partial" | "na", t: "label text" }
+// "v" drives the icon; "t" adds optional context. The z4j-scheduler
+// column is rendered with primary-tinted background to make wins
+// pop visually without forcing operators to read every row.
+const COMPETITORS = [
+  { key: "celery-beat",        label: "celery-beat" },
+  { key: "django-celery-beat", label: "django-celery-beat" },
+  { key: "rq-scheduler",       label: "rq-scheduler" },
+  { key: "apscheduler",        label: "APScheduler 4" },
+  { key: "cron",               label: "system cron" },
+] as const;
+
+type CellValue = "yes" | "no" | "partial" | "na";
+type Cell = { v: CellValue; t?: string };
+type Row = { capability: string; cells: Record<string, Cell>; z4j: Cell };
+
+const COMPARISON: { category: string; rows: Row[] }[] = [
+  {
+    category: "Engine & framework reach",
+    rows: [
+      {
+        capability: "Engines supported",
+        cells: {
+          "celery-beat": { v: "partial", t: "Celery only" },
+          "django-celery-beat": { v: "partial", t: "Celery only" },
+          "rq-scheduler": { v: "partial", t: "RQ only" },
+          "apscheduler": { v: "partial", t: "in-process only" },
+          "cron": { v: "partial", t: "shell exec" },
+        },
+        z4j: { v: "yes", t: "All 6 (Celery, RQ, Dramatiq, Huey, arq, taskiq)" },
+      },
+      {
+        capability: "Framework agnostic",
+        cells: {
+          "celery-beat": { v: "yes" },
+          "django-celery-beat": { v: "no", t: "Django only" },
+          "rq-scheduler": { v: "yes" },
+          "apscheduler": { v: "yes" },
+          "cron": { v: "yes", t: "host OS" },
+        },
+        z4j: { v: "yes", t: "Django / Flask / FastAPI / bare" },
+      },
+      {
+        capability: "Multiple engines, one process",
+        cells: {
+          "celery-beat": { v: "no" },
+          "django-celery-beat": { v: "no" },
+          "rq-scheduler": { v: "no" },
+          "apscheduler": { v: "no" },
+          "cron": { v: "no" },
+        },
+        z4j: { v: "yes", t: "Celery + RQ + Huey side-by-side, one dashboard" },
+      },
+    ],
+  },
+  {
+    category: "Operations & observability",
+    rows: [
+      {
+        capability: "Edit live (no daemon restart)",
+        cells: {
+          "celery-beat": { v: "no" },
+          "django-celery-beat": { v: "partial", t: "Django admin only" },
+          "rq-scheduler": { v: "no" },
+          "apscheduler": { v: "partial", t: "persistent jobstore only" },
+          "cron": { v: "no" },
+        },
+        z4j: { v: "yes", t: "Dashboard / declarative / REST" },
+      },
+      {
+        capability: "Built-in dashboard",
+        cells: {
+          "celery-beat": { v: "no" },
+          "django-celery-beat": { v: "partial", t: "Django admin (basic)" },
+          "rq-scheduler": { v: "no" },
+          "apscheduler": { v: "no" },
+          "cron": { v: "no" },
+        },
+        z4j: { v: "yes", t: "Fire history, run-now, edit, audit log" },
+      },
+      {
+        capability: "Fire history per schedule",
+        cells: {
+          "celery-beat": { v: "no" },
+          "django-celery-beat": { v: "no" },
+          "rq-scheduler": { v: "no" },
+          "apscheduler": { v: "no" },
+          "cron": { v: "partial", t: "syslog only" },
+        },
+        z4j: { v: "yes", t: "Buffered + acked + searchable" },
+      },
+      {
+        capability: "Audit log of schedule edits",
+        cells: {
+          "celery-beat": { v: "no" },
+          "django-celery-beat": { v: "partial", t: "3rd-party django-auditlog" },
+          "rq-scheduler": { v: "no" },
+          "apscheduler": { v: "no" },
+          "cron": { v: "no" },
+        },
+        z4j: { v: "yes", t: "HMAC-chained, tamper-evident" },
+      },
+      {
+        capability: "Manual fire-now button",
+        cells: {
+          "celery-beat": { v: "no" },
+          "django-celery-beat": { v: "no" },
+          "rq-scheduler": { v: "no" },
+          "apscheduler": { v: "partial", t: "API only" },
+          "cron": { v: "no" },
+        },
+        z4j: { v: "yes", t: "Dashboard + REST" },
+      },
+      {
+        capability: "RBAC / project scoping",
+        cells: {
+          "celery-beat": { v: "no" },
+          "django-celery-beat": { v: "partial", t: "Django auth only" },
+          "rq-scheduler": { v: "no" },
+          "apscheduler": { v: "no" },
+          "cron": { v: "partial", t: "UNIX permissions" },
+        },
+        z4j: { v: "yes", t: "Project + role-scoped (admin / operator / viewer)" },
+      },
+    ],
+  },
+  {
+    category: "Reliability & catch-up",
+    rows: [
+      {
+        capability: "HA / leader election",
+        cells: {
+          "celery-beat": { v: "no", t: "single instance only" },
+          "django-celery-beat": { v: "no", t: "single instance only" },
+          "rq-scheduler": { v: "no", t: "single instance only" },
+          "apscheduler": { v: "partial", t: "pluggable, manual" },
+          "cron": { v: "no", t: "single host" },
+        },
+        z4j: { v: "yes", t: "Postgres advisory-lock leader, rolling-restart safe" },
+      },
+      {
+        capability: "Catch-up on outage",
+        cells: {
+          "celery-beat": { v: "partial", t: "all-or-nothing" },
+          "django-celery-beat": { v: "partial", t: "all-or-nothing" },
+          "rq-scheduler": { v: "partial", t: "default fire-all" },
+          "apscheduler": { v: "partial", t: "coalescing only" },
+          "cron": { v: "no", t: "missed = lost" },
+        },
+        z4j: { v: "yes", t: "Per-schedule: skip / fire-one-missed / fire-all-missed" },
+      },
+      {
+        capability: "DST / IANA tz correctness",
+        cells: {
+          "celery-beat": { v: "yes" },
+          "django-celery-beat": { v: "yes" },
+          "rq-scheduler": { v: "partial", t: "UTC default" },
+          "apscheduler": { v: "yes" },
+          "cron": { v: "yes" },
+        },
+        z4j: { v: "yes", t: "Validated at API; DST fall-back fold fixed" },
+      },
+      {
+        capability: "Solar (sunrise / sunset / dusk)",
+        cells: {
+          "celery-beat": { v: "no" },
+          "django-celery-beat": { v: "yes" },
+          "rq-scheduler": { v: "no" },
+          "apscheduler": { v: "no" },
+          "cron": { v: "no" },
+        },
+        z4j: { v: "yes", t: "Astronomical events with location" },
+      },
+      {
+        capability: "Replay past fires from dashboard",
+        cells: {
+          "celery-beat": { v: "no" },
+          "django-celery-beat": { v: "no" },
+          "rq-scheduler": { v: "no" },
+          "apscheduler": { v: "no" },
+          "cron": { v: "no" },
+        },
+        z4j: { v: "yes", t: "One-click replay" },
+      },
+    ],
+  },
+  {
+    category: "Migration & lock-in",
+    rows: [
+      {
+        capability: "Importer FROM other schedulers",
+        cells: {
+          "celery-beat": { v: "na" },
+          "django-celery-beat": { v: "na" },
+          "rq-scheduler": { v: "na" },
+          "apscheduler": { v: "na" },
+          "cron": { v: "na" },
+        },
+        z4j: { v: "yes", t: "All 6 native schedulers + crontab" },
+      },
+      {
+        capability: "Exporter TO other schedulers",
+        cells: {
+          "celery-beat": { v: "na" },
+          "django-celery-beat": { v: "na" },
+          "rq-scheduler": { v: "na" },
+          "apscheduler": { v: "na" },
+          "cron": { v: "na" },
+        },
+        z4j: { v: "yes", t: "No lock-in (round-trip pinned by tests)" },
+      },
+      {
+        capability: "Coexist with native scheduler",
+        cells: {
+          "celery-beat": { v: "na" },
+          "django-celery-beat": { v: "na" },
+          "rq-scheduler": { v: "na" },
+          "apscheduler": { v: "na" },
+          "cron": { v: "na" },
+        },
+        z4j: { v: "yes", t: "z4j-celerybeat coexistence adapter" },
+      },
+      {
+        capability: "Declarative-in-source schedules",
+        cells: {
+          "celery-beat": { v: "yes", t: "beat_schedule dict" },
+          "django-celery-beat": { v: "no", t: "DB-only" },
+          "rq-scheduler": { v: "partial", t: "manual" },
+          "apscheduler": { v: "yes", t: "Python" },
+          "cron": { v: "yes", t: "crontab file" },
+        },
+        z4j: { v: "yes", t: "z4j_scheduler.declarative reconciler" },
+      },
+    ],
+  },
+  {
+    category: "Security",
+    rows: [
+      {
+        capability: "Wire-protocol HMAC + replay protection",
+        cells: {
+          "celery-beat": { v: "partial", t: "broker-dependent" },
+          "django-celery-beat": { v: "partial", t: "broker-dependent" },
+          "rq-scheduler": { v: "no" },
+          "apscheduler": { v: "no" },
+          "cron": { v: "na" },
+        },
+        z4j: { v: "yes", t: "HMAC-SHA256 + per-session seq+nonce binding" },
+      },
+      {
+        capability: "Tamper-evident audit chain",
+        cells: {
+          "celery-beat": { v: "no" },
+          "django-celery-beat": { v: "no" },
+          "rq-scheduler": { v: "no" },
+          "apscheduler": { v: "no" },
+          "cron": { v: "no" },
+        },
+        z4j: { v: "yes", t: "Per-row HMAC, prev-hmac chain, DB-level UNIQUE" },
+      },
+      {
+        capability: "Zero-downtime secret rotation",
+        cells: {
+          "celery-beat": { v: "na" },
+          "django-celery-beat": { v: "na" },
+          "rq-scheduler": { v: "na" },
+          "apscheduler": { v: "na" },
+          "cron": { v: "na" },
+        },
+        z4j: { v: "yes", t: "Z4J_PREVIOUS_SECRETS multi-key window" },
+      },
+    ],
+  },
+  {
+    category: "License & project shape",
+    rows: [
+      {
+        capability: "License",
+        cells: {
+          "celery-beat": { v: "yes", t: "BSD-3" },
+          "django-celery-beat": { v: "yes", t: "BSD-3" },
+          "rq-scheduler": { v: "yes", t: "MIT" },
+          "apscheduler": { v: "yes", t: "MIT" },
+          "cron": { v: "yes", t: "BSD" },
+        },
+        z4j: { v: "yes", t: "Apache-2.0" },
+      },
+      {
+        capability: "Process model",
+        cells: {
+          "celery-beat": { v: "yes", t: "long-running daemon" },
+          "django-celery-beat": { v: "yes", t: "daemon + DB" },
+          "rq-scheduler": { v: "yes", t: "long-running daemon" },
+          "apscheduler": { v: "yes", t: "in-process or daemon" },
+          "cron": { v: "yes", t: "init / systemd" },
+        },
+        z4j: { v: "yes", t: "Standalone OR brain-embedded subprocess" },
+      },
+      {
+        capability: "Idle CPU footprint",
+        cells: {
+          "celery-beat": { v: "yes", t: "low" },
+          "django-celery-beat": { v: "yes", t: "low" },
+          "rq-scheduler": { v: "yes", t: "low" },
+          "apscheduler": { v: "yes", t: "low" },
+          "cron": { v: "yes", t: "negligible" },
+        },
+        z4j: { v: "yes", t: "Negligible (1s tick, semaphore-bounded)" },
+      },
+    ],
+  },
+];
+
+---
+
+<BaseLayout
+  title="z4j-scheduler | Engine-agnostic dynamic scheduler"
+  description="z4j-scheduler is a separate companion process that fires schedules against any of the six engines z4j supports. Schedules live in z4j-brain's database; edit from the dashboard, declarative config, or REST without a daemon restart."
+  keywords={["z4j-scheduler", "dynamic scheduler", "engine-agnostic scheduler", "Python scheduler", "task scheduler"]}
+  breadcrumbs={[
+    { name: "Schedulers", href: "/schedulers" },
+    { name: "z4j-scheduler", href: "/schedulers/z4j-scheduler" },
+  ]}
+>
+  <PackageHero
+    packageName="z4j-scheduler"
+    shortName="z4j-scheduler"
+    icon="clock"
+    tagline={tagline}
+    description={description}
+    breadcrumb={[
+      { label: "Schedulers", href: "/schedulers" },
+      { label: "z4j-scheduler" },
+    ]}
+  />
+
+  <Section compact>
+    <div class="grid gap-6 md:grid-cols-2">
+      <div>
+        <h2 class="mb-4 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+          Capabilities
+        </h2>
+        <ul class="space-y-2.5">
+          {CAPABILITIES.map((c) => (
+            <li class="flex items-start gap-2.5 text-sm">
+              <Icon name="check" size={15} class="mt-0.5 text-[var(--color-accent)] shrink-0" />
+              <span>{c}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div>
+        <h2 class="mb-4 text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">
+          Limitations
+        </h2>
+        <ul class="space-y-2.5">
+          {LIMITATIONS.map((l) => (
+            <li class="flex items-start gap-2.5 text-sm text-[var(--color-muted)]">
+              <Icon name="minus" size={15} class="mt-0.5 shrink-0" />
+              <span>{l}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </Section>
+
+  <Section eyebrow="how it differs" title="vs the existing Python schedulers">
+    <p class="text-[var(--color-muted)] mb-10 max-w-3xl leading-relaxed">
+      A factual capability matrix across the five most-used alternatives.
+      All of them do their job well; the case for z4j-scheduler is the
+      specific combination of engine-agnostic dispatch, live editing, and
+      a tamper-evident audit chain in one service. If your stack runs
+      one engine and one short schedule list, the existing native scheduler
+      is probably the right call.
+    </p>
+
+    {/* Six categorized tables, all rendered from the COMPARISON data with
+        identical styling. The z4j-scheduler column gets a primary-tinted
+        background + heavier left border so wins jump visually without
+        forcing the reader to parse every row. */}
+    {COMPARISON.map((category, idx) => (
+      <div class="mb-10">
+        <div class="mb-4 flex items-center gap-3">
+          <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-primary)]/15 text-xs font-bold text-[var(--color-primary)]">
+            {idx + 1}
+          </span>
+          <h3 class="text-lg font-semibold text-[var(--color-fg)]">
+            {category.category}
+          </h3>
+        </div>
+        <div class="overflow-x-auto rounded-2xl border border-[var(--color-border)]">
+          <table class="w-full table-fixed border-collapse text-left text-sm" style="min-width: 880px;">
+            <colgroup>
+              {/* Capability column slightly wider; the 6 comparison
+                  columns are all equal-width for a unified visual
+                  rhythm (~12.5% each). */}
+              <col style="width: 25%;" />
+              <col style="width: 12.5%;" />
+              <col style="width: 12.5%;" />
+              <col style="width: 12.5%;" />
+              <col style="width: 12.5%;" />
+              <col style="width: 12.5%;" />
+              <col style="width: 12.5%;" />
+            </colgroup>
+            <thead>
+              <tr class="border-b border-[var(--color-border)] bg-[var(--color-surface)]/60">
+                <th class="sticky left-0 z-10 bg-[var(--color-surface)]/60 px-4 py-3 font-semibold text-[var(--color-fg)] backdrop-blur-sm">
+                  Capability
+                </th>
+                {COMPETITORS.map((c) => (
+                  <th class="px-4 py-3 font-medium text-[var(--color-muted)]">
+                    {c.label}
+                  </th>
+                ))}
+                <th class="border-l-2 border-[var(--color-primary)] bg-[var(--color-primary)]/10 px-4 py-3 font-semibold text-[var(--color-primary)]">
+                  z4j-scheduler
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {category.rows.map((row, rIdx) => (
+                <tr class={rIdx % 2 === 1 ? "bg-[var(--color-surface)]/20" : ""}>
+                  <td class="sticky left-0 z-10 bg-inherit px-4 py-3 align-top font-medium text-[var(--color-fg)]">
+                    {row.capability}
+                  </td>
+                  {COMPETITORS.map((c) => {
+                    const cell = row.cells[c.key];
+                    return (
+                      <td class="px-4 py-3 align-top text-[var(--color-muted)]">
+                        <span class="flex items-start gap-2">
+                          {cell.v === "yes" && (
+                            <span class="flex-shrink-0 text-[var(--color-accent)]" aria-label="yes">✓</span>
+                          )}
+                          {cell.v === "no" && (
+                            <span class="flex-shrink-0 text-[var(--color-danger)] opacity-70" aria-label="no">✗</span>
+                          )}
+                          {cell.v === "partial" && (
+                            <span class="flex-shrink-0 text-[var(--color-warning)]" aria-label="partial">~</span>
+                          )}
+                          {cell.v === "na" && (
+                            <span class="flex-shrink-0 text-[var(--color-muted)] opacity-50" aria-label="not applicable">-</span>
+                          )}
+                          {cell.t && <span class="leading-snug">{cell.t}</span>}
+                        </span>
+                      </td>
+                    );
+                  })}
+                  <td class="border-l-2 border-[var(--color-primary)] bg-[var(--color-primary)]/10 px-4 py-3 align-top font-medium text-[var(--color-fg)]">
+                    <span class="flex items-start gap-2">
+                      {row.z4j.v === "yes" && (
+                        <span class="flex-shrink-0 text-[var(--color-accent)]" aria-label="yes">✓</span>
+                      )}
+                      {row.z4j.v === "no" && (
+                        <span class="flex-shrink-0 text-[var(--color-danger)] opacity-70" aria-label="no">✗</span>
+                      )}
+                      {row.z4j.v === "partial" && (
+                        <span class="flex-shrink-0 text-[var(--color-warning)]" aria-label="partial">~</span>
+                      )}
+                      {row.z4j.t && <span class="leading-snug">{row.z4j.t}</span>}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    ))}
+
+    {/* Legend + footnote */}
+    <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-[var(--color-muted)]">
+      <span class="inline-flex items-center gap-1.5">
+        <span class="text-[var(--color-accent)]">✓</span> supported
+      </span>
+      <span class="inline-flex items-center gap-1.5">
+        <span class="text-[var(--color-warning)]">~</span> partial
+      </span>
+      <span class="inline-flex items-center gap-1.5">
+        <span class="text-[var(--color-danger)] opacity-70">✗</span> not supported
+      </span>
+      <span class="inline-flex items-center gap-1.5">
+        <span class="text-[var(--color-muted)] opacity-50">-</span> not applicable
+      </span>
+    </div>
+    <p class="mt-6 max-w-3xl text-sm italic text-[var(--color-muted)]">
+      Last verified 2026-04-28. We update this matrix when an upstream
+      scheduler ships a meaningful capability change. The data is in
+      <code class="rounded bg-[var(--color-surface)] px-1 font-mono text-xs">sites/z4j-com/src/pages/schedulers/z4j-scheduler.astro</code>
+      (top of frontmatter, COMPARISON array). PRs welcome.
+    </p>
+
+  </Section>
+
+  <Section eyebrow="how it works" title="Three things, decoupled">
+    <div class="prose-like max-w-3xl space-y-4 text-[var(--color-muted)] leading-relaxed">
+      <p>
+        Most Python schedulers fuse three concerns into one process: where
+        the schedule lives, when it fires, and what runs the task. z4j-scheduler
+        keeps them separate.
+      </p>
+      <ul class="list-disc pl-6 space-y-2">
+        <li>
+          <strong class="text-[var(--color-fg)]">Where the schedule lives</strong>:
+          z4j-brain's database. Edited from the dashboard, declarative
+          config, or REST.
+        </li>
+        <li>
+          <strong class="text-[var(--color-fg)]">When it fires</strong>:
+          the z4j-scheduler service ticks once per second, dispatches due
+          fires over gRPC to brain.
+        </li>
+        <li>
+          <strong class="text-[var(--color-fg)]">What runs the task</strong>:
+          your existing engine worker (Celery, RQ, arq, etc.) on its
+          existing broker. z4j-scheduler does not run tasks itself.
+        </li>
+      </ul>
+      <p>
+        The decoupling is what lets one z4j-scheduler instance manage
+        schedules across a Celery project, an RQ project, and a Huey
+        project from the same dashboard, with a single audit log of edits.
+      </p>
+    </div>
+  </Section>
+
+  <Section eyebrow="when to use it" title="Fit check">
+    <div class="prose-like max-w-3xl space-y-4 text-[var(--color-muted)] leading-relaxed">
+      <p><strong class="text-[var(--color-fg)]">Greenfield, multiple engines, or multi-project</strong>: use z4j-scheduler. Define schedules from the dashboard or declarative config; one source of truth across the org.</p>
+      <p><strong class="text-[var(--color-fg)]">Migrating from celery-beat / rq-scheduler / APScheduler</strong>: run the one-shot importer to copy existing schedules into z4j, verify in the dashboard, then disable the native scheduler. Or run both during a migration window using the coexistence adapter (z4j-celerybeat).</p>
+      <p><strong class="text-[var(--color-fg)]">One engine, short schedule list, no team scaling concern</strong>: the existing native scheduler is probably fine. z4j-scheduler adds a process to your stack; that's only worth it if you'd benefit from the dashboard, audit chain, or cross-engine surface.</p>
+    </div>
+  </Section>
+
+  <Section eyebrow="install" title="Two deploy modes">
+    <div class="space-y-6 max-w-3xl">
+      <div class="space-y-3">
+        <h3 class="text-base font-semibold text-[var(--color-fg)]">Embedded mode</h3>
+        <p class="text-sm text-[var(--color-muted)]">
+          For single-container homelab / small-deploy setups, z4j-brain spawns
+          z4j-scheduler as a supervised subprocess in its own lifespan and
+          auto-mints loopback mTLS at boot. No extra ops surface.
+        </p>
+        <CodeCopy code={`Z4J_EMBEDDED_SCHEDULER=true
+Z4J_SCHEDULER_GRPC_ENABLED=true`} />
+      </div>
+      <div class="space-y-3">
+        <h3 class="text-base font-semibold text-[var(--color-fg)]">Standalone mode</h3>
+        <p class="text-sm text-[var(--color-muted)]">
+          For production, run z4j-scheduler as a separate process or container.
+          Multiple instances elect a leader via Postgres advisory lock; only
+          the leader ticks. Followers stay warm.
+        </p>
+        <CodeCopy code={`pip install z4j-scheduler
+
+z4j-scheduler serve \\
+  --brain-grpc-url brain.internal:7701 \\
+  --brain-rest-url https://brain.internal \\
+  --tls-cert /etc/z4j/scheduler.crt \\
+  --tls-key /etc/z4j/scheduler.key \\
+  --tls-ca /etc/z4j/ca.crt`} />
+      </div>
+    </div>
+  </Section>
+
+  <Section eyebrow="More schedulers" title="See also">
+    <div class="grid gap-4 md:grid-cols-3">
+      {otherSchedulers.map((s) => (
+        <Card
+          href={`/schedulers/${s.slug}`}
+          title={s.shortName}
+          icon={s.icon}
+          logo={s.logo}
+          description={s.tagline}
+        />
+      ))}
+    </div>
+  </Section>
+
+  <CTA
+    title="Wire it up"
+    primaryHref="/install"
+    primaryLabel="Install z4j"
+    secondaryHref={pkg?.docs ?? "https://z4j.dev/schedulers/z4j-scheduler/"}
+    secondaryLabel="z4j-scheduler docs"
+  />
+</BaseLayout>

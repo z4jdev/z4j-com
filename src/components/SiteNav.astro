@@ -1,5 +1,6 @@
 ---
 import ThemeToggle from "./ThemeToggle.astro";
+import SiteSearch from "./SiteSearch.astro";
 
 const pathname = Astro.url.pathname;
 function isActive(path: string): boolean {
@@ -7,16 +8,18 @@ function isActive(path: string): boolean {
   return pathname.startsWith(path);
 }
 
-const links = [
+interface NavLink {
+  href: string;
+  label: string;
+  external?: boolean;
+}
+
+const links: NavLink[] = [
   { href: "/", label: "Home" },
   { href: "/features", label: "Features" },
   { href: "/engines", label: "Engines" },
   { href: "/frameworks", label: "Frameworks" },
   { href: "/schedulers", label: "Schedulers" },
-  { href: "/install", label: "Install" },
-];
-
-const extraLinks = [
   { href: "https://z4j.dev", label: "Docs", external: true },
   { href: "https://github.com/z4jdev", label: "GitHub", external: true },
 ];
@@ -61,14 +64,32 @@ const extraLinks = [
           <li>
             <a
               href={l.href}
+              {...(l.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
               class:list={[
-                "text-sm font-medium transition-colors hover:text-[var(--color-fg)]",
-                isActive(l.href)
+                "inline-flex items-center gap-1 text-sm font-medium transition-colors hover:text-[var(--color-fg)]",
+                isActive(l.href) && !l.external
                   ? "text-[var(--color-fg)]"
                   : "text-[var(--color-muted)]",
               ]}
             >
               {l.label}
+              {l.external && (
+                <svg
+                  width="11"
+                  height="11"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                  class="opacity-70"
+                >
+                  <path d="M7 17 17 7" />
+                  <path d="M8 7h9v9" />
+                </svg>
+              )}
             </a>
           </li>
         ))
@@ -76,16 +97,7 @@ const extraLinks = [
     </ul>
 
     <div class="flex items-center gap-2 md:gap-3">
-      {
-        extraLinks.map((l) => (
-          <a
-            href={l.href}
-            class="hidden text-sm font-medium text-[var(--color-muted)] transition-colors hover:text-[var(--color-fg)] md:inline"
-          >
-            {l.label}
-          </a>
-        ))
-      }
+      <SiteSearch />
       <ThemeToggle />
       <a
         href="/install"
@@ -122,15 +134,35 @@ const extraLinks = [
           <li>
             <a
               href={l.href}
+              {...(l.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
               class:list={[
                 "flex items-center justify-between rounded-md px-3 py-3 text-sm font-medium transition-colors",
-                isActive(l.href)
+                isActive(l.href) && !l.external
                   ? "bg-[var(--color-surface)] text-[var(--color-fg)]"
                   : "text-[var(--color-muted)] hover:bg-[var(--color-surface)] hover:text-[var(--color-fg)]",
               ]}
             >
-              <span>{l.label}</span>
-              {isActive(l.href) && (
+              <span class="inline-flex items-center gap-1.5">
+                {l.label}
+                {l.external && (
+                  <svg
+                    width="11"
+                    height="11"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                    class="opacity-70"
+                  >
+                    <path d="M7 17 17 7" />
+                    <path d="M8 7h9v9" />
+                  </svg>
+                )}
+              </span>
+              {isActive(l.href) && !l.external && (
                 <span class="size-1.5 rounded-full bg-[var(--color-primary)]"></span>
               )}
             </a>
@@ -138,18 +170,6 @@ const extraLinks = [
         ))
       }
     </ul>
-    <div class="mx-auto flex max-w-6xl flex-wrap items-center gap-4 border-t border-[var(--color-border)] px-7 py-4 text-sm">
-      {
-        extraLinks.map((l) => (
-          <a
-            href={l.href}
-            class="font-medium text-[var(--color-muted)] transition-colors hover:text-[var(--color-fg)]"
-          >
-            {l.label} ↗
-          </a>
-        ))
-      }
-    </div>
   </div>
 </header>
 

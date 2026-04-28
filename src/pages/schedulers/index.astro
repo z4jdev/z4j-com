@@ -11,16 +11,20 @@ import { getEngine } from "../../data/engines";
 
 <BaseLayout
   title="Scheduler adapters for every engine | z4j"
-  description="z4j ships scheduler adapters for every engine: celery-beat, rq-scheduler, APScheduler, Huey periodic tasks, arq cron_jobs, and taskiq schedule sources. One Schedules page, all of them."
-  keywords={["celery-beat dashboard", "rq-scheduler", "APScheduler", "periodic tasks", "cron jobs", "Huey periodic", "arq cron", "taskiq scheduler"]}
+  description="z4j ships a dedicated scheduler adapter for every Python task engine: celery-beat, rq-scheduler, APScheduler, Huey periodic, arq cron, taskiq. Plus z4j-scheduler, an engine-agnostic dynamic scheduler if you want one service that drives any engine."
+  keywords={["celery-beat dashboard", "rq-scheduler", "APScheduler", "z4j-scheduler", "periodic tasks", "cron jobs", "Huey periodic", "arq cron", "taskiq scheduler"]}
 >
   <PageHero
     breadcrumb={[{ label: "Schedulers" }]}
     title="One Schedules page. Every scheduler."
-    subtitle="z4j ships a dedicated scheduler adapter for every Python task engine. Periodic tasks from celery-beat, rq-scheduler, APScheduler, Huey, arq cron, and taskiq all surface in one consistent UI. Create, edit, pause, resume, and trigger schedules from the dashboard."
+    subtitle="z4j ships a dedicated scheduler adapter for every Python task engine. Periodic tasks from celery-beat, rq-scheduler, APScheduler, Huey, arq cron, and taskiq all surface in one consistent UI. Plus z4j-scheduler, an engine-agnostic dynamic scheduler for operators who want a single service across multiple engines."
   />
 
-  <Section>
+  <Section
+    eyebrow="Per-engine adapters"
+    title="Surface your existing scheduler in the z4j dashboard"
+    subtitle="Each engine has one or more native schedulers. z4j ships an adapter for each so you can manage existing schedules from the same UI as everything else - no migration required."
+  >
     <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
       {
         SCHEDULERS.map((s) => {
@@ -60,6 +64,43 @@ import { getEngine } from "../../data/engines";
         })
       }
     </div>
+  </Section>
+
+  {/* z4j-scheduler card. Placed mid-page rather than as a hero
+      because it's an alternative path, not the only path - the
+      per-engine adapters above remain first-class for operators
+      who want to keep their existing scheduler. */}
+  <Section
+    eyebrow="Engine-agnostic option"
+    title="z4j-scheduler"
+    subtitle="A separate companion process that fires schedules against any of the six engines. Schedules live in z4j-brain's database; edit from the dashboard, declarative config, or REST without restarting any daemon. Useful when you have multiple engines in one shop, or want a single audit-logged surface for schedule edits across the org."
+  >
+    <a
+      href="/schedulers/z4j-scheduler"
+      class="group block rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 transition-all hover:-translate-y-0.5 hover:border-[var(--color-primary)]/40 hover:shadow-lg hover:shadow-[var(--color-primary)]/5"
+    >
+      <div class="flex items-start gap-4">
+        <span class="inline-flex size-11 flex-shrink-0 items-center justify-center rounded-lg bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
+          <Icon name="clock" size={22} />
+        </span>
+        <div class="min-w-0 flex-1">
+          <div class="mb-2 flex flex-wrap items-baseline gap-2">
+            <h3 class="text-lg font-semibold tracking-tight">z4j-scheduler</h3>
+            <span class="font-mono text-xs text-[var(--color-muted)]">pip install z4j-scheduler</span>
+          </div>
+          <p class="mb-3 text-sm leading-relaxed text-[var(--color-muted)]">
+            Engine-agnostic dispatch (Celery, RQ, Dramatiq, Huey, arq, taskiq).
+            Live edit from dashboard / declarative / REST. Importer + exporter for
+            every native scheduler so you can migrate in or out without lock-in.
+            HA via Postgres advisory-lock leader. Tamper-evident HMAC-chained audit log.
+          </p>
+          <span class="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--color-primary)] transition-transform group-hover:translate-x-0.5">
+            See full comparison
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 5h8m0 0L5 1m4 4L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+        </div>
+      </div>
+    </a>
   </Section>
 
   <Section

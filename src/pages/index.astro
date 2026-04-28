@@ -11,6 +11,7 @@ import { FRAMEWORKS } from "../data/frameworks";
 import { FEATURES } from "../data/features";
 import { DEPLOYMENTS } from "../data/deployments";
 import { COMPETITORS } from "../data/competitors";
+import { Z4J_HEADLINE_VERSION } from "../data/packages";
 
 const deployBadgeClass: Record<string, string> = {
   accent: "bg-[var(--color-accent)]/15 text-[var(--color-accent)]",
@@ -26,7 +27,7 @@ const softwareApplicationSchema = {
   applicationSubCategory: "Task Queue Control Plane",
   operatingSystem: "Linux, macOS, Windows (Docker)",
   description: "Open-source control plane for Python task queues. Unified dashboard for Celery, RQ, Dramatiq, Huey, arq, and taskiq with retry, cancel, bulk-action, reconciliation, and HMAC-chained audit logging.",
-  softwareVersion: "1.0.5",
+  softwareVersion: Z4J_HEADLINE_VERSION,
   url: "https://z4j.com",
   downloadUrl: "https://z4j.com/install",
   license: "https://z4j.com/license",
@@ -47,6 +48,7 @@ const softwareApplicationSchema = {
   author: { "@type": "Organization", name: "z4j", url: "https://z4j.com" },
   featureList: [
     "Unified action surface across 6 task queue engines",
+    "Notifications across email, Slack, PagerDuty, Discord, Telegram, and webhook with per-subscription cooldown and mute",
     "HMAC-chained tamper-evident audit log",
     "Real-time dashboard with WebSocket streaming",
     "Role-based access control (RBAC)",
@@ -265,6 +267,36 @@ pip install z4j-django z4j-celery z4j-celerybeat</code></pre>
     </div>
   </Section>
 
+  {/* z4j-scheduler: dynamic scheduler that drives any of the
+      engines above. Kept compact - the full marketing page is at
+      /schedulers/z4j-scheduler for operators who want to dig in. */}
+  <Section
+    eyebrow="Schedules"
+    title="One scheduler that drives every engine."
+    subtitle="z4j-scheduler is a separate companion process that fires schedules against any of the six engines above. Schedules live in the database; edit from the dashboard, declarative config, or REST without restarting any daemon."
+  >
+    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <Card
+        href="/schedulers/z4j-scheduler"
+        title="z4j-scheduler"
+        icon="clock"
+        description="Engine-agnostic dispatch, live editing, importer + exporter for every native scheduler. See the side-by-side comparison."
+      />
+      <Card
+        href="/schedulers"
+        title="Per-engine adapters"
+        icon="reconciliation"
+        description="Already running celery-beat / rq-scheduler / APScheduler? Surface those existing schedules in the z4j dashboard for gradual migration or permanent coexistence."
+      />
+      <Card
+        href="https://z4j.dev/schedulers/z4j-scheduler/"
+        title="Migration guide"
+        icon="terminal"
+        description="One-shot importers from celery-beat, rq-scheduler, APScheduler, Huey, arq, taskiq, and crontab. Round-trip exporters too."
+      />
+    </div>
+  </Section>
+
   <!-- Unified actions -->
   <Section id="unified" eyebrow="Architecture" title="The same buttons. Every engine." subtitle="Other dashboards hide Retry on Huey, disable Bulk-Retry on arq, grey out Cancel on taskiq. z4j does not. One protocol primitive, one UI, every engine.">
     <div class="grid gap-8 md:grid-cols-[1.1fr_0.9fr] md:items-center">
@@ -296,13 +328,13 @@ pip install z4j-django z4j-celery z4j-celerybeat</code></pre>
   </Section>
 
   <!-- Features -->
-  <Section eyebrow="Platform capabilities" title="What ships in v1.0" subtitle="Everything below is included on day one. No hidden tiers, no enterprise-only gating.">
+  <Section eyebrow="Platform capabilities" title="What's included">
     <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {FEATURES.slice(0, 9).map((f) => (<Card href={`/features/${f.slug}`} title={f.title} icon={f.icon} description={f.tagline} />))}
     </div>
     <div class="mt-8">
       <a href="/features" class="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-primary)] hover:underline">
-        View all 12 capabilities
+        View all 18 capabilities
         <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 5h8m0 0L5 1m4 4L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
     </div>

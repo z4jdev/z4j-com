@@ -71,23 +71,68 @@ export const FEATURES: FeatureMeta[] = [
     ],
   },
   {
-    slug: "notifications",
+    slug: "notification-providers",
     icon: "notifications",
-    title: "Notifications",
-    tagline: "Email, Slack, PagerDuty, Discord, Telegram, webhook.",
+    title: "Notification providers",
+    tagline:
+      "Six native channels. Plug into the stack you already use.",
     summary:
-      "Six native channels and six triggers (task.failed, task.succeeded, task.retried, task.slow, agent.offline, agent.online). Project-scoped channels for the team plus per-user personal channels. Filter by priority, task name pattern, or queue. Every channel has a Test button and SSRF / DNS-pinning protection out of the box.",
+      "Email, Slack, PagerDuty, Discord, Telegram, and generic HTTPS webhook are first-class channels with a shared CRUD surface, the same SSRF and DNS-pinning protection, and a Test button that dispatches a canned payload through the real provider before you save. Project-wide channels for the team plus per-user personal channels using the same schema, so on-call handoffs do not require touching shared config.",
     bullets: [
-      "Six channels: SMTP email, Slack, PagerDuty (Events API v2), Discord, Telegram bot, generic HTTPS webhook with HMAC signing",
-      "Six triggers cover task lifecycle (failed / succeeded / retried / slow) and agent state (online / offline)",
-      "Project + personal channels with the same schema; users mute or cooldown without affecting teammates",
-      "Test endpoint dispatches a canned payload through the real provider so credentials are verified before save",
-      "Delivery audit log captures status, response code, and sanitized error body for every send",
+      "SMTP email with TLS / STARTTLS, 4-port allow-list, masked passwords on read",
+      "Slack incoming webhook with Block Kit formatting",
+      "PagerDuty native Events API v2 with severity_map per trigger and dedup keys that collapse repeats into one incident",
+      "Discord incoming webhook (Slack-compatible payload, auto /slack suffix)",
+      "Telegram bot via sendMessage with regex-validated bot_token and chat_id",
+      "Generic HTTPS webhook with HMAC-SHA256 signature in X-Z4J-Signature for replay-safe receivers",
     ],
     highlights: [
-      "PagerDuty: native Events API v2, severity_map per trigger, dedup keys collapse repeats",
-      "Webhook: HMAC-SHA256 signature in X-Z4J-Signature for replay-safe delivery",
-      "All channels: SSRF + DNS-pin guard against rebind, 16 KiB config cap, 10s/5s HTTP timeouts",
+      "Test endpoint dispatches through the real provider so credentials are verified before save",
+      "SSRF + DNS-pin guard against rebind, 16 KiB config cap, 10s / 5s HTTP timeouts",
+      "Sensitive fields (smtp_pass, hmac_secret, bot_token, integration_key) masked on read; empty PATCH preserves stored value",
+      "Delivery audit log captures status, response code, and sanitized error body for every send",
+    ],
+  },
+  {
+    slug: "notification-levels",
+    icon: "severity",
+    title: "Severity-aware subscriptions",
+    tagline:
+      "Page on critical. Email on warning. Drop info into a Slack channel.",
+    summary:
+      "Every subscription pins a trigger plus a severity tier, then routes to the channel that fits the level. PagerDuty channels accept a per-trigger severity_map (critical / error / warning / info) so task.failed pages oncall while agent.offline only nudges Slack. Combine with priority range, fnmatch task name pattern, and queue filters to narrow the firehose down to exactly what each tier should hear.",
+    bullets: [
+      "Six triggers covering tasks (failed / succeeded / retried / slow) and agents (online / offline)",
+      "Severity tiers: critical / error / warning / info with sensible per-trigger defaults built in",
+      "PagerDuty severity_default plus severity_map per trigger; one channel can route every level correctly",
+      "Filter by priority_min / priority_max range so a low-priority background job never wakes anyone",
+      "fnmatch patterns on task name (billing.*, *.deliver) and exact-match queue filters",
+      "Project default subscriptions act as templates new members inherit; users override their own without affecting the team",
+    ],
+    highlights: [
+      "Defaults are tuned so most operators only paste the integration key and go",
+      "ReDoS-bounded matcher: complex severity_map regex skipped instead of pinning a worker",
+      "Filters evaluated before dispatch, so a muted or out-of-range subscription costs nothing",
+    ],
+  },
+  {
+    slug: "notification-cooldown",
+    icon: "cooldown",
+    title: "Cooldown and mute",
+    tagline: "One bad deploy posts once. Not three hundred times.",
+    summary:
+      "Every subscription has its own cooldown window (0 to 86400 seconds) so a flood of repeated events collapses to a single notification, and a muted_until timestamp so on-call handoffs and maintenance windows are one click away. Per-user controls live alongside per-project ones, so muting your phone for the weekend does not change anyone else's pager.",
+    bullets: [
+      "cooldown_seconds: drop events that arrive within N seconds of the previous matching event for the same subscription",
+      "muted_until: hard-mute until a timestamp; the subscription resumes automatically when the window expires",
+      "Per-user personal subscriptions with their own cooldown and mute, independent of team channels",
+      "PagerDuty dedup_key collapses repeat firings of (project, trigger, task_id) into one incident upstream",
+      "Backpressure-safe dispatch: bounded outbound concurrency (16 per event batch) keeps fan-out from stalling the WebSocket router",
+    ],
+    highlights: [
+      "Cooldown evaluated before dispatch, so dropping costs essentially nothing",
+      "256-task pending cap on the dispatch queue protects the brain under burst load",
+      "Per-IP rate limit on test, import, and bulk endpoints stops accidental amplification",
     ],
   },
   {
@@ -190,6 +235,64 @@ export const FEATURES: FeatureMeta[] = [
     ],
   },
   {
+    slug: "install-pip",
+    icon: "terminal",
+    title: "Pip + SQLite",
+    tagline: "pip install z4j, then z4j serve. Zero containers, zero infra.",
+    summary:
+      "The lightest deployment tier: a single PyPI install with SQLite as the data store. No Postgres, no Docker daemon, no Kubernetes. Right for a homelab Raspberry Pi, a single-developer laptop, a CI worker, or a small team that just wants a working dashboard in five minutes. Same dashboard, same RBAC, same audit log as the production tiers.",
+    bullets: [
+      "Pure Python install via pip; no Docker daemon required",
+      "SQLite by default, optional Postgres at any time without re-onboarding",
+      "First-boot setup wizard mints secrets and writes them to ~/.z4j/secret.env",
+      "127.0.0.1 default bind keeps dev installs off the network",
+      "Identical feature set to the Docker tiers; nothing is gated to paid plans",
+    ],
+    highlights: [
+      "Five-minute install on any machine with Python 3.13+",
+      "Smart buffer-path fallback for service-user installs (gunicorn under www-data)",
+      "z4j doctor runs a connectivity ladder (DNS, TCP, TLS, WebSocket) for triage",
+    ],
+  },
+  {
+    slug: "install-amd64",
+    icon: "cpu-amd64",
+    title: "Docker on x86 / AMD64",
+    tagline: "Standard cloud VMs. Native, not emulated.",
+    summary:
+      "The z4jdev/z4j Docker image is built natively for linux/amd64, so it runs at full speed on any standard cloud VM (AWS EC2, GCP, Azure, Hetzner, DigitalOcean) without QEMU emulation. Same image works under docker compose, systemd, ECS, Cloud Run, Fly, Railway, and Kubernetes. The bare metrics endpoint, audit log verification, and notification channels are identical to the pip tier.",
+    bullets: [
+      "Multi-arch manifest under z4jdev/z4j; AMD64 is the default for all common cloud providers",
+      "Single image carries brain + dashboard + migrations; one container is the whole control plane",
+      "Postgres recommended in this tier; Z4J_DATABASE_URL points at any reachable Postgres",
+      "Works behind Caddy, nginx, Traefik, Cloudflare Tunnel; auto-promotes to production mode when Z4J_PUBLIC_URL is HTTPS and Z4J_ALLOWED_HOSTS is set",
+    ],
+    highlights: [
+      "Native AMD64 build; no QEMU translation overhead",
+      "Versioned tags (z4jdev/z4j:1.0.14) plus rolling latest tag",
+      "GitHub Actions release pipeline publishes new tags within minutes of a release",
+    ],
+  },
+  {
+    slug: "install-arm64",
+    icon: "cpu-arm64",
+    title: "Docker on ARM64",
+    tagline: "Apple Silicon. Raspberry Pi. AWS Graviton. Native, not emulated.",
+    summary:
+      "Same z4jdev/z4j image, second native arch in the manifest: linux/arm64. Apple Silicon (M-series), Raspberry Pi 4 / 5, AWS Graviton, Oracle Ampere, Hetzner ARM all pull the ARM64 layer automatically. Built natively on ubuntu-24.04-arm runners; no QEMU emulation in the build pipeline or at runtime, so cold starts and steady-state CPU match the AMD64 tier.",
+    bullets: [
+      "linux/arm64 layer in the same z4jdev/z4j multi-arch manifest; docker pull picks the right one",
+      "Native ARM build; matches AMD64 performance without emulation overhead",
+      "Good fit for homelab (Pi 4 / Pi 5), edge nodes, and ARM cloud instances",
+      "Identical Postgres / SQLite story as AMD64; data files are arch-agnostic so you can move between them",
+    ],
+    highlights: [
+      "Built on GitHub Actions native ubuntu-24.04-arm runners",
+      "Pi 4 (4 GB) handles a small homelab fleet comfortably",
+      "AWS Graviton instances often beat AMD64 on price / performance",
+    ],
+  },
+  {
     slug: "redis-streams",
     icon: "realtime",
     title: "Real-time dashboard",
@@ -201,6 +304,21 @@ export const FEATURES: FeatureMeta[] = [
       "Replay guard (+/-60s + nonce + monotonic seq)",
       "Session-bound frames (agent reconnect detection)",
       "HTTPS long-poll fallback for restrictive networks",
+    ],
+  },
+  {
+    slug: "dynamic-scheduler",
+    icon: "clock",
+    title: "Dynamic scheduler",
+    tagline: "Edit schedules from the dashboard. Drives every engine.",
+    summary:
+      "z4j-scheduler is a separate companion process that fires schedules against any of the six engines z4j supports. Schedules live in z4j-brain's database and can be edited from the dashboard, declaratively in app config, or via REST without restarting any daemon.",
+    bullets: [
+      "Engine-agnostic dispatch: Celery, RQ, Dramatiq, Huey, arq, taskiq",
+      "Live edit from dashboard, declarative reconciler, or REST",
+      "Per-schedule catch-up policy (skip / fire-one / fire-all)",
+      "Importer + exporter for every native scheduler (no lock-in)",
+      "Postgres advisory-lock leader for HA",
     ],
   },
 ];

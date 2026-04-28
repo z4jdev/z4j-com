@@ -64,8 +64,8 @@ const pillars = [
     id: "actions",
     icon: "reconciliation",
     label: "Actions",
-    desc: "Retry, cancel, bulk-retry, purge, requeue DLQ.",
-    slugs: ["unified-actions", "reconciliation", "worker-restart"],
+    desc: "Retry, cancel, bulk-retry, purge, requeue DLQ. Dynamic scheduler.",
+    slugs: ["unified-actions", "reconciliation", "worker-restart", "dynamic-scheduler"],
   },
   {
     id: "security",
@@ -85,8 +85,19 @@ const pillars = [
     id: "alerts",
     icon: "notifications",
     label: "Alerts",
-    desc: "Email, Slack, PagerDuty, Discord, Telegram, webhook.",
-    slugs: ["notifications"],
+    desc: "Six providers, severity-aware subscriptions, per-channel cooldown.",
+    slugs: [
+      "notification-providers",
+      "notification-levels",
+      "notification-cooldown",
+    ],
+  },
+  {
+    id: "run-anywhere",
+    icon: "run-anywhere",
+    label: "Run anywhere",
+    desc: "Pip + SQLite. Docker AMD64. Docker ARM64. Native, not emulated.",
+    slugs: ["install-pip", "install-amd64", "install-arm64"],
   },
 ];
 
@@ -127,9 +138,9 @@ function featuresFor(slugs: string[]) {
     </nav>
   </PageHero>
 
-  <!-- Four pillars -->
+  <!-- Six pillars in a 3-up grid -->
   <Section compact>
-    <div class="grid gap-px overflow-hidden rounded-lg border border-[var(--color-border)] bg-[var(--color-border)] sm:grid-cols-2 lg:grid-cols-4">
+    <div class="grid gap-px overflow-hidden rounded-lg border border-[var(--color-border)] bg-[var(--color-border)] sm:grid-cols-2 lg:grid-cols-3">
       {pillars.map((p) => (
         <a
           href={`#${p.id}`}

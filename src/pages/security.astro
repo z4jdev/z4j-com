@@ -8,13 +8,13 @@ import CTA from "../components/CTA.astro";
 
 <BaseLayout
   title="Security posture | z4j"
-  description="z4j security posture: HMAC-chained audit log, Argon2id password hashing, defense-in-depth rate limits, redaction pipeline, SSRF hardening, two pre-release audits."
+  description="z4j security posture: HMAC-chained audit log, Argon2id password hashing, defense-in-depth rate limits, redaction pipeline, SSRF hardening, published threat model."
   keywords={["z4j security", "HMAC audit log", "Argon2id hashing", "task queue security", "tamper-evident logs"]}
 >
   <PageHero
     breadcrumb={[{ label: "Security" }]}
-    title="Built for production from day one."
-    subtitle="Two rounds of pre-release security audits. Zero open HIGH or CRITICAL findings. Every control below is enforced end-to-end."
+    title="Security posture"
+    subtitle="The controls below are implemented end-to-end. v1 is a young codebase: we publish our threat model and disclosure process, and we will earn the rest with time and operator feedback."
   />
 
   <Section>
@@ -35,30 +35,25 @@ import CTA from "../components/CTA.astro";
   </Section>
 
   <Section
-    eyebrow="audit trail"
-    title="Pre-release security audits"
-    subtitle="Findings are public. Fixes are in-tree. Methodology is documented."
+    eyebrow="transparency"
+    title="Audit notes"
+    subtitle="We publish our pre-release reviews so you can read what we looked at and what we fixed. They are not a proof of security — only a record of what was checked."
   >
     <div class="grid gap-4 md:grid-cols-2">
       <Card
         href="https://github.com/z4jdev/z4j/blob/main/docs/SECURITY_AUDIT_PRERELEASE.md"
-        title="Pre-release audit"
-        description="Dec 2025 deep pass: OpenAPI-driven auth bypass, IDOR, CSRF, SSRF, XSS, rate limits, HMAC tampering. Zero HIGH/CRITICAL open."
-      />
-      <Card
-        href="https://github.com/z4jdev/z4j/blob/main/docs/SECURITY_AUDIT_FINDINGS.md"
-        title="Prior audit rounds (6 batches)"
-        description="Sept 2025 to Feb 2026, six adversarial audit rounds. All findings closed pre-v1.0."
+        title="Pre-release review"
+        description="Coverage included: auth/session, IDOR, CSRF, SSRF, XSS, rate limits, HMAC handling. Methodology and scope documented."
       />
       <Card
         href="https://github.com/z4jdev/z4j/blob/main/docs/SECURITY_HARDENING_RQ.md"
-        title="z4j-rq hardening"
-        description="Adapter-specific adversarial pass on z4j-rq. 70 unit tests + security scenarios all green."
+        title="z4j-rq notes"
+        description="Adapter-specific review pass on z4j-rq."
       />
       <Card
         href="https://github.com/z4jdev/z4j/blob/main/docs/SECURITY_HARDENING_DRAMATIQ.md"
-        title="z4j-dramatiq hardening"
-        description="Adapter-specific adversarial pass on z4j-dramatiq (including dual-broker Redis + RabbitMQ)."
+        title="z4j-dramatiq notes"
+        description="Adapter-specific review pass on z4j-dramatiq (Redis + RabbitMQ brokers)."
       />
     </div>
   </Section>
