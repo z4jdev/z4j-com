@@ -38,13 +38,10 @@ const softwareApplicationSchema = {
     priceCurrency: "USD",
     availability: "https://schema.org/InStock",
   },
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "4.9",
-    reviewCount: "1",
-    bestRating: "5",
-    worstRating: "1",
-  },
+  // No AggregateRating: Google flags fabricated/single-review ratings as
+  // spammy structured data and the penalty (manual action / suppression
+  // of rich results site-wide) outweighs any benefit. Re-add once we
+  // have real third-party reviews to point at.
   author: { "@type": "Organization", name: "z4j", url: "https://z4j.com" },
   featureList: [
     "Unified action surface across 6 task queue engines",
@@ -56,6 +53,36 @@ const softwareApplicationSchema = {
     "Schedule CRUD (create, edit, delete, trigger)",
     "Secure-by-default secrets redaction",
     "Self-hosted with Docker or Kubernetes",
+  ],
+};
+
+// SoftwareSourceCode helps Google + LLM crawlers connect this landing
+// to the canonical GitHub repo. Same metadata-loop reason GitHub itself
+// emits SoftwareSourceCode for every repo - it's the schema.org type
+// search engines key on for "view code on GitHub" badges and source
+// citations in AI answers.
+const sourceCodeSchema = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  name: "z4j",
+  description: "Open-source control plane for Python task queues. Brain (server + dashboard) is AGPL v3; agents that ship in your worker are Apache 2.0.",
+  codeRepository: "https://github.com/z4jdev",
+  programmingLanguage: ["Python", "TypeScript", "Astro"],
+  runtimePlatform: ["Python 3.11+", "Node.js"],
+  license: "https://www.gnu.org/licenses/agpl-3.0.html",
+  author: { "@type": "Organization", name: "z4j", url: "https://z4j.com" },
+  url: "https://z4j.com",
+  targetProduct: { "@type": "SoftwareApplication", name: "z4j" },
+  keywords: [
+    "Celery dashboard",
+    "Celery monitoring",
+    "Flower alternative",
+    "Celerybeat",
+    "RQ dashboard",
+    "Dramatiq dashboard",
+    "Python task queue",
+    "task queue dashboard",
+    "control plane",
   ],
 };
 
@@ -92,7 +119,7 @@ const faqSchema = {
       name: "What is the license for z4j?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "z4j uses split licensing. The brain (dashboard and backend) is AGPL-3.0. All agent pip packages you install in your application are Apache-2.0, so your application code is never AGPL-tainted. Commercial licenses are available.",
+        text: "z4j uses split licensing. z4j (dashboard and backend) is AGPL-3.0. All agent pip packages you install in your application are Apache-2.0, so your application code is never AGPL-tainted. Commercial licenses are available.",
       },
     },
     {
@@ -108,7 +135,7 @@ const faqSchema = {
       name: "Is z4j production-ready?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes. z4j 1.0.5 has passed two rounds of pre-release security audits plus a full v1.0.5 end-to-end audit (44/44 checks across CLI surface, lifecycle, server runtime, UX flows, state recovery, and security). Argon2id password hashing, HMAC-signed wire protocol, defense-in-depth rate limits, SSRF-hardened external calls.",
+        text: "Yes. z4j 1.4.0 is the current baseline. Argon2id password hashing, HMAC v1 audit-log chain, defense-in-depth rate limits, SSRF-hardened external calls, HTTPS-only webhooks by default, 3-of-4 character-class password policy enforced on every write path. 702 brain unit tests + 2,129 tests across the workspace.",
       },
     },
     {
@@ -127,7 +154,7 @@ const faqSchema = {
   title="z4j | Control plane for Python task queues"
   description="Open-source dashboard and control plane for Celery, RQ, Dramatiq, Huey, arq, and taskiq. Retry, cancel, bulk-action across every Python task engine. Self-hosted."
   keywords={["task queue dashboard", "Celery UI", "RQ dashboard", "Dramatiq monitoring", "task retry", "bulk retry", "HMAC audit log"]}
-  jsonLd={[softwareApplicationSchema, faqSchema]}
+  jsonLd={[softwareApplicationSchema, sourceCodeSchema, faqSchema]}
 >
 
   <!-- Hero -->
@@ -145,9 +172,12 @@ const faqSchema = {
       </p>
 
       <div class="mt-8 flex flex-wrap items-center gap-3">
-        <a href="/install" class="inline-flex items-center rounded-lg bg-[var(--color-primary)] px-6 py-3 text-sm font-semibold text-white hover:opacity-90 transition-opacity">
-          Get started
+        <a href="https://demo.z4j.dev" class="inline-flex items-center rounded-lg bg-[var(--color-primary)] px-6 py-3 text-sm font-semibold text-white hover:opacity-90 transition-opacity">
+          Try the live demo
           <svg class="ml-2 size-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </a>
+        <a href="/install" class="inline-flex items-center rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-3 text-sm font-semibold hover:border-[var(--color-primary)]/50 transition-colors">
+          Install z4j
         </a>
         <a href="https://z4j.dev" class="inline-flex items-center rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-3 text-sm font-semibold hover:border-[var(--color-primary)]/50 transition-colors">Read the docs</a>
         <a href="https://github.com/z4jdev" class="inline-flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-3 text-sm font-semibold hover:border-[var(--color-primary)]/50 transition-colors">
@@ -155,6 +185,11 @@ const faqSchema = {
           Star on GitHub
         </a>
       </div>
+      <p class="mt-3 text-xs text-[var(--color-muted)]">
+        Demo opens with one click into a populated dashboard
+        (4 sample projects, fake data, no install). Mutations
+        toast-block: it's a navigable preview, not a sandbox.
+      </p>
 
       <div class="mt-6 flex flex-wrap items-center gap-4 text-xs text-[var(--color-muted)]">
         <span class="flex items-center gap-1.5"><Icon name="shield" size={14} class="text-[var(--color-accent)]" /> AGPL-3.0 brain</span>
@@ -302,7 +337,7 @@ pip install z4j-django z4j-celery z4j-celerybeat</code></pre>
     <div class="grid gap-8 md:grid-cols-[1.1fr_0.9fr] md:items-center">
       <div class="space-y-4">
         <p class="text-[var(--color-muted)] leading-relaxed">Engine adapters implement one universal primitive, <code class="rounded bg-[var(--color-surface-raised)] px-1.5 py-0.5 font-mono text-sm">submit_task(name, args, kwargs)</code>, that every task queue can satisfy.</p>
-        <p class="text-[var(--color-muted)] leading-relaxed">When the brain is asked to <em>retry</em> a Huey task, it reads the original args from its own <code class="rounded bg-[var(--color-surface-raised)] px-1.5 py-0.5 font-mono text-sm">tasks</code> table and lowers the action to <code class="rounded bg-[var(--color-surface-raised)] px-1.5 py-0.5 font-mono text-sm">submit_task</code>. The user never knows the difference.</p>
+        <p class="text-[var(--color-muted)] leading-relaxed">When z4j is asked to <em>retry</em> a Huey task, it reads the original args from its own <code class="rounded bg-[var(--color-surface-raised)] px-1.5 py-0.5 font-mono text-sm">tasks</code> table and lowers the action to <code class="rounded bg-[var(--color-surface-raised)] px-1.5 py-0.5 font-mono text-sm">submit_task</code>. The user never knows the difference.</p>
         <ul class="mt-4 space-y-2.5 text-sm">
           <li class="flex items-start gap-2.5"><Icon name="check" size={16} class="mt-0.5 text-[var(--color-accent)] shrink-0" /><span><strong>Retry / Bulk-Retry / DLQ-Requeue</strong> polyfilled on every engine</span></li>
           <li class="flex items-start gap-2.5"><Icon name="check" size={16} class="mt-0.5 text-[var(--color-accent)] shrink-0" /><span><strong>Cancel</strong> native on 5 engines</span></li>
@@ -388,7 +423,7 @@ pip install z4j-django z4j-celery z4j-celerybeat</code></pre>
       <Card title="HMAC-chained audit log" icon="audit-log" description="Per-row HMAC plus prev_row_hmac chain. Tamper-evident against DBA-level row deletions." />
       <Card title="Defense-in-depth rate limits" icon="rate-limiting" description="IP buckets on login (20/min), invitations (30/min), password-reset (10/min). Inline pruning, bounded memory." />
       <Card title="Argon2id password hashing" icon="password-reset" description="64 MiB memory, 3 iterations. Policy: 3-of-4 character classes plus ~1,500-entry denylist." />
-      <Card title="Redaction pipeline" icon="redaction" description="Recursive scrubber at the agent, defense-in-depth re-scrub on the brain. Zero unredacted args on the wire." />
+      <Card title="Redaction pipeline" icon="redaction" description="Recursive scrubber at the agent, defense-in-depth re-scrub on z4j. Zero unredacted args on the wire." />
       <Card title="Wire-protocol HMAC" icon="key" description="Every frame signed (HMAC v2). Replay guard (+/-60s + nonce + monotonic seq). Session-bound." />
       <Card title="SSRF-hardened" icon="shield" description="Private-IP block + DNS-rebinding resolve-before-dial + scheme allow-list for webhooks, SMTP hosts, and channel URLs." />
     </div>
