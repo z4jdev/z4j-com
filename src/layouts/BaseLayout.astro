@@ -3,6 +3,7 @@ import "../styles/global.css";
 import SiteNav from "../components/SiteNav.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import SEO from "../components/SEO.astro";
+import ConsentBanner from "../components/ConsentBanner.astro";
 
 interface Props {
   title: string;
@@ -61,6 +62,37 @@ const {
         document.documentElement.setAttribute('data-theme',t);
       })();
     </script>
+
+    {/* Google Analytics 4 with Consent Mode v2.
+        Default consent is denied for everything; the gtag.js
+        script still loads and sends cookieless pings so basic
+        pageview counts surface in GA4 even before the user
+        interacts with the consent banner. Once the visitor
+        clicks Accept in the ConsentBanner, gtag('consent',
+        'update', ...) flips analytics_storage to granted and
+        full GA tracking engages. Visitors who Decline keep the
+        default-denied state permanently (persisted in
+        localStorage under z4j-consent). */}
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('consent', 'default', {
+        'analytics_storage': 'denied',
+        'ad_storage': 'denied',
+        'ad_user_data': 'denied',
+        'ad_personalization': 'denied',
+        'wait_for_update': 500
+      });
+      try {
+        var c = localStorage.getItem('z4j-consent');
+        if (c === 'granted') {
+          gtag('consent', 'update', { 'analytics_storage': 'granted' });
+        }
+      } catch (e) {}
+      gtag('js', new Date());
+      gtag('config', 'G-EBT7XX96WM');
+    </script>
+    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-EBT7XX96WM"></script>
   </head>
   <body class="min-h-screen flex flex-col">
     <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:bg-[var(--color-primary)] focus:px-3 focus:py-2 focus:text-white focus:text-sm">
@@ -71,5 +103,6 @@ const {
       <slot />
     </main>
     <SiteFooter />
+    <ConsentBanner />
   </body>
 </html>
