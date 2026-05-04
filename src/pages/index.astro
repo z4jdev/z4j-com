@@ -176,13 +176,28 @@ const faqSchema = {
           Install z4j
           <svg class="ml-2 size-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
         </a>
-        <a href="https://demo.z4j.dev" class="inline-flex items-center rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-3 text-sm font-semibold hover:border-[var(--color-primary)]/50 transition-colors">
-          Try the live demo
+        <a
+          href="https://demo.z4j.dev"
+          target="_blank"
+          rel="noopener"
+          class="demo-cta group relative inline-flex items-center gap-2 overflow-hidden rounded-lg px-6 py-3 text-sm font-semibold text-[var(--color-fg)] transition-all hover:scale-[1.02] hover:text-white"
+        >
+          <span aria-hidden="true" class="demo-cta-bg"></span>
+          <span aria-hidden="true" class="demo-cta-shimmer"></span>
+          <span class="relative z-10 flex items-center gap-2">
+            <span aria-hidden="true" class="demo-cta-dot"></span>
+            Try the live demo
+            <Icon name="external" size={14} class="opacity-70 transition-opacity group-hover:opacity-100" />
+          </span>
         </a>
-        <a href="https://z4j.dev" class="inline-flex items-center rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-3 text-sm font-semibold hover:border-[var(--color-primary)]/50 transition-colors">Read the docs</a>
-        <a href="https://github.com/z4jdev" class="inline-flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-3 text-sm font-semibold hover:border-[var(--color-primary)]/50 transition-colors">
+        <a href="https://z4j.dev" target="_blank" rel="noopener" class="inline-flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-3 text-sm font-semibold hover:border-[var(--color-primary)]/50 transition-colors">
+          Read the docs
+          <Icon name="external" size={14} class="opacity-70" />
+        </a>
+        <a href="https://github.com/z4jdev" target="_blank" rel="noopener" class="inline-flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-3 text-sm font-semibold hover:border-[var(--color-primary)]/50 transition-colors">
           <Icon name="github" size={16} />
           Star on GitHub
+          <Icon name="external" size={14} class="opacity-70" />
         </a>
       </div>
       <p class="mt-3 text-xs text-[var(--color-muted)]">
@@ -191,6 +206,86 @@ const faqSchema = {
         install). Mutations toast-block: it's a navigable preview,
         not a sandbox.
       </p>
+
+      <style>
+        /* Magical demo CTA: gradient halo + slow shimmer + live-pulse dot.
+           Outline-feel default that fills with gradient on hover, so it
+           reads as secondary against the primary Install button without
+           feeling plain. */
+        .demo-cta {
+          border: 1px solid color-mix(in oklch, var(--color-primary) 35%, var(--color-border));
+          background: var(--color-surface);
+          box-shadow: 0 0 0 0 color-mix(in oklch, var(--color-primary) 0%, transparent);
+        }
+        .demo-cta:hover {
+          border-color: color-mix(in oklch, var(--color-primary) 70%, transparent);
+          box-shadow: 0 6px 24px -8px color-mix(in oklch, var(--color-primary) 60%, transparent);
+        }
+        .demo-cta-bg {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(
+            120deg,
+            color-mix(in oklch, var(--color-primary) 90%, transparent) 0%,
+            color-mix(in oklch, var(--color-accent) 85%, transparent) 100%
+          );
+          opacity: 0;
+          transition: opacity 0.2s ease;
+        }
+        .demo-cta:hover .demo-cta-bg {
+          opacity: 1;
+        }
+        /* Slow shimmer sweeping across the button, only when hovered. */
+        .demo-cta-shimmer {
+          position: absolute;
+          top: 0;
+          left: -120%;
+          width: 60%;
+          height: 100%;
+          background: linear-gradient(
+            120deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.25) 50%,
+            transparent 100%
+          );
+          opacity: 0;
+          transition: opacity 0.2s ease;
+        }
+        .demo-cta:hover .demo-cta-shimmer {
+          opacity: 1;
+          animation: demo-cta-shimmer 1.4s linear infinite;
+        }
+        @keyframes demo-cta-shimmer {
+          to {
+            left: 120%;
+          }
+        }
+        /* Live-pulse dot: green, gently pulses to signal "this is live
+           and clickable right now". */
+        .demo-cta-dot {
+          display: inline-block;
+          width: 0.5rem;
+          height: 0.5rem;
+          border-radius: 9999px;
+          background: oklch(0.72 0.18 150);
+          box-shadow: 0 0 0 0 oklch(0.72 0.18 150 / 0.6);
+          animation: demo-cta-pulse 1.8s ease-in-out infinite;
+        }
+        @keyframes demo-cta-pulse {
+          0%, 100% {
+            box-shadow: 0 0 0 0 oklch(0.72 0.18 150 / 0.6);
+          }
+          50% {
+            box-shadow: 0 0 0 6px oklch(0.72 0.18 150 / 0);
+          }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .demo-cta-dot,
+          .demo-cta-shimmer {
+            animation: none;
+          }
+        }
+      </style>
 
       <div class="mt-6 flex flex-wrap items-center gap-4 text-xs text-[var(--color-muted)]">
         <span class="flex items-center gap-1.5"><Icon name="shield" size={14} class="text-[var(--color-accent)]" /> AGPL-3.0 brain</span>
