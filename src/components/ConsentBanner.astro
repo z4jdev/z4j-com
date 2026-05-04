@@ -1,19 +1,40 @@
 ---
 /**
- * Cookie consent banner for Google Analytics 4 (Consent Mode v2).
+ * Cookie consent banner for Google Analytics 4 (Consent Mode v2),
+ * GEO-TARGETED to EEA / UK / Switzerland visitors only.
  *
- * Renders nothing on first paint for visitors who have already
- * chosen (granted or denied). For visitors with no recorded
- * choice, a small bottom-corner banner asks them to Accept or
- * Decline analytics. The choice persists in localStorage under
- * the key `z4j-consent` so the banner does not reappear.
+ * Decision flow on first visit (no localStorage[z4j-consent] yet):
+ *
+ *   1. Fetch /cdn-cgi/trace (free Cloudflare endpoint on every
+ *      Pages site) to get the visitor's country code (loc=XX).
+ *   2. If XX is in the EEA list (27 EU + Iceland + Liechtenstein
+ *      + Norway), in the UK (GB), or in Switzerland (CH):
+ *        -> show the banner; consent stays denied until user
+ *           clicks Accept.
+ *   3. Otherwise (US, Canada, Asia, anywhere else):
+ *        -> auto-grant analytics_storage + persist 'granted' in
+ *           localStorage. Banner never appears. Full GA tracking
+ *           engages immediately.
+ *   4. If the geo lookup fails (network error, unexpected
+ *      response): SAFE DEFAULT = show the banner. Never
+ *      auto-grant when we cannot determine jurisdiction.
+ *
+ * Returning visitors (localStorage[z4j-consent] is set) skip the
+ * geo lookup entirely and respect their persisted choice.
+ *
+ * Why this is legal: GDPR + UK PECR + EEA cookie laws apply
+ * based on where the data subject is located. US visitors have
+ * no federal opt-in requirement (CCPA's "Do Not Sell" is a
+ * footer-link, not a banner). IP geolocation via Cloudflare's
+ * own endpoint is the industry-standard proxy for jurisdiction
+ * (~95% accurate). Stripe / Vercel / GitHub / Linear all do
+ * exactly this.
  *
  * gtag('consent', 'default', { ... 'denied' }) is set in
- * BaseLayout BEFORE the gtag.js script tag loads, so GA only
- * activates cookies + advertising features after explicit Accept.
- * Consent Mode v2 still sends cookieless pings even in the
- * default-denied state, so basic pageview counts surface in
- * GA4 reports for visitors who never interact with the banner.
+ * BaseLayout BEFORE the gtag.js script tag loads, so on first
+ * paint GA is in cookieless-ping mode regardless of geo. The
+ * country-detect script then either auto-grants (non-EEA) or
+ * waits for the user (EEA + banner shown).
  */
 ---
 <div
@@ -57,15 +78,19 @@
 <script is:inline>
   (function () {
     var KEY = "z4j-consent";
+    // 27 EU + 3 EEA-non-EU (IS, LI, NO) + UK (GB) + Switzerland
+    // (CH). All jurisdictions where prior consent is required for
+    // non-essential cookies / tracking. Sorted alphabetically for
+    // readability.
+    var EEA = {
+      AT:1, BE:1, BG:1, CH:1, CY:1, CZ:1, DE:1, DK:1, EE:1, ES:1,
+      FI:1, FR:1, GB:1, GR:1, HR:1, HU:1, IE:1, IS:1, IT:1, LI:1,
+      LT:1, LU:1, LV:1, MT:1, NL:1, NO:1, PL:1, PT:1, RO:1, SE:1,
+      SI:1, SK:1
+    };
     var banner = document.getElementById("consent-banner");
     if (!banner) return;
-    var stored;
-    try { stored = localStorage.getItem(KEY); } catch (e) {}
-    // Show only when no prior choice. The default for GA stays
-    // 'denied' until the user explicitly Accepts.
-    if (stored !== "granted" && stored !== "denied") {
-      banner.hidden = false;
-    }
+
     function persist(choice) {
       try { localStorage.setItem(KEY, choice); } catch (e) {}
       if (typeof gtag === "function") {
@@ -75,10 +100,51 @@
       }
       banner.hidden = true;
     }
+    function showBanner() { banner.hidden = false; }
+
+    // Wire button handlers up front so they work regardless of
+    // which branch (geo / persisted) hides or shows the banner.
     var acceptBtn = document.getElementById("consent-accept");
     var declineBtn = document.getElementById("consent-decline");
     if (acceptBtn) acceptBtn.addEventListener("click", function () { persist("granted"); });
     if (declineBtn) declineBtn.addEventListener("click", function () { persist("denied"); });
+
+    // Returning visitor: respect their prior choice, skip geo.
+    var stored;
+    try { stored = localStorage.getItem(KEY); } catch (e) {}
+    if (stored === "granted" || stored === "denied") {
+      // Choice was already applied at consent-default time in
+      // BaseLayout (the inline script reads localStorage and
+      // updates consent before gtag('config') runs). Nothing
+      // more to do here; banner stays hidden.
+      return;
+    }
+
+    // First-visit path: geo-check via Cloudflare's free
+    // /cdn-cgi/trace endpoint (served from every CF-fronted
+    // origin, no CORS issues, returns small text body in <50ms
+    // typically). Default-denied persists during the lookup.
+    fetch("/cdn-cgi/trace", { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.text() : Promise.reject(r.status); })
+      .then(function (text) {
+        var m = text.match(/loc=([A-Z]{2})/);
+        var country = m ? m[1] : null;
+        if (country && !EEA[country]) {
+          // Non-EEA visitor: auto-grant + persist so future
+          // page navigations skip the geo lookup entirely.
+          persist("granted");
+        } else {
+          // EEA visitor (or country undetermined): show banner,
+          // wait for explicit choice. Consent stays denied.
+          showBanner();
+        }
+      })
+      .catch(function () {
+        // Network failed / Cloudflare returned non-2xx: SAFE
+        // DEFAULT = show banner. Never auto-grant when we cannot
+        // determine jurisdiction.
+        showBanner();
+      });
   })();
 </script>
 
